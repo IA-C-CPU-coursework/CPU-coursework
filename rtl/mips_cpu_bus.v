@@ -15,8 +15,6 @@ module mips_cpu_bus(
     input logic[31:0] readdata
     );
     
-    logic [31:0][31:0] registers;
-    logic [31:0] pc;
 
     wire [5:0] opcode = address[31:26];
     wire [25:0] jump_address = readdata[25:0];
