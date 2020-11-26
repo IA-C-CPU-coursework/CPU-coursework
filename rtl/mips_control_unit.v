@@ -1,31 +1,48 @@
 module control(
-    input[2:0] opcode, 
-    input reset,
-    output  // Determine output signals that must be controlled
-)
-always_comb begin
-    if (reset == 1) begin
+    input instruction[31:0],
+// Determine output signals that must be controlled
 
+    output RegWrite, MemWrite, ALUSrc, ALUControl, 
+    
+);
+    //MAKE SURE TO CHANGE WIRE NAME OF THINGY
+    wire opcode = instruction [31:26];
+    wire FuncCode = instruction [5:0];
+/*    
+always @(reset) begin
+    if(reset==1) begin
+    #1
+        if (reset==1) begin
+            
+        end
     end
-    else begin
-        case(opcode)
-        0: begin //add
-            
-        end
-        1: begin //sli
-            
-        end
-        2: begin //jump
-            
-        end
-        3: begin // jump and link
-            
-        end
-        4: begin
-            
-        end
-        5: begin
-            
-        end // etc
+end */
+    
+always_comb begin
+    if (opcode == 0 && FuncCode == 6'b100001) begin //ADDU
+        //SET CONTROLS
+    end
+    
+    else if (opcode == 6'b001001) begin //ADDIU
+    end
+    else if (opcode == 0 && FuncCode == 6'b100100) begin //AND
+    end
+    else if (opcode == 6'b001100) begin //ANDI
+    end
+    else if () begin //BEQ
+    end
+    else if () begin
+    end
+    else if () begin
+    end
+    else if () begin
+    end
+    else if () begin
+    end
+    else if () begin
+    end
+    else if () begin
+    end
+    else if () begin
     end
 end
