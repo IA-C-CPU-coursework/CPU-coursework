@@ -9,14 +9,7 @@ module control(
     wire opcode = instruction [31:26];
     wire FuncCode = instruction [5:0];
 /*    
-always @(reset) begin
-    if(reset==1) begin
-    #1
-        if (reset==1) begin
-            
-        end
-    end
-end */
+
     
 always_comb begin
     if (opcode == 0 && FuncCode == 6'b100001) begin //ADDU

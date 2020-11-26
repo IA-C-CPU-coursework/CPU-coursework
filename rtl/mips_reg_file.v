@@ -19,13 +19,10 @@ assign registers[0] = 0; // Hardwired to 0
 // When reset is high set all registers to zero    
 always_comb begin   
     if (reset) begin
-        #1 if (reset) begin // Makes sure reset is high for one clock cycle
-            int i;
-            for (i=0;i<32;i++) begin
-                registers[i] = 0;
-            end
-
-        end
+        int i;
+        for (i=0;i<32;i++) begin
+            registers[i] = 0;
+        end  
     end
 end
 
