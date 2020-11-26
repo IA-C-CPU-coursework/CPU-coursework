@@ -29,7 +29,11 @@ always_comb begin
     end
     else if (opcode == 6'b001100) begin //ANDI
     end
-    else if () begin //BEQ
+    else if (opcode == 6'b000100) begin //BEQ
+    end
+    else if (opcode == 6'b000001 ) begin //BGEZ
+    end
+    else if (opcode == 6'b000001) begin //BGEZAL
     end
     else if () begin
     end
@@ -39,10 +43,6 @@ always_comb begin
     end
     else if () begin
     end
-    else if () begin
-    end
-    else if () begin
-    end
-    else if () begin
+    else if (opcode == 6'bxxxxxx) begin
     end
 end
