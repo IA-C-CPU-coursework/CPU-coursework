@@ -14,7 +14,6 @@ always_comb begin
     2: ALUout = A+B;
     6: ALUout = A-B;
     7: ALUout = A<B;
-    12: ALUout = ~(A|B);
     default: ALUout = 0;
     endcase
 end
