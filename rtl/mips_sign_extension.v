@@ -3,6 +3,6 @@ module mips_sign_extension(
     output [31:0] o
     );
 
-    assign out[15:0] = in[15:0];
-    assign out[31:16] = in[15];
+    assign o[15:0] = i[15:0];
+    assign o[31:16] = i[15];
 endmodule
