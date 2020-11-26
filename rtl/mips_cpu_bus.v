@@ -19,8 +19,6 @@ module mips_cpu_bus(
     wire [5:0] opcode = address[31:26];
     wire [25:0] jump_address = readdata[25:0];
 
-     /* $0 is hardwired to 0 and 31 is a link register */
-    assign registers[0] = 0;
 
     always_comb begin
         

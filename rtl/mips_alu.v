@@ -1,8 +1,8 @@
 module ALU(
-    input [3:0] ALUcontrol;
-    input [31:0] A,B;
-    output [31:0] ALUout;
-    output isZero;
+    input [2:0] ALUcontrol,
+    input [31:0] A,B,
+    output [31:0] ALUout,
+    output isZero
     );
 
 assign isZero = (ALUout==0);

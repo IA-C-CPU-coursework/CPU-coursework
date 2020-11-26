@@ -10,12 +10,15 @@ module RegFile(
 
 );
 
-logic [31:0][31:0] registers;
-
+logic [0:31][31:0] registers;
+assign registers[0] = 0; // Hardwired to 0
 
 always_ff (@posedge CLK) begin
     if(RegWrite) begin
-        registers[WriteAddress] <= DataIn;
+        if(WriteAddress!=0) begin
+            registers[WriteAddress] <= DataIn;
+        end
+        
     end
     if(!RegWrite) begin
         DataOut1 <= registers[Address1];

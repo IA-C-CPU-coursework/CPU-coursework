@@ -1,5 +1,5 @@
 module SignExtension(
-    input [16:0] i,
+    input [15:0] i,
     output [31:0] o
     );
 
