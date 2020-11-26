@@ -1,5 +1,5 @@
 module RegFile(
-    input reset;
+    input rst;
     input CLK;
     input WriteAddress; // Which Register to write to
     input RegWrite; // Write enable
@@ -18,7 +18,7 @@ assign registers[0] = 0; // Hardwired to 0
 
 // When reset is high set all registers to zero    
 always_comb begin   
-    if (reset) begin
+    if (rst) begin
         int i;
         for (i=0;i<32;i++) begin
             registers[i] = 0;
