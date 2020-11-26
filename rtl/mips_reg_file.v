@@ -17,11 +17,11 @@ always_ff (@posedge CLK) begin
     if(RegWrite) begin
         if(WriteAddress!=0) begin
             registers[WriteAddress] <= DataIn;
+            end
         end
-        
     end
-    if(!RegWrite) begin
-        DataOut1 <= registers[Address1];
-        DataOut2 <= registers[Address2];
-    end
-end
+    
+assign DataOut1 = registers[Address1];
+assign DataOut2 = registers[Address2];
+    
+endmodule
