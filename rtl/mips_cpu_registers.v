@@ -28,10 +28,13 @@ always @(reset) begin
     end
 end
 
+// Use always_ff when simulating flip flops
 always @(posedge clk) begin
     if(reset == 0) begin
         memory[write_r] = write_data;
     end
 end
+    
+// I believe that these two lines should be set on posedge clock please correct me if wrong   
 assign data_r1 = memory[read_r1];
 assign data_r2 = memory[read_r2];
