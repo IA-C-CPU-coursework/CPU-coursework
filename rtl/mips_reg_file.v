@@ -1,13 +1,13 @@
-module RegFile(
-    input rst;
-    input CLK;
-    input WriteAddress; // Which Register to write to
-    input RegWrite; // Write enable
-    input [31:0] DataIn; // Data to write to reg
-    input [5:0] Address1; // Reg numbers
-    input [5:0] Address2;
-    output [31:0] DataOut1; // Output data for respective registers
-    output [31:0] DataOut2;
+module mips_reg_file(
+    input rst,
+    input CLK,
+    input WriteAddress, // Which Register to write to
+    input RegWrite, // Write enable
+    input [31:0] DataIn, // Data to write to reg
+    input [5:0] Address1, // Reg numbers
+    input [5:0] Address2,
+    output [31:0] DataOut1, // Output data for respective registers
+    output [31:0] DataOut2
 
 );
 
