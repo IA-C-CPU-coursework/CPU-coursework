@@ -8,109 +8,113 @@ module control(
     //MAKE SURE TO CHANGE WIRE NAME OF THINGY
     wire opcode = instruction [31:26];
     wire FuncCode = instruction [5:0];
-/*    
+
 
     
 always_comb begin
-    if (opcode == 0 && FuncCode == 6'b100001) begin //ADDU
-        //SET CONTROLS
+    case(opcode)
+    6'b000000: begin //Opcode == 0 (ADDU, AND)
+        if (FuncCode == 6'b100001) begin //ADDU
+        
+        end
+        else if (FuncCode == 6'b100100) begin // AND
+        end
     end
-    else if (opcode == 6'b001001) begin //ADDIU
+    6'b001001: begin //ADDIU
+        
     end
-    else if (opcode == 0 && FuncCode == 6'b100100) begin //AND
+
+    6'b001100: begin //ANDI
     end
-    else if (opcode == 6'b001100) begin //ANDI
+    6'b000100: begin //BEQ
     end
-    else if (opcode == 6'b000100) begin //BEQ
+    6'b000001: begin //BGEZ
     end
-    else if (opcode == 6'b000001 ) begin //BGEZ
+    6'b000001 begin //BGEZAL
     end
-    else if (opcode == 6'b000001) begin //BGEZAL
+    6'bxxxxxx: begin //BGTZ
     end
-    else if (opcode == 6'bxxxxxx) begin //BGTZ
+    6'bxxxxxx: begin //BLEZ
     end
-    else if (opcode == 6'bxxxxxx) begin //BLEZ
+    6'bxxxxxx: begin //BLTZ
     end
-    else if (opcode == 6'bxxxxxx) begin //BLTZ
+    6'bxxxxxx: begin//BLTZAL
     end
-    else if (opcode == 6'bxxxxxx) begin//BLTZAL
+    6'bxxxxxx: begin //BNE
     end
-    else if (opcode == 6'bxxxxxx) begin //BNE
+    6'bxxxxxx: begin //DIV
     end
-    else if (opcode == 6'bxxxxxx) begin //DIV
+    6'bxxxxxx: begin //DIVU
     end
-    else if (opcode == 6'bxxxxxx) begin //DIVU
+    6'bxxxxxx: begin //J
     end
-    else if (opcode == 6'bxxxxxx) begin //J
+    6'bxxxxxx: begin //JALR
     end
-    else if (opcode == 6'bxxxxxx) begin //JALR
+    6'bxxxxxx: begin //JAL
     end
-    else if (opcode == 6'bxxxxxx) begin //JAL
+    6'bxxxxxx: begin //JR
     end
-    else if (opcode == 6'bxxxxxx) begin //JR
+    6'bxxxxxx: begin //LB
     end
-    else if (opcode == 6'bxxxxxx) begin //LB
+    6'bxxxxxx: begin //LBU
     end
-    else if (opcode == 6'bxxxxxx) begin //LBU
+    6'bxxxxxx: begin //LH
     end
-    else if (opcode == 6'bxxxxxx) begin //LH
+    6'bxxxxxx: begin //LHU
     end
-    else if (opcode == 6'bxxxxxx) begin //LHU
+    6'bxxxxxx: begin //LUI
     end
-    else if (opcode == 6'bxxxxxx) begin //LUI
+    6'bxxxxxx: begin //LW
     end
-    else if (opcode == 6'bxxxxxx) begin //LW
+    6'bxxxxxx: begin //LWL
     end
-    else if (opcode == 6'bxxxxxx) begin //LWL
+    6'bxxxxxx: begin //LWR
     end
-    else if (opcode == 6'bxxxxxx) begin //LWR
+    6'bxxxxxx: begin //MTHI
     end
-    else if (opcode == 6'bxxxxxx) begin //MTHI
+    6'bxxxxxx: begin //MTLO
     end
-    else if (opcode == 6'bxxxxxx) begin //MTLO
+    6'bxxxxxx: begin //MULT
     end
-    else if (opcode == 6'bxxxxxx) begin //MULT
+    6'bxxxxxx: begin //MULTU
     end
-    else if (opcode == 6'bxxxxxx) begin //MULTU
+    6'bxxxxxx: begin //OR
     end
-    else if (opcode == 6'bxxxxxx) begin //OR
+    6'bxxxxxx: begin //ORI
     end
-    else if (opcode == 6'bxxxxxx) begin //ORI
+    6'bxxxxxx: begin //SB
     end
-    else if (opcode == 6'bxxxxxx) begin //SB
+    6'bxxxxxx: begin //SH
     end
-    else if (opcode == 6'bxxxxxx) begin //SH
+    6'bxxxxxx: begin //SLL
     end
-    else if (opcode == 6'bxxxxxx) begin //SLL
+    6'bxxxxxx: begin //SLLV
     end
-    else if (opcode == 6'bxxxxxx) begin //SLLV
+    6'bxxxxxx: begin //SLT
     end
-    else if (opcode == 6'bxxxxxx) begin //SLT
+    6'bxxxxxx: begin //SLTI
     end
-    else if (opcode == 6'bxxxxxx) begin //SLTI
+    6'bxxxxxx: begin //SLTIU
     end
-    else if (opcode == 6'bxxxxxx) begin //SLTIU
+    6'bxxxxxx: begin //SLTU
     end
-    else if (opcode == 6'bxxxxxx) begin //SLTU
+    6'bxxxxxx: begin //SRA
     end
-    else if (opcode == 6'bxxxxxx) begin //SRA
+    6'bxxxxxx: begin //SRAV
     end
-    else if (opcode == 6'bxxxxxx) begin //SRAV
+    6'bxxxxxx: begin //SRL
     end
-    else if (opcode == 6'bxxxxxx) begin //SRL
+    6'bxxxxxx: begin //SRLV
     end
-    else if (opcode == 6'bxxxxxx) begin //SRLV
+    6'bxxxxxx: begin //SUBU
     end
-    else if (opcode == 6'bxxxxxx) begin //SUBU
+    6'bxxxxxx: begin //SW
     end
-    else if (opcode == 6'bxxxxxx) begin //SW
+    6'bxxxxxx: begin //XOR
     end
-    else if (opcode == 6'bxxxxxx) begin //XOR
+    6'bxxxxxx: begin //XORI
     end
-    else if (opcode == 6'bxxxxxx) begin //XORI
-    end
-    else begin
-    end
+    endcase
 
 
 end
