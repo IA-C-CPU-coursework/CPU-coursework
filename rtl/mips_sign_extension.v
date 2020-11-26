@@ -1,4 +1,4 @@
-module SignExtension(
+module mips_sign_extension(
     input [15:0] i,
     output [31:0] o
     );
