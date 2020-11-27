@@ -1,3 +1,11 @@
+/*
+Questions for DT:
+
+
+*/
+
+
+
 module mips_cpu_bus(
     /* Standard signals */
     input logic clk,
@@ -15,19 +23,72 @@ module mips_cpu_bus(
     input logic[31:0] readdata
     );
     
-
+    logic [7:0] pc = 0;
+    wire pc_next = pc+1;
     wire [5:0] opcode = address[31:26];
     wire [25:0] jump_address = readdata[25:0];
+    logic resetlastclock = 0;
 
-     /* $0 is hardwired to 0 and 31 is a link register */
-    assign registers[0] = 0;
+    typedef enum logic[2:0] {
+        FETCH_INSTR_ADDR = 3'b000,
+        FETCH_INSTR_DATA = 3'b001,
+        EXEC_INSTR_ADDR  = 3'b010,
+        EXEC_INSTR_DATA  = 3'b011,
+        HALTED =      3'b100,
+        WAITING = 3'b101
+    } state_t;
+
+    state_t state;
+
+    always @(posedge clk) begin
+        if(reset) begin
+            if(resetlastclock) begin
+                //RESET THE REGISTERS 
+                $display("CPU : Resetting.");
+                pc <= 32'hBFC00000; //Reset vector 
+            end
+            else begin
+                resetlastclock <= 1;
+            end
+        end
+
+        else begin
+            resetlastclock <= 0;
+
+            case(state)
+                FETCH_INSTR_ADDR: begin
+                    pc <= pc_next
+                end
+                FETCH_INSTR_DATA: begin
+                    pc <= pc_next
+                end
+                EXEC_INSTR_ADDR: begin
+                    pc <= pc_next
+                end
+                EXEC_INSTR_DATA: begin
+                    pc <= pc_next
+                end
+                WAITING: begin
+                    
+                end
+                HALTED: begin
+                end
+
+                default: begin
+                    $fatal("CPU: Current State: %d",state)
+                end
+            endcase
+        end
+
+
+
+
+
+    end 
 
     always_comb begin
         
     end
-    
-    always_ff (@posedge clk) begin
-        
-    end
+
 
 endmodule
