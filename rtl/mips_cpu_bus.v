@@ -1,11 +1,3 @@
-/*
-Questions for DT:
-
-
-*/
-
-
-
 module mips_cpu_bus(
     /* Standard signals */
     input logic clk,
