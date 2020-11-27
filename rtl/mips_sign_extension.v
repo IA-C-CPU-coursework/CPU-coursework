@@ -4,5 +4,6 @@ module mips_sign_extension(
     );
 
     assign o[15:0] = i[15:0];
-    assign o[31:16] = i[15];
+    assign o[31:16] = i[15] ? 16'hffff : 16'h0000;
+    // assign o[31:16] = {16{i[15]}}; // just another way
 endmodule
