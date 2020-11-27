@@ -1,11 +1,12 @@
 module mips_alu(
     input [2:0] ALUcontrol,
     input [31:0] A,B,
-    output [31:0] ALUout,
-    output isZero
+    output logic [31:0] ALUout,
+    output Zero
     );
 
-assign isZero = (ALUout==0);
+assign Zero = (ALUout==0);
+
 
 always_comb begin
     case(ALUcontrol)//different ALUControl inputs serve different operations
