@@ -1,3 +1,11 @@
+/*
+Questions for DT:
+
+
+*/
+
+
+
 module mips_cpu_bus(
     /* Standard signals */
     input logic clk,
@@ -15,7 +23,8 @@ module mips_cpu_bus(
     input logic[31:0] readdata
     );
     
-
+    logic [7:0] pc = 0;
+    wire pc_next = pc+1;
     wire [5:0] opcode = address[31:26];
     wire [25:0] jump_address = readdata[25:0];
     logic resetlastclock = 0;
@@ -25,7 +34,8 @@ module mips_cpu_bus(
         FETCH_INSTR_DATA = 3'b001,
         EXEC_INSTR_ADDR  = 3'b010,
         EXEC_INSTR_DATA  = 3'b011,
-        HALTED =      3'b100
+        HALTED =      3'b100,
+        WAITING = 3'b101
     } state_t;
 
     state_t state;
@@ -33,10 +43,9 @@ module mips_cpu_bus(
     always @(posedge clk) begin
         if(reset) begin
             if(resetlastclock) begin
-                //RESET
+                //RESET THE REGISTERS 
                 $display("CPU : Resetting.");
-                pc <= 0;
-                acc <= 0;
+                pc <= 32'hBFC00000; //Reset vector 
             end
             else begin
                 resetlastclock <= 1;
@@ -47,24 +56,27 @@ module mips_cpu_bus(
             resetlastclock <= 0;
 
             case(state)
-            FETCH_INSTR_ADDR: begin
-                
-            end
-            FETCH_INSTR_DATA: begin
-                
-            end
-            EXEC_INSTR_ADDR: begin
-                
-            end
-            EXEC_INSTR_DATA: begin
-                
-            end
-            HALTED: begin
-            end
+                FETCH_INSTR_ADDR: begin
+                    pc <= pc_next
+                end
+                FETCH_INSTR_DATA: begin
+                    pc <= pc_next
+                end
+                EXEC_INSTR_ADDR: begin
+                    pc <= pc_next
+                end
+                EXEC_INSTR_DATA: begin
+                    pc <= pc_next
+                end
+                WAITING: begin
+                    
+                end
+                HALTED: begin
+                end
 
-            default: begin
-                $fatal("Unexpected state: %d", state)
-            end
+                default: begin
+                    $fatal("CPU: Current State: %d",state)
+                end
             endcase
         end
 
@@ -77,9 +89,6 @@ module mips_cpu_bus(
     always_comb begin
         
     end
-    
-    always_ff (@posedge clk) begin
-        
-    end
+
 
 endmodule
