@@ -21,7 +21,7 @@ generate
     for (i=0; i<32; i=i+1) begin
         always_ff @(posedge CLK) begin
             if (rst) begin
-                registers[1] <= 0; //Every other way i tried to assign all reg to zero resulted in compile error
+                registers[i] <= 0; 
             end 
         end
     end

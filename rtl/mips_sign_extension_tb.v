@@ -27,10 +27,10 @@ module mips_sign_extension_tb;
 
         @(posedge clk);
         assert(data_out == sign_extended) begin
-            $display("data_out == $signed(data_in) %h %h", data_out, sign_extended); 
+            $display("✅ data_out == $signed(data_in) %h %h", data_out, sign_extended); 
         end
         else begin
-            $error("data_out != $signed(data_in) %h %h", data_out, sign_extended); 
+            $error("❌ data_out != $signed(data_in) %h %h", data_out, sign_extended); 
         end
     endtask
 
@@ -53,6 +53,7 @@ module mips_sign_extension_tb;
 
 
     initial begin
+    $display("Start unit test for mips_sign_extension");
     // Test Cases
         
         //--------------------------------------------------------------------
