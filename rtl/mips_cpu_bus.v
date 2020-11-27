@@ -25,8 +25,9 @@ module mips_cpu_bus(
     
     logic [7:0] pc = 0;
     wire pc_next = pc+1;
-    wire [5:0] opcode = address[31:26];
-    wire [25:0] jump_address = readdata[25:0];
+    wire [25:0] jump_address;
+    wire instantALUinput[15:0];
+    
     logic resetlastclock = 0;
 
     typedef enum logic[2:0] {
@@ -39,12 +40,17 @@ module mips_cpu_bus(
     } state_t;
 
     state_t state;
-
+    
+    mips_reg_file(.rst(resetheld),.clk(clk),.WriteAddress(),.RegWrite(),.DataIn(),.Address1(),.Address2(),.DataOut1(),.DataOut2())
+    
+    logic resetheld = 0;
     always @(posedge clk) begin
         if(reset) begin
             if(resetlastclock) begin
                 //RESET THE REGISTERS 
+                resetheld = 1;
                 $display("CPU : Resetting.");
+                resetheld = 0;
                 pc <= 32'hBFC00000; //Reset vector 
             end
             else begin
