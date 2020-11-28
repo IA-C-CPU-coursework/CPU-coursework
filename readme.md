@@ -390,10 +390,10 @@ the MIPS ISA Specification (Revision 3.2).
 
 The instructions to be tested are:
 
-Code    |   Meaning                                   |
---------|---------------------------------------------|
-ADDU    |  Add unsigned (no overflow)                 |
-AND     |  Bitwise and                                |
+Code    |   Meaning                                   
+--------|---------------------------------------------
+ADDU    |  Add unsigned (no overflow)                 
+AND     |  Bitwise and                                
 ANDI    |  Bitwise and immediate                     
 BEQ     |  Branch on equal                         
 BGEZ    |  Branch on greater than or equal to zero   
