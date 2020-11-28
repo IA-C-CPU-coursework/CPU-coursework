@@ -14,60 +14,96 @@ module mips_cpu_bus(
     output logic[3:0] byteenable,
     input logic[31:0] readdata
     );
-    
+
+    wire [5:0] opcode =  instruction [31:26];
+    wire [5:0] FuncCode = instruction [5:0];
     logic [7:0] pc = 0;
-    wire pc_next = pc+1;
+ 
+    wire pc_next = pc+4;
     wire [25:0] jump_address;
-    wire instantALUinput[15:0];
+    wire [15:0] instantALUinput;
     
-    logic resetlastclock = 0;
+    logic resetlastedge = 0;
+    logic [31:0] instruction;
+    logic [31:0] data;
 
     typedef enum logic[2:0] {
         FETCH_INSTR_ADDR = 3'b000,
         FETCH_INSTR_DATA = 3'b001,
         EXEC_INSTR_ADDR  = 3'b010,
         EXEC_INSTR_DATA  = 3'b011,
-        HALTED =      3'b100,
-        WAITING = 3'b101
+        WRITE_BACK = 3'b101,
+        HALTED =      3'b100
+
     } state_t;
 
     state_t state;
-    
-    mips_reg_file(.rst(resetheld),.clk(clk),.WriteAddress(),.RegWrite(),.DataIn(),.Address1(),.Address2(),.DataOut1(),.DataOut2())
-    
+    wire [31:0] A,B;
+    wire [4:0] rd,rs,rt;
+    wire RegDst;
+    assign rd = [20:16] instruction;
+    assign rs = [25:21] instruction;
+    assign rt = [16:11] instruction;
+
+    wire [4:0] Address2;
+    assign Address2 = RegDst ? rd:rt;
+
     logic resetheld = 0;
+    mips_control_unit(.opcode(opcode),.FuncCode(FuncCode),.reset(resetheld),.RegDst(RegDst))
+
+    mips_reg_file(.rst(resetheld),.clk(clk),.WriteAddress(),.RegWrite(),.DataIn(),.Address1(rs),.Address2(Address2),.DataOut1(A),.DataOut2(B))
+   
+    mips_alu(.alucontrol(),.A(A),.B(ALUSrc?B:),.ALUout(),.Zero())
+
+   
     always @(posedge clk) begin
         if(reset) begin
-            if(resetlastclock) begin
+            if(resetlastedge) begin
                 //RESET THE REGISTERS 
-                resetheld = 1;
                 $display("CPU : Resetting.");
-                resetheld = 0;
+
                 pc <= 32'hBFC00000; //Reset vector 
+                state <= FETCH_INSTR_ADDR;
             end
             else begin
-                resetlastclock <= 1;
+                resetlastedge <= 1;
             end
         end
 
         else begin
-            resetlastclock <= 0;
+            resetlastedge <= 0;
 
             case(state)
-                FETCH_INSTR_ADDR: begin
-                    pc <= pc_next
-                end
-                FETCH_INSTR_DATA: begin
-                    pc <= pc_next
-                end
-                EXEC_INSTR_ADDR: begin
-                    pc <= pc_next
-                end
-                EXEC_INSTR_DATA: begin
-                    pc <= pc_next
-                end
-                WAITING: begin
+                FETCH_INSTR_ADDR: begin // GETS INSTRUCTION FROM RAM
                     
+                    $display("CPU: Fetching address: %d",pc)
+                    if(waitrequest)begin
+                        
+                    end
+                    else begin
+                        instruction <= readdata;
+                        state <= EXEC_INSTR_ADDR;
+                    end
+                end
+                FETCH_INSTR_DATA: begin //GETS REQUIRED REGISTER VALUES
+                    $display("CPU: Fetching data from registers. R1 = %d, R2 = %d",)
+                    
+                end
+                EXEC_INSTR_ADDR: begin //
+                    
+                end
+                EXEC_INSTR_DATA: begin // MEMORY ACCESS
+                    if(waitrequest) begin
+                        
+                    end
+                    else begin
+                        data <= readdata;
+                    end
+                    
+                end
+                WRITE_BACK: begin // WRITES TO REGISTERS
+                    pc <= pc_next;
+                    state <= FETCH_INSTR_ADDR;
                 end
                 HALTED: begin
                 end

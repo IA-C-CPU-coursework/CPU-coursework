@@ -1,29 +1,30 @@
-module control(
-    input instruction[31:0],
+module mips_control_unit(
+    input [5:0] opcode, 
+    input [5:0] FuncCode,
+    input reset,
 // Determine output signals that must be controlled
 
-    output RegWrite, MemWrite, ALUSrc, ALUControl, 
+    output RegWrite, MemToReg, ALUSrc, MemRead, MemWrite, RegDst, 
+    output ALUControl
     
 );
-    //MAKE SURE TO CHANGE WIRE NAME OF THINGY
-    wire opcode = instruction [31:26];
-    wire FuncCode = instruction [5:0];
-
-
     
 always_comb begin
     case(opcode)
+/*    
     6'b000000: begin //Opcode == 0 (ADDU, AND)
         if (FuncCode == 6'b100001) begin //ADDU
-        
+            
         end
         else if (FuncCode == 6'b100100) begin // AND
-        end
-    end
-    6'b001001: begin //ADDIU
         
+        end
+    end */
+    6'b001001: begin //ADDIU **
+        ALUControl = 2;
     end
 
+/*
     6'b001100: begin //ANDI
     end
     6'b000100: begin //BEQ
@@ -52,7 +53,7 @@ always_comb begin
     end
     6'bxxxxxx: begin //JAL
     end
-    6'bxxxxxx: begin //JR
+    6'bxxxxxx: begin //JR **
     end
     6'bxxxxxx: begin //LB
     end
@@ -64,7 +65,7 @@ always_comb begin
     end
     6'bxxxxxx: begin //LUI
     end
-    6'bxxxxxx: begin //LW
+    6'bxxxxxx: begin //LW **
     end
     6'bxxxxxx: begin //LWL
     end
@@ -108,13 +109,14 @@ always_comb begin
     end
     6'bxxxxxx: begin //SUBU
     end
-    6'bxxxxxx: begin //SW
+    6'bxxxxxx: begin //SW **
     end
     6'bxxxxxx: begin //XOR
     end
     6'bxxxxxx: begin //XORI
-    end
+    end */
     endcase
 
 
 end
+endmodule
