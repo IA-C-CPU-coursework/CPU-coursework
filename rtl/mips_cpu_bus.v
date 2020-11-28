@@ -44,16 +44,31 @@ module mips_cpu_bus(
     assign rd = [20:16] instruction;
     assign rs = [25:21] instruction;
     assign rt = [16:11] instruction;
-
+    wire [2:0] ALUControl;
     wire [4:0] Address2;
-    assign Address2 = RegDst ? rd:rt;
-
+    wire MemRead,MemWrite,MemtoReg;
+    wire RegWrite;
+    assign WriteAddress = RegDst ? rd:rt;
+    assign read = MemRead;
+    assign write = MemWrite;
+    wire [31:0] ALUout;
     logic resetheld = 0;
-    mips_control_unit(.opcode(opcode),.FuncCode(FuncCode),.reset(resetheld),.RegDst(RegDst))
+    wire writedata = MemtoReg ? ALUout:data
 
-    mips_reg_file(.rst(resetheld),.clk(clk),.WriteAddress(),.RegWrite(),.DataIn(),.Address1(rs),.Address2(Address2),.DataOut1(A),.DataOut2(B))
+    mips_control_unit(
+    .RegWrite(RegWrite)
+    .opcode(opcode),
+    .FuncCode(FuncCode),
+    .reset(resetheld),
+    .RegDst(RegDst),
+    .ALUControl(ALUControl),
+    .MemRead(MemRead),
+    .MemWrite(MemWrite)
+    .MemtoReg(MemtoReg))
+
+    mips_reg_file(.rst(resetheld),.clk(clk),.WriteAddress(WriteAddress),.RegWrite(RegWrite),.DataIn(writedata),.Address1(rs),.Address2(rt),.DataOut1(A),.DataOut2(B))
    
-    mips_alu(.alucontrol(),.A(A),.B(ALUSrc?B:),.ALUout(),.Zero())
+    mips_alu(.alucontrol(),.A(A),.B(),.ALUout(ALUout),.Zero())
 
    
     always @(posedge clk) begin
@@ -86,18 +101,18 @@ module mips_cpu_bus(
                     end
                 end
                 FETCH_INSTR_DATA: begin //GETS REQUIRED REGISTER VALUES
-                    $display("CPU: Fetching data from registers. R1 = %d, R2 = %d",)
+                    $display("CPU: Fetching data from registers.")
                     
                 end
-                EXEC_INSTR_ADDR: begin //
                     
                 end
                 EXEC_INSTR_DATA: begin // MEMORY ACCESS
                     if(waitrequest) begin
-                        
+                        $display("RAM: Readdata blocked by waitrequest")
                     end
                     else begin
                         data <= readdata;
+                        $display("CPU: Read data from registers")
                     end
                     
                 end

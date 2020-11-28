@@ -4,8 +4,8 @@ module mips_control_unit(
     input reset,
 // Determine output signals that must be controlled
 
-    output RegWrite, MemToReg, ALUSrc, MemRead, MemWrite, RegDst, 
-    output ALUControl
+    output RegWrite, MemtoReg, ALUSrc, MemRead, MemWrite, RegDst, 
+    output logic [2:0] ALUControl
     
 );
     

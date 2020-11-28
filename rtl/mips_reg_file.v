@@ -1,6 +1,6 @@
 module mips_reg_file(
     input rst,
-    input CLK,
+    input clk,
     input RegWrite, // Write enable
     input [4:0] WriteAddress, // Which Register to write to
     input [4:0] Address1, // Read reg numbers
@@ -16,7 +16,7 @@ logic [31:0] registers [0:31];
 //assign registers[0] = 0; // Hardwired to 0
     
 // Writing to registers
-always_ff @(posedge CLK) begin
+always_ff @(posedge clk) begin
     if (rst) begin
         registers[1] <= 0; //Every other way i tried to assign all reg to zero resulted in compile error
         registers[2] <= 0;
