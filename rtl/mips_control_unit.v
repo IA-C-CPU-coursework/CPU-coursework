@@ -21,7 +21,15 @@ always_comb begin
         end
     end */
     6'b001001: begin //ADDIU **
+        ALUSrc = 1;
         ALUControl = 2;
+        RegWrite = 1;
+        MemtoReg = ;
+        MemRead = 1;
+        MemWrite = 0;
+        RegDst = 1;
+        branch = 0;
+        jump = 0;
     end
 
 /*
