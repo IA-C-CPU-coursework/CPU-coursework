@@ -19,9 +19,11 @@ module mips_cpu_bus(
     wire [5:0] FuncCode = instruction [5:0];
     logic [7:0] pc = 0;
  
-    wire pc_next = pc+4;
-    wire [25:0] jump_address;
-    wire [15:0] instantALUinput;
+    assign address = pc;
+    wire pc_next;
+    logic [25:0] jump_address;
+    assign jump_address = instruction[25:0];
+    wire [15:0] instant;
     
     logic resetlastedge = 0;
     logic [31:0] instruction;
@@ -48,12 +50,22 @@ module mips_cpu_bus(
     wire [4:0] Address2;
     wire MemRead,MemWrite,MemtoReg;
     wire RegWrite;
+    wire ALUSrc;
     assign WriteAddress = RegDst ? rd:rt;
     assign read = MemRead;
     assign write = MemWrite;
     wire [31:0] ALUout;
     logic resetheld = 0;
-    wire writedata = MemtoReg ? ALUout:data
+    wire [31:0] writedata = MemtoReg ? ALUout:data
+    wire [31:0] instantextended;
+    wire [31:0] D2;
+    assign B = ALUSrc ? D2:instantextended;
+    wire jump, branch;
+
+    mips_sign_extension(
+        .i(instant),
+        .o(instantextended)
+    )
 
     mips_control_unit(
     .RegWrite(RegWrite)
@@ -64,7 +76,10 @@ module mips_cpu_bus(
     .ALUControl(ALUControl),
     .MemRead(MemRead),
     .MemWrite(MemWrite)
-    .MemtoReg(MemtoReg))
+    .MemtoReg(MemtoReg)
+    .ALUSrc(ALUSrc),
+    .jump(jump),
+    .branch(branch))
 
     mips_reg_file(
     .rst(resetheld),
@@ -75,16 +90,24 @@ module mips_cpu_bus(
     .Address1(rs),
     .Address2(rt),
     .DataOut1(A),
-    .DataOut2(B))
+    .DataOut2(D2))
    
     mips_alu(
     .ALUcontrol(ALUcontrol),
     .A(A),
-    .B(),
+    .B(B),
     .ALUout(ALUout),
     .Zero())
 
-   
+    always_comb begin
+        if (pc==0) begin state = HALTED end
+        
+    end
+
+    always_comb begin // determine next pc
+        pc_next = jump ? (branch ? pc+4:( (pc +4) + (instantextended<<2) ) ):jump_address<<2
+    end
+
     always @(posedge clk) begin
         if(reset) begin
             if(resetlastedge) begin
