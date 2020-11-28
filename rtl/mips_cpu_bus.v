@@ -32,8 +32,8 @@ module mips_cpu_bus(
         FETCH_INSTR_DATA = 3'b001,
         EXEC_INSTR_ADDR  = 3'b010,
         EXEC_INSTR_DATA  = 3'b011,
-        WRITE_BACK = 3'b101,
-        HALTED =      3'b100
+        WRITE_BACK = 3'b100,
+        HALTED =      3'b101
 
     } state_t;
 
@@ -66,9 +66,23 @@ module mips_cpu_bus(
     .MemWrite(MemWrite)
     .MemtoReg(MemtoReg))
 
-    mips_reg_file(.rst(resetheld),.clk(clk),.WriteAddress(WriteAddress),.RegWrite(RegWrite),.DataIn(writedata),.Address1(rs),.Address2(rt),.DataOut1(A),.DataOut2(B))
+    mips_reg_file(
+    .rst(resetheld),
+    .clk(clk),
+    .WriteAddress(WriteAddress),
+    .RegWrite(RegWrite),
+    .DataIn(writedata),
+    .Address1(rs),
+    .Address2(rt),
+    .DataOut1(A),
+    .DataOut2(B))
    
-    mips_alu(.alucontrol(),.A(A),.B(),.ALUout(ALUout),.Zero())
+    mips_alu(
+    .ALUcontrol(ALUcontrol),
+    .A(A),
+    .B(),
+    .ALUout(ALUout),
+    .Zero())
 
    
     always @(posedge clk) begin
@@ -121,6 +135,7 @@ module mips_cpu_bus(
                     state <= FETCH_INSTR_ADDR;
                 end
                 HALTED: begin
+                    $display("CPU: HALTED")
                 end
 
                 default: begin
@@ -134,10 +149,6 @@ module mips_cpu_bus(
 
 
     end 
-
-    always_comb begin
-        
-    end
 
 
 endmodule
