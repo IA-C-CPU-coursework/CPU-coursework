@@ -17,9 +17,9 @@ module mips_cpu_bus(
 
     wire [5:0] opcode =  instruction [31:26];
     wire [5:0] FuncCode = instruction [5:0];
-    logic [7:0] pc = 0;
+    logic [31:0] pc = 0;
  
-    wire [7:0] pc4 = pc+4;
+    wire [31:0] pc4 = pc+4;
     wire pc_next;
 
     
@@ -45,7 +45,7 @@ module mips_cpu_bus(
     } state_t;
 
     state_t state;
-    logic [25:0] jumptarget;
+    logic [31:0] jumptarget;
     wire [31:0] A,B;
     wire [4:0] rd,rs,rt;
     wire RegDst;
@@ -67,8 +67,8 @@ module mips_cpu_bus(
     wire [31:0] instantextended;
     wire [31:0] D2;
     assign B = ALUSrc ? instantextended:D2;
-    wire jumpimmediate,jumpfromreg, branch, link;
-    wire branchtype = jumpimmediate || jumpfromreg || branch;
+    wire jumpimmediate, jumpfromreg, branch, link;
+    wire branchtype = jump || branch;
     wire jump = jumpimmediate || jumpfromreg;
     logic readinstruction;
     wire zero;
@@ -116,6 +116,25 @@ module mips_cpu_bus(
         if (pc==0) state = HALTED;
     end
 
+    always @(*) begin // Gets jump address
+        if(branch) begin
+            jumptarget = pc+4+ instantextended;
+            
+        end
+        else if (jump)begin
+            if(jumpimmediate)begin
+                jumptarget = {pc4[31:28],instruction[25:0],2'b00}; //cannot use always_comb because unsupported with constant
+            end
+            else if(jumpfromreg)begin
+                jumptarget = A;
+            end
+        end
+        
+    end
+
+    logic isDelaySlot = 0;
+    logic faileddelay = 0;
+
     assign read = (state==FETCH_INSTR_ADDR) ? 1 : (state==EXEC_INSTR_ADDR && MemRead);
     
     assign write = state==EXEC_INSTR_DATA ? MemWrite : 0;
@@ -128,11 +147,12 @@ module mips_cpu_bus(
             if(resetlastedge) begin
                 //RESET THE REGISTERS 
                 $display("CPU : Resetting.");
-
+                resetheld = 1;
                 pc <= 32'hBFC00000; //Reset vector 
                 state <= FETCH_INSTR_ADDR;
             end
             else begin
+                resetheld = 0;
                 resetlastedge <= 1;
             end
         end
@@ -154,16 +174,30 @@ module mips_cpu_bus(
                     end
                     else begin
                         instruction <= readdata;
-                        state <= EXEC_INSTR_ADDR;
-                    end
-                    if(branchtype) begin
-                        state <= FETCH_BRANCH_ADDRESS;
                         
                     end
                     
+                   
+                    
                 end
                 EXEC_INSTR_ADDR:begin
-                    
+                    if(branchtype && !faileddelay) begin //Can only execute delay slot if not previously failed branch
+                        isDelaySlot <=1;
+                        pc <= pc4;
+                        state <= FETCH_INSTR_ADDR;
+                    end
+                    if(isDelaySlot)begin
+                        if(branchtype)begin
+                            $display("CPU : INFO : Attemped to branch in delay slot. Going back to previous branch.");
+                            pc <= pc - 4;
+                            state <= FETCH_INSTR_ADDR;
+                            faileddelay <= 1;
+                            isDelaySlot <=0;
+                        end
+                    end
+                    else begin
+                        state <= EXEC_INSTR_ADDR;
+                    end
                 end
 
                 
@@ -174,23 +208,31 @@ module mips_cpu_bus(
                     else begin
                         data <= readdata;
                         $display("CPU: Read data from registers");
+                        state <= WRITE_BACK;
                     end
                     
                 end
                 WRITE_BACK: begin // WRITES TO REGISTERS
-                    pc <= pc4;
+
+                    pc <= branchtype ? jumptarget:pc4;                    
                     state <= FETCH_INSTR_ADDR;
+                    isDelaySlot <= 0;
+            
+                    
                 end
                 HALTED: begin
                     $display("CPU: HALTED");
                 end
 
-                FETCH_BRANCH_ADDRESS: begin
-                    if (jump) begin 
-                        jumptarget <= jumpfromreg ? A: instruction[25:0]; //Chooses immediate jump address or from register
-                    end
-                    
-                end
+                // FETCH_BRANCH_ADDRESS: begin
+                //     if (jump) begin 
+                //         jumptarget <= jumpfromreg ? A: instruction[25:0]; //Chooses immediate jump address or from register
+                //     end
+                //     if (branch)begin
+                        
+                //     end
+                //     pc <= pc4;
+                // end
 
 
 
