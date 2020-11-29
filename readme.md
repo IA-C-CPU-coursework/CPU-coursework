@@ -406,10 +406,10 @@ BLTZAL  |  Branch on less than zero and link
 BNE     |  Branch on not equal                        
 DIV     |  Divide                                     
 DIVU    |  Divide unsigned                            
-J       |  Jump                                       
+J       .|  Jump                                       
 JALR    |  Jump and link register                     
 JAL     |  Jump and link                              
-JR      |  Jump register                              
+JR      .|  Jump register                              
 LB     . |  Load byte                                  
 LBU     .|  Load byte unsigned                        
 LH      .|  Load half-word                             
@@ -433,10 +433,10 @@ SLTI    |  Set on less than immediate (signed)
 SLTIU   |  Set on less than immediate unsigned        
 SLTU    |  Set on less than unsigned                  
 SRA     .|  Shift right arithmetic                     
-SRAV    |  Shift right arithmetic                     
-SRL     |  Shift right logical                        
-SRLV    |  Shift right logical variable               
-SUBU    |  Subtract unsigned                          
+SRAV   . |  Shift right arithmetic                     
+SRL     .|  Shift right logical                        
+SRLV    .|  Shift right logical variable               
+SUBU   . |  Subtract unsigned                          
 SW      .|  Store word                                 
 XOR     .|  Bitwise exclusive or                       
 XORI    .|  Bitwise exclusive or immediate             

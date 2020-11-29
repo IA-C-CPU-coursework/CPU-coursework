@@ -23,30 +23,30 @@ Sequencing:
   Jump
 
 1. ADDIU   |  Add immediate unsigned (no overflow)
-addiu,$v0,$zero,0000
-addiu,$v0,$zero,000C
-addiu,$v0,$zero,002D
-addiu,$v0,$zero,006E
-addiu,$v0,$zero,00A8
+addiu,$v0,$zero,0
+addiu,$v0,$zero,C
+addiu,$v0,$zero,2D
+addiu,$v0,$zero,A86E
+addiu,$v0,$zero,B0A8
 
 2. SLL     |  Shift left logical                         
-addiu,&t0,$zero,003C
+addiu,$t0,$zero,3C
 sll,$v0,$t0,1
-addiu,&v0,$v0,0
+addiu,$v0,$v0,0
 sll,$v0,$t0,3
-addiu,&v0,$v0,0
+addiu,$v0,$v0,0
 sll,$v0,$t0,6
-addiu,&v0,$v0,0
+addiu,$v0,$v0,0
 sll,$v0,$t0,7
-addiu,&v0,$v0,0
+addiu,$v0,$v0,0
 
 
 
 3. LW      |  Load word 
 one way of testing is to store specific value in the RAM, and access it using lw 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400 // sp = BCF0 << 16 = BCF00000 , BCF00000 + 400 = BCF00400
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400 // sp = BCF0 << 16 = BCF00000 , BCF00000 + 400 = BCF00400
 lw,$v0,0($sp)
 lw,$v0,4($sp)
 lw,$v0,8($sp)
@@ -60,47 +60,46 @@ lw,$v0,16($sp)
 00000231
 
 4. ADDU | add unsigned number
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400 
-addu,$v0,&zero,&t0
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
 lw,$t0,0($sp)
-addu,$v0,&zero,&t0
 lw,$t1,4($sp)
-addu,$v0,&zero,&t1
-lw,$t2,8($s0)
-addu,$v0,&zero,&t2
-lw,$t3,12(s0)
-addu,$v0,&zero,&t3
-lw,$t4,16(s0)
-addu,$v0,&zero,&t4
+lw,$t2,8($sp)
+lw,$t3,12($sp)
+lw,$t4,16($sp)
+addu,$v0,$t0,$t1
+addu,$v0,$t2,$t1
+addu,$v0,$t3,$t2
+addu,$v0,$t3,$t4
+addu,$v0,$t5,$t1
 
-00000030
-00000020
-00000013
-00000074
-00001D3C
+0020E120
+A0CfC020
+00105010
+0120A182
+B023B940
 
 5. LUI     |  Load upper immediate
 addu,$v0,$zero,$t0
-lui,&t1,A412
+lui,$t1,A412
 addu,$v0,$zero,$t1
 lui,$t2,3680
 addu,$v0,$zero,$t2
-lui,&t3,1099
+lui,$t3,1099
 addu,$v0,$zero,$t3
-lui,&t4,8412
+lui,$t4,8412
 addu,$v0,$zero,$t4
 lui,$t5,1680
 addu,$v0,$zero,$t5
-lui,&t6,1099
+lui,$t6,1099
 addu,$v0,$zero,$t6
 
 
 6. SW      |  Store word 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400 
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
 addu,$v0,$zero,$t0
 lui,$t0,C123
 addu,$v0,$zero,$t0
@@ -119,9 +118,9 @@ lw,$t1,8($sp)
 addu,$v0,$zero,$t1
 
 7. LB      |  Load byte
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400 
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
 lb,$t0,0($sp)
 addu,$v0,$zero,$t0
 lb,$t1,4($sp)
@@ -142,9 +141,9 @@ B023B940
 
 
 8. LBU     |  Load byte unsigned 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400 
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
 lbu,$t0,0($sp)
 addu,$v0,$zero,$t0
 lbu,$t1,4($sp)
@@ -164,9 +163,9 @@ F0105010
 B023B940
 
 9. LH      |  Load half-word 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400 
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
 lh,$t0,0($sp)
 addu,$v0,$zero,$t0
 lh,$t1,4($sp)
@@ -185,9 +184,9 @@ addu,$v0,$zero,$t4
 B023B940
 
 10. LHU     .|  Load half-word unsigned  
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400 
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400 
 lhu,$t0,0($sp)
 addu,$v0,$zero,$t0
 lhu,$t1,4($sp)
@@ -206,9 +205,9 @@ addu,$v0,$zero,$t4
 B023B940
 
 11.1  LWL     .|  Load word left 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400 
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
 lwl,$t0,0($sp)
 addu,$v0,$zero,$t0
 lwl,$t1,4($sp)
@@ -221,14 +220,14 @@ addu,$v0,$zero,$t2
 00105010
 
 11.2 LWL     .|  Load word left 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400 
-lui,&t3,1099
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
+lui,$t3,1099
 sw,$t3,0($sp)
 lwl,$t4,0($sp)
 addu,$v0,$zero,$t4
-lui,&t4,8412
+lui,$t4,8412
 sw,$t4,4($sp)
 lwl,$t4,4($sp)
 addu,$v0,$zero,$t4
@@ -239,9 +238,9 @@ addu,$v0,$zero,$t5
 
 
 12.1---LWR     |  Load word right 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400 
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
 lwr,$t0,0($sp)
 addu,$v0,$zero,$t0
 lwr,$t1,4($sp)
@@ -254,14 +253,14 @@ addu,$v0,$zero,$t2
 00105010
 
 12.2----LWR     |  Load word right
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400 
-lui,&t3,1099
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
+lui,$t3,1099
 sw,$t3,0($sp)
 lwr,$t4,0($sp)
 addu,$v0,$zero,$t4
-lui,&t4,8412
+lui,$t4,8412
 sw,$t4,4($sp)
 lwr,$t4,4($sp)
 addu,$v0,$zero,$t4
@@ -276,14 +275,14 @@ addu,$v0,$zero,$t5
 14.MTLO    |  Move to LO
 
 15.SB      |  Store byte 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400
-lui,&t3,1099
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
+lui,$t3,1099
 sb,$t3,0($sp)
 lb,$t4,0($sp)
 addu,$v0,$zero,$t4
-lui,&t4,8412
+lui,$t4,8412
 sb,$t4,4($sp)
 lb,$t4,4($sp)
 addu,$v0,$zero,$t4
@@ -293,14 +292,14 @@ lb,$t5,8($sp)
 addu,$v0,$zero,$t5 
 
 16.SH      |  Store half-word 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400
-lui,&t3,1099
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
+lui,$t3,1099
 sh,$t3,0($sp)
 lh,$t4,0($sp)
 addu,$v0,$zero,$t4
-lui,&t4,8412
+lui,$t4,8412
 sh,$t4,4($sp)
 lh,$t4,4($sp)
 addu,$v0,$zero,$t4
@@ -310,125 +309,219 @@ lh,$t5,8($sp)
 addu,$v0,$zero,$t5
 
 17.SLLV    |  Shift left logical variable 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400
-lui,%t0,2021
-lui,%t1,2,
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
+lui,$t0,2021
+lui,$t1,2,
 sllv,$t2,$t0,$t1
 addu,$v0,$zero,$t2
-lui,%t0,3456
-lui,%t1,4,
+lui,$t0,3456
+lui,$t1,4,
 sllv,$t2,$t0,$t1
 addu,$v0,$zero,$t2
-lui,%t0,A210
-lui,%t1,7,
+lui,$t0,A210
+lui,$t1,7,
 sllv,$t2,$t0,$t1
 addu,$v0,$zero,$t2
 
 18. OR      .|  Bitwise or   
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400
-lui,%t0,2021
-lui,%t1,1022
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
+lui,$t0,2021
+lui,$t1,1022
 or,$t3,$t0,$t1
 addu,$v0,$zero,$t3
-lui,%t0,3456
-lui,%t1,982C
+lui,$t0,3456
+lui,$t1,982C
 or,$t3,$t0,$t1
 addu,$v0,$zero,$t3
-lui,%t0,3827
-lui,%t1,1024
+lui,$t0,3827
+lui,$t1,1024
 or,$t3,$t0,$t1
 addu,$v0,$zero,$t3
 
 19. ORI     |  Bitwise or immediate 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400
-lui,%t0,2021
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
+lui,$t0,2021
 ori,$t3,$t0,1022
 addu,$v0,$zero,$t3
-lui,%t0,3456
+lui,$t0,3456
 ori,$t3,$t0,982C
 addu,$v0,$zero,$t3
-lui,%t0,3827
+lui,$t0,3827
 ori,$t3,$t0,1024
 addu,$v0,$zero,$t3
 
 20. XOR     |  Bitwise exclusive or 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400
-lui,%t0,2021
-lui,%t1,1022
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
+lui,$t0,2021
+lui,$t1,1022
 xor,$t3,$t0,$t1
 addu,$v0,$zero,$t3
-lui,%t0,3456
-lui,%t1,982C
+lui,$t0,3456
+lui,$t1,982C
 xor,$t3,$t0,$t1
 addu,$v0,$zero,$t3
-lui,%t0,3827
-lui,%t1,1024
+lui,$t0,3827
+lui,$t1,1024
 xor,$t3,$t0,$t1
 addu,$v0,$zero,$t3
 
 21. XORI    |  Bitwise exclusive or immediate 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400
-lui,%t0,2021
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
+lui,$t0,2021
 xori,$t3,$t0,1022
 addu,$v0,$zero,$t3
-lui,%t0,3456
+lui,$t0,3456
 xori,$t3,$t0,982C
 addu,$v0,$zero,$t3
-lui,%t0,3827
+lui,$t0,3827
 xori,$t3,$t0,1024
 addu,$v0,$zero,$t3
 
 22.AND     |  Bitwise and  
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400
-lui,%t0,2021
-lui,%t1,1022
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
+lui,$t0,2021
+lui,$t1,1022
 and,$t3,$t0,$t1
 addu,$v0,$zero,$t3
-lui,%t0,3456
-lui,%t1,982C
+lui,$t0,3456
+lui,$t1,982C
 and,$t3,$t0,$t1
 addu,$v0,$zero,$t3
-lui,%t0,3827
-lui,%t1,1024
+lui,$t0,3827
+lui,$t1,1024
 add,$t3,$t0,$t1
 addu,$v0,$zero,$t3
 
 23. ANDI    |  Bitwise and immediate 
-addiu,&t0,&zero,BCF0
-sll,%t1,$t0,10
-addiu,&sp,$t1,400
-lui,%t0,2021
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
+lui,$t0,2021
 andi,$t3,$t0,1022
 addu,$v0,$zero,$t3
-lui,%t0,3456
+lui,$t0,3456
 andi,$t3,$t0,982C
 addu,$v0,$zero,$t3
-lui,%t0,3827
+lui,$t0,3827
 andi,$t3,$t0,1024
 addu,$v0,$zero,$t3
 
 24. SRA     |  Shift right arithmetic 
-lui,%t0,A021
+lui,$t0,A021
 sra,$t1,$t0,1
 addu,$v0,$zero,$t1
-lui,%t0,32A1
-sra,$t1,$t0,1
+lui,$t0,32A1
+sra,$t1,$t0,5
 addu,$v0,$zero,$t1
-lui,%t0,A021
-sra,$t1,$t0,1
+lui,$t0,1C21
+sra,$t1,$t0,7
 addu,$v0,$zero,$t1
-lui,%t0,A021
-sra,$t1,$t0,1
+lui,$t0,2021
+sra,$t1,$t0,10
 addu,$v0,$zero,$t1
+
+25.SRAV    |  Shift right arithmetic 
+lui,$t0,A021
+lui,$t1,2
+sra,$t2,$t0,$t1
+addu,$v0,$zero,$t2
+lui,$t0,1C21
+lui,$t1,4
+sra,$t2,$t0,$t1
+addu,$v0,$zero,$t2
+lui,$t0,1098
+lui,$t1,8
+sra,$t2,$t0,$t1
+addu,$v0,$zero,$t2
+lui,$t0,F001
+lui,$t1,10
+sra,$t2,$t0,$t1
+addu,$v0,$zero,$t2
+
+26. SRL     |  Shift right logical
+lui,$t0,A021
+srl,$t1,$t0,1
+addu,$v0,$zero,$t1
+lui,$t0,32A1
+srl,$t1,$t0,5
+addu,$v0,$zero,$t1
+lui,$t0,1C21
+srl,$t1,$t0,7
+addu,$v0,$zero,$t1
+lui,$t0,2021
+srl,$t1,$t0,10
+addu,$v0,$zero,$t1
+
+27.SRLV    |  Shift right logical variable 
+lui,$t0,A021
+lui,$t1,2
+srlv,$t2,$t0,$t1
+addu,$v0,$zero,$t2
+lui,$t0,1C21
+lui,$t1,4
+srlv,$t2,$t0,$t1
+addu,$v0,$zero,$t2
+lui,$t0,1098
+lui,$t1,8
+srlv,$t2,$t0,$t1
+addu,$v0,$zero,$t2
+lui,$t0,F001
+lui,$t1,10
+srlv,$t2,$t0,$t1
+addu,$v0,$zero,$t2
+
+28 SUBU    |  Subtract unsigned
+addiu,$t0,$zero,BCF0
+sll,$t1,$t0,10
+addiu,$sp,$t1,400
+lw,$t0,0($sp)
+lw,$t1,4($sp)
+lw,$t2,8($sp)
+lw,$t3,12($sp)
+lw,$t4,16($sp)
+subu,$t5,$t0,$t1
+addu,$v0,$zero,$t5
+subu,$t5,$t0,$t2
+addu,$v0,$zero,$t5
+subu,$t5,$t0,$t3
+addu,$v0,$zero,$t5
+subu,$t5,$t0,$t4
+addu,$v0,$zero,$t5
+
+
+FCBFE120
+03CfC020
+10105010
+0120A182
+5023B940
+
+29. J       |  Jump   
+lui,$t0,1023
+addu,$v0,$zero,$t0
+j labela
+lui,$t0,12C3
+addu,$v0,$zero,$t0
+j labelb
+lui,$t0,1523
+addu,$v0,$zero,$t0
+
+labela: lui,$t0,B023
+        addu,$v0,$zero,$t0
+
+label b:lui,$t0,6023
+        addu,$v0,$zero,$t0
+
+30. JR      .|  Jump register 
+lui 
