@@ -1,0 +1,434 @@
+working on testbench and testcases
+11-27:
+writing a simple tb module:
+the testbench will displat the value stored in the register_v0
+the outputs can be captured into a txt file.
+current format is register_v0: xxx (value). 
+--------------------------
+creating the test folder.
+different testcases should be included in assembly, with format .asm.txt
+(C++) assembler convert this assembly into hex stored in binary
+
+notes about instruction:
+Data operations:
+  Alrithmetic 
+  Logical
+
+Data transfer:
+  Load
+  store
+
+Sequencing:
+  Branch(conditional)
+  Jump
+
+1. ADDIU   |  Add immediate unsigned (no overflow)
+addiu,$v0,$zero,0000
+addiu,$v0,$zero,000C
+addiu,$v0,$zero,002D
+addiu,$v0,$zero,006E
+addiu,$v0,$zero,00A8
+
+2. SLL     |  Shift left logical                         
+addiu,&t0,$zero,003C
+sll,$v0,$t0,1
+addiu,&v0,$v0,0
+sll,$v0,$t0,3
+addiu,&v0,$v0,0
+sll,$v0,$t0,6
+addiu,&v0,$v0,0
+sll,$v0,$t0,7
+addiu,&v0,$v0,0
+
+
+
+3. LW      |  Load word 
+one way of testing is to store specific value in the RAM, and access it using lw 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400 // sp = BCF0 << 16 = BCF00000 , BCF00000 + 400 = BCF00400
+lw,$v0,0($sp)
+lw,$v0,4($sp)
+lw,$v0,8($sp)
+lw,$v0,12($sp)
+lw,$v0,16($sp)
+
+00000012
+00000023
+00000034
+00000056
+00000231
+
+4. ADDU | add unsigned number
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400 
+addu,$v0,&zero,&t0
+lw,$t0,0($sp)
+addu,$v0,&zero,&t0
+lw,$t1,4($sp)
+addu,$v0,&zero,&t1
+lw,$t2,8($s0)
+addu,$v0,&zero,&t2
+lw,$t3,12(s0)
+addu,$v0,&zero,&t3
+lw,$t4,16(s0)
+addu,$v0,&zero,&t4
+
+00000030
+00000020
+00000013
+00000074
+00001D3C
+
+5. LUI     |  Load upper immediate
+addu,$v0,$zero,$t0
+lui,&t1,A412
+addu,$v0,$zero,$t1
+lui,$t2,3680
+addu,$v0,$zero,$t2
+lui,&t3,1099
+addu,$v0,$zero,$t3
+lui,&t4,8412
+addu,$v0,$zero,$t4
+lui,$t5,1680
+addu,$v0,$zero,$t5
+lui,&t6,1099
+addu,$v0,$zero,$t6
+
+
+6. SW      |  Store word 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400 
+addu,$v0,$zero,$t0
+lui,$t0,C123
+addu,$v0,$zero,$t0
+sw,$t0,0($sp)
+lw,$t1,0($sp)
+addu,$v0,$zero,$t1
+lui,$t0,A145
+addu,$v0,$zero,$t0
+sw,$t0,4($sp)
+lw,$t1,4($sp)
+addu,$v0,$zero,$t1
+lui,$t0,4567
+addu,$v0,$zero,$t0
+sw,$t0,8($sp)
+lw,$t1,8($sp)
+addu,$v0,$zero,$t1
+
+7. LB      |  Load byte
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400 
+lb,$t0,0($sp)
+addu,$v0,$zero,$t0
+lb,$t1,4($sp)
+addu,$v0,$zero,$t1
+lb,$t2,8($sp)
+addu,$v0,$zero,$t2
+lb,$t3,12($sp)
+addu,$v0,$zero,$t3
+lb,$t4,16($sp)
+addu,$v0,$zero,$t4
+
+
+FFFFE120
+03CfC020
+F0105010
+0120A182
+B023B940
+
+
+8. LBU     |  Load byte unsigned 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400 
+lbu,$t0,0($sp)
+addu,$v0,$zero,$t0
+lbu,$t1,4($sp)
+addu,$v0,$zero,$t1
+lbu,$t2,8($sp)
+addu,$v0,$zero,$t2
+lbu,$t3,12($sp)
+addu,$v0,$zero,$t3
+lbu,$t4,16($sp)
+addu,$v0,$zero,$t4
+
+
+FFFFE120
+03CfC020
+F0105010
+0120A182
+B023B940
+
+9. LH      |  Load half-word 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400 
+lh,$t0,0($sp)
+addu,$v0,$zero,$t0
+lh,$t1,4($sp)
+addu,$v0,$zero,$t1
+lh,$t2,8($sp)
+addu,$v0,$zero,$t2
+lh,$t3,12($sp)
+addu,$v0,$zero,$t3
+lh,$t4,16($sp)
+addu,$v0,$zero,$t4
+
+0020E120
+00CfC020
+00105010
+0120A182
+B023B940
+
+10. LHU     .|  Load half-word unsigned  
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400 
+lhu,$t0,0($sp)
+addu,$v0,$zero,$t0
+lhu,$t1,4($sp)
+addu,$v0,$zero,$t1
+lhu,$t2,8($sp)
+addu,$v0,$zero,$t2
+lhu,$t3,12($sp)
+addu,$v0,$zero,$t3
+lhu,$t4,16($sp)
+addu,$v0,$zero,$t4
+
+0020E120
+00CfC020
+00105010
+0120A182
+B023B940
+
+11.1  LWL     .|  Load word left 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400 
+lwl,$t0,0($sp)
+addu,$v0,$zero,$t0
+lwl,$t1,4($sp)
+addu,$v0,$zero,$t1
+lwl,$t2,8($sp)
+addu,$v0,$zero,$t2
+
+0020E120
+00CfC020
+00105010
+
+11.2 LWL     .|  Load word left 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400 
+lui,&t3,1099
+sw,$t3,0($sp)
+lwl,$t4,0($sp)
+addu,$v0,$zero,$t4
+lui,&t4,8412
+sw,$t4,4($sp)
+lwl,$t4,4($sp)
+addu,$v0,$zero,$t4
+lui,$t5,1680
+sw,$t5,8($sp)
+lwl,$t5,8($sp)
+addu,$v0,$zero,$t5
+
+
+12.1---LWR     |  Load word right 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400 
+lwr,$t0,0($sp)
+addu,$v0,$zero,$t0
+lwr,$t1,4($sp)
+addu,$v0,$zero,$t1
+lwr,$t2,8($sp)
+addu,$v0,$zero,$t2
+
+0020E120
+00CfC020
+00105010
+
+12.2----LWR     |  Load word right
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400 
+lui,&t3,1099
+sw,$t3,0($sp)
+lwr,$t4,0($sp)
+addu,$v0,$zero,$t4
+lui,&t4,8412
+sw,$t4,4($sp)
+lwr,$t4,4($sp)
+addu,$v0,$zero,$t4
+lui,$t5,1680
+sw,$t5,8($sp)
+lwr,$t5,8($sp)
+addu,$v0,$zero,$t5
+
+(..... )
+13.MTHI    |  Move to HI 
+
+14.MTLO    |  Move to LO
+
+15.SB      |  Store byte 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400
+lui,&t3,1099
+sb,$t3,0($sp)
+lb,$t4,0($sp)
+addu,$v0,$zero,$t4
+lui,&t4,8412
+sb,$t4,4($sp)
+lb,$t4,4($sp)
+addu,$v0,$zero,$t4
+lui,$t5,1680
+sb,$t5,8($sp)
+lb,$t5,8($sp)
+addu,$v0,$zero,$t5 
+
+16.SH      |  Store half-word 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400
+lui,&t3,1099
+sh,$t3,0($sp)
+lh,$t4,0($sp)
+addu,$v0,$zero,$t4
+lui,&t4,8412
+sh,$t4,4($sp)
+lh,$t4,4($sp)
+addu,$v0,$zero,$t4
+lui,$t5,1680
+sh,$t5,8($sp)
+lh,$t5,8($sp)
+addu,$v0,$zero,$t5
+
+17.SLLV    |  Shift left logical variable 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400
+lui,%t0,2021
+lui,%t1,2,
+sllv,$t2,$t0,$t1
+addu,$v0,$zero,$t2
+lui,%t0,3456
+lui,%t1,4,
+sllv,$t2,$t0,$t1
+addu,$v0,$zero,$t2
+lui,%t0,A210
+lui,%t1,7,
+sllv,$t2,$t0,$t1
+addu,$v0,$zero,$t2
+
+18. OR      .|  Bitwise or   
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400
+lui,%t0,2021
+lui,%t1,1022
+or,$t3,$t0,$t1
+addu,$v0,$zero,$t3
+lui,%t0,3456
+lui,%t1,982C
+or,$t3,$t0,$t1
+addu,$v0,$zero,$t3
+lui,%t0,3827
+lui,%t1,1024
+or,$t3,$t0,$t1
+addu,$v0,$zero,$t3
+
+19. ORI     |  Bitwise or immediate 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400
+lui,%t0,2021
+ori,$t3,$t0,1022
+addu,$v0,$zero,$t3
+lui,%t0,3456
+ori,$t3,$t0,982C
+addu,$v0,$zero,$t3
+lui,%t0,3827
+ori,$t3,$t0,1024
+addu,$v0,$zero,$t3
+
+20. XOR     |  Bitwise exclusive or 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400
+lui,%t0,2021
+lui,%t1,1022
+xor,$t3,$t0,$t1
+addu,$v0,$zero,$t3
+lui,%t0,3456
+lui,%t1,982C
+xor,$t3,$t0,$t1
+addu,$v0,$zero,$t3
+lui,%t0,3827
+lui,%t1,1024
+xor,$t3,$t0,$t1
+addu,$v0,$zero,$t3
+
+21. XORI    |  Bitwise exclusive or immediate 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400
+lui,%t0,2021
+xori,$t3,$t0,1022
+addu,$v0,$zero,$t3
+lui,%t0,3456
+xori,$t3,$t0,982C
+addu,$v0,$zero,$t3
+lui,%t0,3827
+xori,$t3,$t0,1024
+addu,$v0,$zero,$t3
+
+22.AND     |  Bitwise and  
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400
+lui,%t0,2021
+lui,%t1,1022
+and,$t3,$t0,$t1
+addu,$v0,$zero,$t3
+lui,%t0,3456
+lui,%t1,982C
+and,$t3,$t0,$t1
+addu,$v0,$zero,$t3
+lui,%t0,3827
+lui,%t1,1024
+add,$t3,$t0,$t1
+addu,$v0,$zero,$t3
+
+23. ANDI    |  Bitwise and immediate 
+addiu,&t0,&zero,BCF0
+sll,%t1,$t0,10
+addiu,&sp,$t1,400
+lui,%t0,2021
+andi,$t3,$t0,1022
+addu,$v0,$zero,$t3
+lui,%t0,3456
+andi,$t3,$t0,982C
+addu,$v0,$zero,$t3
+lui,%t0,3827
+andi,$t3,$t0,1024
+addu,$v0,$zero,$t3
+
+24. SRA     |  Shift right arithmetic 
+lui,%t0,A021
+sra,$t1,$t0,1
+addu,$v0,$zero,$t1
+lui,%t0,32A1
+sra,$t1,$t0,1
+addu,$v0,$zero,$t1
+lui,%t0,A021
+sra,$t1,$t0,1
+addu,$v0,$zero,$t1
+lui,%t0,A021
+sra,$t1,$t0,1
+addu,$v0,$zero,$t1
