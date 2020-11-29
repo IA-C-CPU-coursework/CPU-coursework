@@ -513,15 +513,13 @@ addu,$v0,$zero,$t0
 j labela
 lui,$t0,12C3
 addu,$v0,$zero,$t0
-j labelb
-lui,$t0,1523
-addu,$v0,$zero,$t0
-
 labela: lui,$t0,B023
         addu,$v0,$zero,$t0
-
-label b:lui,$t0,6023
+        j labelb
+labelb: lui,$t0,6023
         addu,$v0,$zero,$t0
 
 30. JR      .|  Jump register 
-lui 
+lui,$t0,1023
+addu,$v0,$zero,$t0
+addiu,$t1,$zero,$
