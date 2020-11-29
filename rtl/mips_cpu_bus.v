@@ -20,68 +20,82 @@ module mips_cpu_bus(
     logic [7:0] pc = 0;
  
     assign address = pc;
+    wire [7:0] pc4 = pc+4;
     wire pc_next;
-    logic [25:0] jump_address;
-    assign jump_address = instruction[25:0];
+
+    
     wire [15:0] instant;
     
     logic resetlastedge = 0;
     logic [31:0] instruction;
     logic [31:0] data;
 
-    typedef enum logic[2:0] {
-        FETCH_INSTR_ADDR = 3'b000,
-        FETCH_INSTR_DATA = 3'b001,
-        EXEC_INSTR_ADDR  = 3'b010,
-        EXEC_INSTR_DATA  = 3'b011,
-        WRITE_BACK = 3'b100,
-        HALTED =      3'b101
+    typedef enum logic[3:0] {
+        FETCH_INSTR_ADDR  = 4'b0000,
+        FETCH_INSTR_DATA  = 4'b0001,
+        EXEC_INSTR_ADDR   = 4'b0010,
+        EXEC_INSTR_DATA   = 4'b0011,
+        WRITE_BACK        = 4'b0100,
+        HALTED            = 4'b0101
+        //FETCH_INSTR_ADDR = 4'b0110, //State' indicated a slot instruction
+        //FETCH_INSTR_DATA = 4'b0111,
+        //EXEC_INSTR_ADDR  = 4'b1000,
+        //WRITE_BACK       = 4'b1001
 
     } state_t;
 
     state_t state;
+    wire [25:0] jumptarget;
     wire [31:0] A,B;
     wire [4:0] rd,rs,rt;
     wire RegDst;
-    assign rd = [20:16] instruction;
-    assign rs = [25:21] instruction;
-    assign rt = [16:11] instruction;
+    assign rd =  instruction [20:16];
+    assign rs =  instruction[25:21];
+    assign rt =  instruction[16:11];
     wire [2:0] ALUControl;
+    wire [3:0] byteenable_wire;
     wire [4:0] Address2;
-    wire MemRead,MemWrite,MemtoReg;
+    wire MemRead,MemWrite,MemtoReg,WriteAddress;
     wire RegWrite;
     wire ALUSrc;
     assign WriteAddress = RegDst ? rd:rt;
     assign read = MemRead;
     assign write = MemWrite;
+    assign byteenable = byteenable_wire;
     wire [31:0] ALUout;
     logic resetheld = 0;
-    wire [31:0] writedata = MemtoReg ? ALUout:data
+    assign writedata = MemtoReg ? data:ALUout;
     wire [31:0] instantextended;
     wire [31:0] D2;
-    assign B = ALUSrc ? D2:instantextended;
-    wire jump, branch;
+    assign B = ALUSrc ? instantextended:D2;
+    wire jumpimmediate,jumpfromreg, branch, link;
+    wire branchtype = jumpimmediate || jumpfromreg || branch;
+    wire jump = jumpimmediate || jumpfromreg;
+    logic readinstruction;
+    wire zero;
 
-    mips_sign_extension(
+    mips_sign_extension sign_extender(
         .i(instant),
         .o(instantextended)
-    )
+    );
 
-    mips_control_unit(
-    .RegWrite(RegWrite)
+    mips_control_unit control_unit(
+    .RegWrite(RegWrite),
     .opcode(opcode),
     .FuncCode(FuncCode),
     .reset(resetheld),
     .RegDst(RegDst),
     .ALUControl(ALUControl),
     .MemRead(MemRead),
-    .MemWrite(MemWrite)
-    .MemtoReg(MemtoReg)
+    .MemWrite(MemWrite),
+    .MemtoReg(MemtoReg),
     .ALUSrc(ALUSrc),
-    .jump(jump),
-    .branch(branch))
+    .jumpimmediate(jumpimmediate),
+    .jumpfromreg(jumpfromreg),
+    .branch(branch),
+    .link(link));
 
-    mips_reg_file(
+    mips_reg_file regfile(
     .rst(resetheld),
     .clk(clk),
     .WriteAddress(WriteAddress),
@@ -90,23 +104,25 @@ module mips_cpu_bus(
     .Address1(rs),
     .Address2(rt),
     .DataOut1(A),
-    .DataOut2(D2))
+    .DataOut2(D2));
    
-    mips_alu(
-    .ALUcontrol(ALUcontrol),
+    mips_alu alu(
+    .ALUcontrol(ALUControl),
     .A(A),
     .B(B),
     .ALUout(ALUout),
-    .Zero())
+    .Zero(zero));
 
     always_comb begin
-        if (pc==0) begin state = HALTED end
-        
+        if (pc==0) state = HALTED;
     end
 
-    always_comb begin // determine next pc
-        pc_next = jump ? (branch ? pc+4:( (pc +4) + (instantextended<<2) ) ):jump_address<<2
-    end
+    assign read = (state==FETCH_INSTR_ADDR) ? 1 : (state==EXEC_INSTR_ADDR && MemRead);
+    
+    assign write = state==EXEC_INSTR_DATA ? MemWrite : 0;
+
+    assign address  = (state == FETCH_INSTR_ADDR) ? pc:ALUout;
+    
 
     always @(posedge clk) begin
         if(reset) begin
@@ -128,7 +144,12 @@ module mips_cpu_bus(
             case(state)
                 FETCH_INSTR_ADDR: begin // GETS INSTRUCTION FROM RAM
                     
-                    $display("CPU: Fetching address: %d",pc)
+                    $display("CPU: Fetching address: %d",pc);
+                    state <= FETCH_INSTR_ADDR;
+                   
+                end
+                FETCH_INSTR_DATA: begin //GETS REQUIRED REGISTER VALUES
+                    $display("CPU: Fetching data from registers.");
                     if(waitrequest)begin
                         
                     end
@@ -136,33 +157,46 @@ module mips_cpu_bus(
                         instruction <= readdata;
                         state <= EXEC_INSTR_ADDR;
                     end
-                end
-                FETCH_INSTR_DATA: begin //GETS REQUIRED REGISTER VALUES
-                    $display("CPU: Fetching data from registers.")
+                    if(branchtype) begin
+                        state <= FETCH_BRANCH_ADDRESS;
+                        
+                    end
                     
                 end
+                EXEC_INSTR_ADDR:begin
                     
                 end
+
+                
                 EXEC_INSTR_DATA: begin // MEMORY ACCESS
                     if(waitrequest) begin
-                        $display("RAM: Readdata blocked by waitrequest")
+                        $display("RAM: Readdata blocked by waitrequest");
                     end
                     else begin
                         data <= readdata;
-                        $display("CPU: Read data from registers")
+                        $display("CPU: Read data from registers");
                     end
                     
                 end
                 WRITE_BACK: begin // WRITES TO REGISTERS
-                    pc <= pc_next;
+                    pc <= pc4;
                     state <= FETCH_INSTR_ADDR;
                 end
                 HALTED: begin
-                    $display("CPU: HALTED")
+                    $display("CPU: HALTED");
                 end
 
+                FETCH_BRANCH_ADDRESS: begin
+                    if (jump) begin 
+                        jumptarget <= jumpfromreg ? A: instruction[25:0]; //Chooses immediate jump address or from register
+                    end
+                    
+                end
+
+
+
                 default: begin
-                    $fatal("CPU: Current State: %d",state)
+                    $fatal("CPU: Current State: %d",state);
                 end
             endcase
         end

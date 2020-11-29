@@ -4,12 +4,25 @@ module mips_control_unit(
     input reset,
 // Determine output signals that must be controlled
 
-    output RegWrite, MemtoReg, ALUSrc, MemRead, MemWrite, RegDst, branch, jump
-    output logic [2:0] ALUControl
+    output logic RegWrite, MemtoReg, ALUSrc, MemRead, MemWrite, RegDst, branch, jumpimmediate, jumpfromreg, link,
+    output logic [2:0] ALUControl,
+    output logic [3:0] byteenable
     
 );
     
 always_comb begin
+    //defaults:
+    byteenable = 4'b1111;
+    branch = 0;
+    jumpimmediate = 0;
+    jumpfromreg = 0;
+    MemRead = 0;
+    MemWrite = 0;
+    RegWrite = 0;
+    RegDst = 0;
+    link = 0;
+    MemtoReg = 0;
+    ALUSrc = 0;
     case(opcode)
 /*    
     6'b000000: begin //Opcode == 0 (ADDU, AND)
@@ -21,15 +34,12 @@ always_comb begin
         end
     end */
     6'b001001: begin //ADDIU **
-        ALUSrc = 1;
-        ALUControl = 2;
+        ALUSrc = 1; 
+        ALUControl = 2; 
         RegWrite = 1;
-        MemtoReg = ;
+        MemtoReg = 1;
         MemRead = 1;
-        MemWrite = 0;
-        RegDst = 1;
-        branch = 0;
-        jump = 0;
+        RegDst = 0;
     end
 
 /*
@@ -61,8 +71,15 @@ always_comb begin
     end
     6'bxxxxxx: begin //JAL
     end
-    6'bxxxxxx: begin //JR **
+    */
+    6'bxxxxxx: begin //JR 
+        jumpfromreg = 1;
+        link = 0;
+        RegWrite = 0;
+        MemRead = 0;
+        MemWrite = 0;
     end
+    /*
     6'bxxxxxx: begin //LB
     end
     6'bxxxxxx: begin //LBU
@@ -73,8 +90,17 @@ always_comb begin
     end
     6'bxxxxxx: begin //LUI
     end
-    6'bxxxxxx: begin //LW **
+    */
+    6'b100010: begin //LW 
+        RegWrite = 1;
+        MemtoReg = 1;
+        MemRead = 1;
+        MemWrite = 0;
+        RegDst = 0;
+        ALUControl = 2;
+        ALUSrc = 1;
     end
+    /*
     6'bxxxxxx: begin //LWL
     end
     6'bxxxxxx: begin //LWR
@@ -117,8 +143,13 @@ always_comb begin
     end
     6'bxxxxxx: begin //SUBU
     end
-    6'bxxxxxx: begin //SW **
-    end
+    */
+    6'bxxxxxx: begin //SW 
+    ALUSrc = 1;
+    MemWrite = 1;
+
+
+    end /*
     6'bxxxxxx: begin //XOR
     end
     6'bxxxxxx: begin //XORI
