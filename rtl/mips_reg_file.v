@@ -2,7 +2,7 @@ module mips_reg_file(
     input rst,
     input clk,
     input RegWrite, // Write enable
-    input [4:0] WriteAddress, // Which Register to write to
+    input logic [4:0] WriteAddress, // Which Register to write to
     input [4:0] Address1, // Read reg numbers
     input [4:0] Address2,
     input [31:0] DataIn, // Data to write to reg

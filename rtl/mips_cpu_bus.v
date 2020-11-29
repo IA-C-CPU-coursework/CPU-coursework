@@ -19,7 +19,6 @@ module mips_cpu_bus(
     wire [5:0] FuncCode = instruction [5:0];
     logic [7:0] pc = 0;
  
-    assign address = pc;
     wire [7:0] pc4 = pc+4;
     wire pc_next;
 
@@ -36,7 +35,8 @@ module mips_cpu_bus(
         EXEC_INSTR_ADDR   = 4'b0010,
         EXEC_INSTR_DATA   = 4'b0011,
         WRITE_BACK        = 4'b0100,
-        HALTED            = 4'b0101
+        HALTED            = 4'b0101,
+        FETCH_BRANCH_ADDRESS = 4'b0110
         //FETCH_INSTR_ADDR = 4'b0110, //State' indicated a slot instruction
         //FETCH_INSTR_DATA = 4'b0111,
         //EXEC_INSTR_ADDR  = 4'b1000,
@@ -45,7 +45,7 @@ module mips_cpu_bus(
     } state_t;
 
     state_t state;
-    wire [25:0] jumptarget;
+    logic [25:0] jumptarget;
     wire [31:0] A,B;
     wire [4:0] rd,rs,rt;
     wire RegDst;
@@ -55,12 +55,11 @@ module mips_cpu_bus(
     wire [2:0] ALUControl;
     wire [3:0] byteenable_wire;
     wire [4:0] Address2;
-    wire MemRead,MemWrite,MemtoReg,WriteAddress;
+    wire MemRead,MemWrite,MemtoReg;
+    wire [4:0] WriteAddress;
     wire RegWrite;
     wire ALUSrc;
     assign WriteAddress = RegDst ? rd:rt;
-    assign read = MemRead;
-    assign write = MemWrite;
     assign byteenable = byteenable_wire;
     wire [31:0] ALUout;
     logic resetheld = 0;
