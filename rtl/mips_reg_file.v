@@ -7,12 +7,14 @@ module mips_reg_file(
     input [4:0] Address2,
     input [31:0] DataIn, // Data to write to reg
     output [31:0] DataOut1, // Output data for respective registers
-    output [31:0] DataOut2
+    output [31:0] DataOut2,
+    output [31:0] regv0
 
 );
 
     
 logic [31:0] registers [0:31]; 
+assign regv0 = registers[2];
 //assign registers[0] = 0; // Hardwired to 0
     
 // Writing to registers

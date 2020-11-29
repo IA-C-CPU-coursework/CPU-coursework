@@ -17,12 +17,17 @@ module mips_cpu_bus(
 
     wire [5:0] opcode =  instruction [31:26];
     wire [5:0] FuncCode = instruction [5:0];
-    logic [31:0] pc = 0;
+    logic [31:0] pc;
+    logic resetted = 0;
+    wire v0;
+    assign register_v0 = resetted?(active? 0:v0):0;
+    initial begin
+        active = 0;
+        pc = 0;
+    end
  
     wire [31:0] pc4 = pc+4;
-    wire pc_next;
-
-    
+    wire pc_next;     
     wire [15:0] instant;
     
     logic resetlastedge = 0;
@@ -35,13 +40,7 @@ module mips_cpu_bus(
         EXEC_INSTR_ADDR   = 4'b0010,
         EXEC_INSTR_DATA   = 4'b0011,
         WRITE_BACK        = 4'b0100,
-        HALTED            = 4'b0101,
-        FETCH_BRANCH_ADDRESS = 4'b0110
-        //FETCH_INSTR_ADDR = 4'b0110, //State' indicated a slot instruction
-        //FETCH_INSTR_DATA = 4'b0111,
-        //EXEC_INSTR_ADDR  = 4'b1000,
-        //WRITE_BACK       = 4'b1001
-
+        HALTED            = 4'b0101
     } state_t;
 
     state_t state;
@@ -103,7 +102,9 @@ module mips_cpu_bus(
     .Address1(rs),
     .Address2(rt),
     .DataOut1(A),
-    .DataOut2(D2));
+    .DataOut2(D2),
+    .regv0()
+    );
    
     mips_alu alu(
     .ALUcontrol(ALUControl),
@@ -144,6 +145,8 @@ module mips_cpu_bus(
 
     always @(posedge clk) begin
         if(reset) begin
+            active = 1;
+            resetted = 1;
             if(resetlastedge) begin
                 //RESET THE REGISTERS 
                 $display("CPU : Resetting.");
@@ -163,18 +166,17 @@ module mips_cpu_bus(
             case(state)
                 FETCH_INSTR_ADDR: begin // GETS INSTRUCTION FROM RAM
                     
-                    $display("CPU: Fetching address: %d",pc);
+                    $display("CPU : INFO : Fetching address: %d",pc);
                     state <= FETCH_INSTR_ADDR;
                    
                 end
                 FETCH_INSTR_DATA: begin //GETS REQUIRED REGISTER VALUES
-                    $display("CPU: Fetching data from registers.");
+                    $display("CPU : INFO : Fetching data from registers.");
                     if(waitrequest)begin
                         
                     end
                     else begin
                         instruction <= readdata;
-                        
                     end
                     
                    
@@ -203,11 +205,11 @@ module mips_cpu_bus(
                 
                 EXEC_INSTR_DATA: begin // MEMORY ACCESS
                     if(waitrequest) begin
-                        $display("RAM: Readdata blocked by waitrequest");
+                        $display("RAM : INFO : Read data blocked by waitrequest");
                     end
                     else begin
                         data <= readdata;
-                        $display("CPU: Read data from registers");
+                        $display("CPU : INFO : Read data from registers");
                         state <= WRITE_BACK;
                     end
                     
@@ -221,7 +223,8 @@ module mips_cpu_bus(
                     
                 end
                 HALTED: begin
-                    $display("CPU: HALTED");
+                    $display("CPU: WARNING : HALTED");
+                    active = 0;
                 end
 
                 // FETCH_BRANCH_ADDRESS: begin
@@ -237,7 +240,7 @@ module mips_cpu_bus(
 
 
                 default: begin
-                    $fatal("CPU: Current State: %d",state);
+                    $fatal("CPU : FATAL : Unspecified state: %d",state);
                 end
             endcase
         end
