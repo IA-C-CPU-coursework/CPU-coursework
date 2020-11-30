@@ -1,0 +1,5 @@
+addiu,$v0,$zero,0
+addiu,$v0,$zero,C
+addiu,$v0,$zero,2D
+addiu,$v0,$zero,A86E
+addiu,$v0,$zero,B0A8
