@@ -166,7 +166,6 @@ module mips_cpu_bus(
 
         else begin
             resetlastedge <= 0;
-
             case(state)
 
                 /* During FETCH_INST the instruction is fetched, 
@@ -219,7 +218,7 @@ module mips_cpu_bus(
                 end
 
                 WRITE_BACK: begin 
-                    pc <= branchtype ? jumptarget:pc4;                    
+                    pc <= branchtype ? jumptarget:(isDelaySlot ? (pc-4):pc4);      
                     state <= FETCH_INSTR;
                     isDelaySlot <= 0;
                 end
