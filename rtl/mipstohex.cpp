@@ -60,18 +60,20 @@ int getReg(string s)
 }
 map<string,string> findLabel(vector<string> &strings)
 {
+    int line =0;
     stringstream ss;
     map<string,string> labels;
     for(int i =0;i<strings.size();i++)
     {
+        line = line+4;
         int pos = strings[i].find(":");
         if (pos != std::string::npos) {
         string label = strings[i].substr(0,pos);
         //ss << setfill('0') << setw(8) << hex << i << endl; //hex version
-        ss << bitset<26>(i).to_string();
+        ss << bitset<26>(line).to_string();
         labels[label] =  ss.str();
         ss.str("");
-        cerr << "label :" << label << " line :" << i<< " newstring is " << strings[i].substr(pos+1,string::npos) <<endl;
+        cerr << "label :" << label << " line :" << line<< "(" << i << ")" << " newstring is " << strings[i].substr(pos+1,string::npos) <<endl;
         strings[i] = strings[i].substr(pos+1,string::npos);
         }
     }
@@ -109,7 +111,7 @@ string procLine(string line, map<string,pair<int, int>> &instr,map<string,string
             +bitset<5>(0).to_string()
             +bitset<6>(op2).to_string();    
         }
-        else if((op2 <=27)||(op2 >= 24)) //DIV DIVU MULT MULTU
+        else if((op2 <=27)&&(op2>=24)) //DIV DIVU MULT MULTU
         {
              out = out + "000000" //OP
             +bitset<5>(getReg(parts[1])).to_string()  //source
@@ -184,20 +186,35 @@ string procLine(string line, map<string,pair<int, int>> &instr,map<string,string
         }
         else if((op == 4)||(op == 5)){ // beq and bne
                             // OPCODE                                            SOURCE                          DEST                            OFFSET
-            out = out + bitset<6>(op).to_string()+bitset<5>(getReg(parts[1])).to_string()+bitset<5>(getReg(parts[2])).to_string()+bitset<16>(hex2Dec(parts[3])).to_string();
-                          
+            out = out + bitset<6>(op).to_string()+bitset<5>(getReg(parts[1])).to_string()+bitset<5>(getReg(parts[2])).to_string();
+            if (labels.find(parts[3]) == labels.end() ) {
+                out = out+bitset<16>(hex2Dec(parts[3])).to_string(); 
+            } else {//labels found
+                cerr << "subbing label " << parts[3] << endl;
+                out = out+labels[parts[3]].substr(10,std::string::npos);
+            }              
         }
         else if((op == 1)&&(instr[parts[0]].second =! 3)) // BGEZ and BGEZAL BLTZ BLTZAL
         {                     //OPCODE                                      //SOURCE                                 //SET 1  either or zero                            IMMEDIATE
-            out = out + bitset<6>(op).to_string()+bitset<5>(getReg(parts[1])).to_string()+bitset<5>(instr[parts[0]].second ).to_string()+bitset<16>(hex2Dec(parts[2])).to_string();
-             
+            out = out + bitset<6>(op).to_string()+bitset<5>(getReg(parts[1])).to_string()+bitset<5>(instr[parts[0]].second ).to_string();
+            if (labels.find(parts[3]) == labels.end() ) {
+                out = out+bitset<16>(hex2Dec(parts[3])).to_string(); 
+            } else {//labels found
+                cerr << "subbing label " << parts[3] << endl;
+                out = out+labels[parts[3]].substr(10,std::string::npos);
+            }    
             cerr << parts[0] << ":" <<getReg(parts[1]) << ":" << parts[2]<< endl;
              
         }
         else if((op == 7 )|| (op == 6)|| ((op == 1)&&(instr[parts[0]].second == 3))) // BGTZ and BLEZ 
         {                     //OPCODE                                      //SOURCE                                 // set 0                                IMMEDIATE
-            out = out + bitset<6>(op).to_string()+bitset<5>(getReg(parts[1])).to_string()+bitset<5>(0).to_string()+bitset<16>(hex2Dec(parts[2])).to_string();
-             
+            out = out + bitset<6>(op).to_string()+bitset<5>(getReg(parts[1])).to_string()+bitset<5>(0).to_string();
+            if (labels.find(parts[3]) == labels.end() ) {
+                out = out+bitset<16>(hex2Dec(parts[3])).to_string(); 
+            } else {//labels found
+                cerr << "subbing label " << parts[3] << endl;
+                out = out+labels[parts[3]].substr(10,std::string::npos);
+            }   
             cerr << parts[0] << ":" <<getReg(parts[1]) << ":" << parts[2]<< endl;
              
         }
