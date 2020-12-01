@@ -2,7 +2,9 @@
 
 ## Architecture Overview
 
-![mips32_arch-MIPS_CPU_DATA_PATH](https://ouikujie-images.oss-cn-shanghai.aliyuncs.com/img/20201130072005.svg)
+![mips32_arch-MIPS_CPU_DATA_PATH](https://ouikujie-images.oss-cn-shanghai.aliyuncs.com/img/20201201021153.svg)
+
+
 
 ## Instruction in details
 
@@ -10,42 +12,42 @@
 //-----------------------------------------------------------------------------
 // Arithmetic Logic Unit
 //-----------------------------------------------------------------------------
-ADDU    rd, rs, rt      3    Unsigned                        rd = rs + rt (unsigned)
-ADDIU   rt, rs, imm     3    Immediate Unsigned              rt = rs + imm[15:0]
-AND     rd, rs, rt      3    And                             rd = rs & rt
-ANDI    rt, rs, imm     3    And Immediate                   rt = rs & imm[31:0]
+ADDU    rd, rs, rt      2    Unsigned                        rd = rs + rt (unsigned)
+ADDIU   rt, rs, imm     2    Immediate Unsigned              rt = rs + imm[15:0]
+AND     rd, rs, rt      2    And                             rd = rs & rt
+ANDI    rt, rs, imm     2    And Immediate                   rt = rs & imm[31:0]
 LUI     rt, imm         2    Load Upper Immediate            rt = imm[31:0] << 16
-OR      rd, rs, rt      3    Or                              rd = rs | rt
-ORI     rt, rs, imm     3    Or Immediate                    rt = rs | imm[31:0]
-SLT     rd, rs, rt      3    Set on Less Than                rd = rs < rt
-SLTI    rt, rs, imm     3    Set on Less Than Immediate      rt = rs < imm[31:0]
-SLTIU   rt, rs, imm     3    Set on < Immediate Unsigned     rt = rs < imm[15:0]
-SLTU    rd, rs, rt      3    Set On Less Than Unsigned       rd = rs < rt
-SUBU    rd, rs, rt      3    Subtract                        rd = rs - rt (unsigned)
-XOR     rd, rs, rt      3    Exclusive Or                    rd = rs ^ rt
-XORI    rt, rs, imm     3    Exclusice Or Immediate          rt = rs ^ imm
+OR      rd, rs, rt      2    Or                              rd = rs | rt
+ORI     rt, rs, imm     2    Or Immediate                    rt = rs | imm[31:0]
+SLT     rd, rs, rt      2    Set on Less Than                rd = rs < rt
+SLTI    rt, rs, imm     2    Set on Less Than Immediate      rt = rs < imm[31:0]
+SLTIU   rt, rs, imm     2    Set on < Immediate Unsigned     rt = rs < imm[15:0]
+SLTU    rd, rs, rt      2    Set On Less Than Unsigned       rd = rs < rt
+SUBU    rd, rs, rt      2    Subtract                        rd = rs - rt (unsigned)
+XOR     rd, rs, rt      2    Exclusive Or                    rd = rs ^ rt
+XORI    rt, rs, imm     2    Exclusice Or Immediate          rt = rs ^ imm
 
 
 //-----------------------------------------------------------------------------
 // Shift
 //-----------------------------------------------------------------------------
-SLL     rd, rt, sa      3    Shift Left Logical              rd = rt << sa
-SLLV    rd, rt, rs      3    Shift Left Logical Variable     rd = rt << rs
-SRA     rd, rt, sa      3    Shift Right Arithmetic          rd = rt >> sa 
-SRAV    rd, rt, rs      3    Shift Right Arithmetic          rd = rt >> rs
-SRL     rd, rt, sa      3    Shift Right Logical             rd = rt >> sa
-SRLV    rd, rt, rs      3    Shift Right Logical Variable    rd = rt >> rs
+SLL     rd, rt, sa      2    Shift Left Logical              rd = rt << sa
+SLLV    rd, rt, rs      2    Shift Left Logical Variable     rd = rt << rs
+SRA     rd, rt, sa      2    Shift Right Arithmetic          rd = rt >> sa 
+SRAV    rd, rt, rs      2    Shift Right Arithmetic          rd = rt >> rs
+SRL     rd, rt, sa      2    Shift Right Logical             rd = rt >> sa
+SRLV    rd, rt, rs      2    Shift Right Logical Variable    rd = rt >> rs
 
 
 //-----------------------------------------------------------------------------
 // Multiply
 //-----------------------------------------------------------------------------
-DIV     rs, rt          3    Divide                          HI = rs % rt; LO = rs / rt (signed)
-DIVU    rs, rt          3    Divide Unsigned                 HI = rs % rt; LO = rs / rt (unsigned)
-MTHI    rs              3    Move to HI                      HI = rs
-MTLO    rs              3    Move to LO                      LO = rs
-MULT    rs, rt          3    Multiply                        HI, LO = rs * rt (signed)
-MULTU   rs, rt          3    Multiply Unsigned               HI, LO = rs * rt (unsigned)
+DIV     rs, rt          2    Divide                          HI = rs % rt; LO = rs / rt (signed)
+DIVU    rs, rt          2    Divide Unsigned                 HI = rs % rt; LO = rs / rt (unsigned)
+MTHI    rs              2    Move to HI                      HI = rs
+MTLO    rs              2    Move to LO                      LO = rs
+MULT    rs, rt          2    Multiply                        HI, LO = rs * rt (signed)
+MULTU   rs, rt          2    Multiply Unsigned               HI, LO = rs * rt (unsigned)
 
 
 //-----------------------------------------------------------------------------
@@ -85,7 +87,144 @@ SB      rt, offset(rs)  3    Store Byte                      mem[rs + offset] = 
 SH      rt, offset(rs)  3    Store Halfword                  mem[rs + offset] = rt[15:00]
                              aligned location
 SW      rt, offset(rs)  3    Store Word                      mem[rs + offset] = rt[31:00]
+
+
 ```
 
-For `MULT`, maybe we need two `write_addr` on `RegFile` to write `HI` and `LO` at the same time?   
+### Decoder Control Signals
 
+Multiplexers: MemSrc, RegSrc, RegData, ALUSrc, Buffer 
+Storage: MemWrite, MemRead, ByteEn, RegWrite, CntEn
+ALU: ALUControl
+PC: PCControl
+
+##### MemWrite
+
+enable write to memory when asserted
+
+##### MemRead
+
+enable read to memory when asserted
+
+##### ByteEn 
+
+`byteenable` signal for Avalon memory
+
+##### RegWrite
+
+enable write to register file when asserted
+
+##### CntEn 
+
+enable write to Program Counter when asserted 
+
+##### MemSrc
+
+```verilog
+mem_addr[31:0] = MemSrc ? pc[31:0] : alu_result[31:0];
+```
+
+##### RegSrc 
+
+```verilog
+write_addr[4:0] = RegSrc ? mem_out[20:16] : mem_out[15:11]; 
+```
+
+##### ALUSrc
+
+```verilog
+alu_src_2[31:0] = ALUSrc ? read_data_2[31:0] : signed_offset[31:0];
+```
+
+##### Buffer
+
+```verilog
+buffered_mem_out[31:0] <= mem_out[31:0];
+buffer_mem_out[31:0] = Buffer ? buffered_mem_out[31:0]  : mem_out[31:0];
+```
+
+##### RegData[1:0]
+
+```verilog
+case(RegSrc) begin
+    2'b00: assign write_data = mem_out;
+    2'b01: assign write_data = mem_addr;
+    2'b10: assign write_data = alu_result;
+    2'b11: 
+end
+```
+
+##### PCControl[1:0] 
+
+```verilog
+if (CntEn) begin
+    case(PCControl) begin
+        2'b00: pc[31:0] <= pc[31:0]  + offset[15:0] << 2;
+        2'b01: pc[31:0] <= pc[31:28] + target << 2;
+        2'b10: pc[31:0] <= rs[31:0]
+        2'b11: pc[31:0] <= pc[31:0]  + 4;
+    end
+end
+```
+
+##### ALUControl[4:0]
+
+```verilog
+case(ALUControl) begin
+    5'b00000: alu_result[31:0] = alu_src_1[31:0] +  alu_src_2[31:0]; // unsigned add
+    5'b00001: alu_result[31:0] = alu_src_1[31:0] &  alu_src_2[31:0]; // and
+    5'b00010: HI              <= alu_src_1[31:0] %  alu_src_2[31:0]; // divide
+              LO              <= alu_src_1[31:0] /  alu_src_2[31:0]; // divide
+    5'b00011: branch           = alu_src_1[31:0] == alu_src_2[31:0]; // equal to
+    5'b00100: branch           = alu_src_1[31:0] >  alu_src_2[31:0]; // greater than 
+    5'b00101: branch           = alu_src_1[31:0] >= alu_src_2[31:0]; // greater than or equal to 
+    5'b00110: branch           = alu_src_1[31:0] <  alu_src_2[31:0]; // less than 
+    5'b00111: branch           = alu_src_1[31:0] <= alu_src_2[31:0]; // less than or equal to 
+    5'b01000: HI, LO          <= alu_src_1[31:0] *  alu_src_2[31:0]; // multiply
+    5'b01001: branch           = alu_src_1[31:0] != alu_src_2[31:0]; // not equal to 
+    5'b01010: alu_result[31:0] = alu_src_1[31:0] |  alu_src_2[31:0]; // or 
+    5'b01011: alu_result[31:0] = alu_src_1[31:0] << alu_src_2[31:0]; // shift to left logic 
+    5'b01100: alu_result[31:0] = alu_src_1[31:0] >> alu_src_2[31:0]; // shift to right arithmetic 
+    5'b01101: alu_result[31:0] = alu_src_1[31:0] >> alu_src_2[31:0]; // shift to right logic 
+    5'b01110: alu_result[31:0] = alu_src_1[31:0] -  alu_src_2[31:0]; // subtract
+    5'b01111: alu_result[31:0] = alu_src_1[31:0] ^  alu_src_2[31:0]; // xor
+    5'b10000: HI              <= alu_result[31:0];                   // Move to HI
+    5'b10001: alu_result[31:0] = HI;                                 // Move from HI
+    5'b10010: LO              <= alu_result[31:0];                   // Move to LO
+    5'b10011: alu_result[31:0] = LO;                                 // Move from LO
+end
+```
+
+
+
+### State Machine
+
+- FETCH
+- EXEC1
+- EXEC2
+
+##### State: FETCH
+
+```
+Instr	MemSrc  MemWrite    MemRead ByteEnable  Buffer  RegSrc  RegData RegWrite    PCControl   CntEn   ALUSrc  ALUOp 
+x       1       0           1       1111        x       x       x       0           xx          0       x       x
+```
+
+##### State: EXEC1
+
+```
+Instr	MemSrc  MemWrite    MemRead ByteEnable  Buffer  RegSrc  RegData RegWrite    PCControl   CntEn   ALUSrc  ALUOp 
+ADDIU   1       0           1       1111        0       1       10      1           11          1       0       00000
+ADDU    1       0           1       1111        0       1       10      1           11          1       1       00000
+LW      1       0           1       1111        0       x       xx      0           xx          0       0       00000
+SW      1       0           1       1111        0       x       xx      0           xx          0       0       00000
+JR      1       0           1       1111        0       x       xx      0           10          1       x       xxxxx
+```
+
+##### State: EXEC2
+
+```
+Instr	MemSrc  MemWrite    MemRead ByteEnable  Buffer  RegSrc  RegData RegWrite    PCControl   CntEn   ALUSrc  ALUOp 
+LW      0       0           1       1111        1       0       00      1           11          1       0       00000
+SW      0       1           0       1111        1       x       xx      x           11          1       0       00000
+```
