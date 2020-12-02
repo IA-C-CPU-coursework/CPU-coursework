@@ -1,0 +1,5 @@
+addiu,$t0,$zero,987
+sll,$v0,$t0,6
+addiu,$v0,$v0,0
+sll,$v0,$t0,7
+addiu,$v0,$v0,0
