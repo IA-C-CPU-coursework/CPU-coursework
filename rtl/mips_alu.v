@@ -1,5 +1,8 @@
 //-----------------------------------------------------------------------------
 // ALU Module
+//
+// carry out required calculations based on ALUControl signal
+// save result of multiplication and division into a internal 64-bit register 
 //-----------------------------------------------------------------------------
 
 module mips_alu(
@@ -17,7 +20,7 @@ module mips_alu(
 
     always_comb begin
         case(ALUControl)
-        // deliver required calculations based on ALUControl signal 
+        // carry out required calculations based on ALUControl signal 
         // following are calculations/operations not involving HILO register
             5'b00000:   alu_result[31:0] = alu_src_1[31:0] +  alu_src_2[31:0]; // add (unsigned)
             5'b00001:   alu_result[31:0] = alu_src_1[31:0] &  alu_src_2[31:0]; // and
@@ -46,7 +49,7 @@ module mips_alu(
 
     always_ff @(posedge clk)begin
         case(ALUControl)
-        // deliver required calculations based on ALUControl signal 
+        // carry out required calculations based on ALUControl signal 
         // following are calculations/operations involving HILO register
             5'b00010:   begin 
                             HILO[63:32] <= alu_src_1[31:0] %  alu_src_2[31:0]; // divide
