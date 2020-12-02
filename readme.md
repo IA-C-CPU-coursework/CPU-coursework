@@ -210,7 +210,7 @@ Instr	MemSrc  MemWrite  MemRead  ByteEnable  RegSrc  RegData  RegWrite  PCContro
 ADDIU   1       0         1        1111        1       10       1         11         1      0       00000
 ADDU    1       0         1        1111        1       10       1         11         1      1       00000
 LW      1       0         1        1111        x       xx       0         xx         0      0       00000
-SW      0       1         0        1111        x       xx       0         xx         0      0       00000
+SW      0       1         0        1111        x       xx       0         xx         1      0       00000
 JR      1       0         1        1111        x       xx       0         10         1      x       xxxxx
 ```
 
@@ -219,5 +219,4 @@ JR      1       0         1        1111        x       xx       0         10    
 ```
 Instr   MemSrc  MemWrite  MemRead  ByteEnable  RegSrc  RegData RegWrite   PCControl  CntEn  ALUSrc  ALUControl 
 LW      0       0         1        1111        0       00      1          11         1      0       00000
-SW      0       1         0        1111        x       xx      x          11         1      0       00000
 ```

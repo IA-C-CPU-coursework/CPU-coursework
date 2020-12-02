@@ -127,7 +127,7 @@ module mips_decoder(
     // classification of instruction 
     logic load  = LB  || LBU || LH  || LHU || LW  || LWL || LWR;
     logic store = SB  || SH  || SW;
-    logic three_cycle = load || store;
+    logic three_cycle = load;
     logic two_cycle   = !three_cycle;
 
 
@@ -152,9 +152,9 @@ module mips_decoder(
             end
             2'b01: begin 
             // state == EXEC1
-                MemSrc       = 1'b1;
-                MemWrite     = 1'b0;
-                MemRead      = 1'b1;
+                MemSrc       = !store;
+                MemWrite     = store;
+                MemRead      = !store;
                 ByteEn       = 4'b1111;
                 RegSrc       = ADDIU || ADDU;
                 RegData      = 2'b10;
@@ -168,8 +168,8 @@ module mips_decoder(
             end
             2'b10: begin 
             // state == EXEC2
-                MemSrc       = 0;
-                MemWrite     = store;
+                MemSrc       = 1'b0;
+                MemWrite     = 1'b0;
                 MemRead      = load;
                 ByteEn       = 4'b1111;
                 RegSrc       = 1'b0;
