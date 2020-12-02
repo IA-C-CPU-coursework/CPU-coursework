@@ -2,7 +2,7 @@
 
 ## Architecture Overview
 
-![mips32_arch-MIPS_CPU_DATA_PATH](https://ouikujie-images.oss-cn-shanghai.aliyuncs.com/img/20201201021153.svg)
+![mips32_arch-MIPS_CPU](https://ouikujie-images.oss-cn-shanghai.aliyuncs.com/img/20201202200707.svg)
 
 
 
@@ -83,19 +83,20 @@ LWL     rt, offset(rs)  3    Load Word Left                  rt[31:16] = mem[rs 
                              possibly unaligned word        
 LWR     rt, offset(rs)  3    Load Word Right                 rt[15:00] = mem[rs + offset]
                              possibly unaligned word        
-SB      rt, offset(rs)  3    Store Byte                      mem[rs + offset] = rt[07:00]
-SH      rt, offset(rs)  3    Store Halfword                  mem[rs + offset] = rt[15:00]
+SB      rt, offset(rs)  2    Store Byte                      mem[rs + offset] = rt[07:00]
+SH      rt, offset(rs)  2    Store Halfword                  mem[rs + offset] = rt[15:00]
                              aligned location
-SW      rt, offset(rs)  3    Store Word                      mem[rs + offset] = rt[31:00]
-
-
+SW      rt, offset(rs)  2    Store Word                      mem[rs + offset] = rt[31:00]
 ```
 
 ### Decoder Control Signals
 
-Multiplexers: MemSrc, RegSrc, RegData, ALUSrc, Buffer 
+Multiplexers: MemSrc, RegSrc, RegData, ALUSrc 
+
 Storage: MemWrite, MemRead, ByteEn, RegWrite, CntEn
+
 ALU: ALUControl
+
 PC: PCControl
 
 ##### MemWrite
@@ -136,21 +137,13 @@ write_addr[4:0] = RegSrc ? mem_out[20:16] : mem_out[15:11];
 alu_src_2[31:0] = ALUSrc ? read_data_2[31:0] : signed_offset[31:0];
 ```
 
-##### Buffer
-
-```verilog
-buffered_mem_out[31:0] <= mem_out[31:0];
-buffer_mem_out[31:0] = Buffer ? buffered_mem_out[31:0]  : mem_out[31:0];
-```
-
 ##### RegData[1:0]
 
 ```verilog
-case(RegSrc) begin
+case(RegData) begin
     2'b00: assign write_data = mem_out;
     2'b01: assign write_data = mem_addr;
     2'b10: assign write_data = alu_result;
-    2'b11: 
 end
 ```
 
@@ -161,7 +154,7 @@ if (CntEn) begin
     case(PCControl) begin
         2'b00: pc[31:0] <= pc[31:0]  + offset[15:0] << 2;
         2'b01: pc[31:0] <= pc[31:28] + target << 2;
-        2'b10: pc[31:0] <= rs[31:0]
+        2'b10: pc[31:0] <= rs[31:0];
         2'b11: pc[31:0] <= pc[31:0]  + 4;
     end
 end
@@ -206,25 +199,25 @@ end
 ##### State: FETCH
 
 ```
-Instr	MemSrc  MemWrite    MemRead ByteEnable  Buffer  RegSrc  RegData RegWrite    PCControl   CntEn   ALUSrc  ALUOp 
-x       1       0           1       1111        x       x       x       0           xx          0       x       x
+Instr	MemSrc  MemWrite  MemRead  ByteEnable  RegSrc  RegData  RegWrite  PCControl  CntEn  ALUSrc  ALUControl 
+x       1       0         1        1111        x       x        0         xx         0      x       x
 ```
 
 ##### State: EXEC1
 
 ```
-Instr	MemSrc  MemWrite    MemRead ByteEnable  Buffer  RegSrc  RegData RegWrite    PCControl   CntEn   ALUSrc  ALUOp 
-ADDIU   1       0           1       1111        0       1       10      1           11          1       0       00000
-ADDU    1       0           1       1111        0       1       10      1           11          1       1       00000
-LW      1       0           1       1111        0       x       xx      0           xx          0       0       00000
-SW      1       0           1       1111        0       x       xx      0           xx          0       0       00000
-JR      1       0           1       1111        0       x       xx      0           10          1       x       xxxxx
+Instr	MemSrc  MemWrite  MemRead  ByteEnable  RegSrc  RegData  RegWrite  PCControl  CntEn  ALUSrc  ALUControl 
+ADDIU   1       0         1        1111        1       10       1         11         1      0       00000
+ADDU    1       0         1        1111        1       10       1         11         1      1       00000
+LW      1       0         1        1111        x       xx       0         xx         0      0       00000
+SW      0       1         0        1111        x       xx       0         xx         0      0       00000
+JR      1       0         1        1111        x       xx       0         10         1      x       xxxxx
 ```
 
 ##### State: EXEC2
 
 ```
-Instr	MemSrc  MemWrite    MemRead ByteEnable  Buffer  RegSrc  RegData RegWrite    PCControl   CntEn   ALUSrc  ALUOp 
-LW      0       0           1       1111        1       0       00      1           11          1       0       00000
-SW      0       1           0       1111        1       x       xx      x           11          1       0       00000
+Instr   MemSrc  MemWrite  MemRead  ByteEnable  RegSrc  RegData RegWrite   PCControl  CntEn  ALUSrc  ALUControl 
+LW      0       0         1        1111        0       00      1          11         1      0       00000
+SW      0       1         0        1111        x       xx      x          11         1      0       00000
 ```

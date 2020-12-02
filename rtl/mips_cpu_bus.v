@@ -9,6 +9,7 @@
 `include "mips_state_machine.v"
 `include "mips_sign_extension.v"
 `include "mips_reg_file.v"
+`include "mips_instruction_register.v"
 
 
 module mips_cpu_bus(
@@ -79,8 +80,8 @@ module mips_cpu_bus(
     logic [31:0] signed_offset;
 
     // signals required by mips_state_machines
-    logic halt;
-    logic extra;
+    logic Halt;
+    logic Extra;
     // logic waitrequest;
     logic[1:0] state;
 
@@ -97,6 +98,10 @@ module mips_cpu_bus(
     // logic CntEn;
     // logic ALUControl;
     // logic PCControl;
+
+    // instruction register
+    // logic [31:0] mem_out;
+    logic [31:0] mem_out_buffer;
 
     //-------------------------------------------------------------------------
     // Multiplexer
@@ -116,6 +121,14 @@ module mips_cpu_bus(
     //-------------------------------------------------------------------------
     // Module Instanciation 
     //-------------------------------------------------------------------------
+
+    //instanciation of instruction register
+    mips_instruction_register instrReg(
+        .clk(clk),
+        .state(state),
+        .mem_out(mem_out),
+        .mem_out_buffer(mem_out_buffer)
+    );
 
     // instanciation of mips_reg_file
     mips_reg_file regFile(
@@ -140,21 +153,21 @@ module mips_cpu_bus(
     mips_state_machine stateMachine(
         .rst(reset),
         .clk(clk),
-        .halt(halt),
-        .extra(extra),
+        .Halt(Halt),
+        .Extra(Extra),
         .waitrequest(waitrequest),
         .s(state)
     );
 
     // instantiation of mips_decoder
     mips_decoder decoder(
-        .instruction(mem_out), // instruction read from memory
+        .instruction(mem_out_buffer), // instruction read from memory
         .pc(pc), // instruction location
-        .halt(halt), // asserted when trying to execute instruction from 0x0
+        .Halt(Halt), // asserted when trying to execute instruction from 0x0
         .branch(branch),
         // state machine 
         .state(state), 
-        .extra(extra),
+        .Extra(Extra),
         // momery
         .MemWrite(MemWrite),
         .MemRead(MemRead),
@@ -166,7 +179,6 @@ module mips_cpu_bus(
         .MemSrc(MemSrc),
         .RegSrc(RegSrc),
         .ALUSrc(ALUSrc),
-        .Buffer(Buffer),
         // program counter
         .PCControl(PCControl),
         .CntEn(CntEn),

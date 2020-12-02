@@ -5,11 +5,11 @@
 module mips_decoder(
     input [31:0] instruction, // instruction read from memory
     input [31:0] pc, // instruction location
-    output halt, // asserted when trying to execute instruction from 0x0
+    output Halt, // asserted when trying to execute instruction from 0x0
     input branch,
     // state machine 
     input [1:0] state, 
-    output logic extra,
+    output logic Extra,
     // momery
     output logic MemWrite,
     output logic MemRead,
@@ -21,7 +21,6 @@ module mips_decoder(
     output logic MemSrc,
     output logic RegSrc,
     output logic ALUSrc,
-    output logic Buffer,
     // program counter
     output logic [1:0] PCControl,
     output logic CntEn,
@@ -29,7 +28,7 @@ module mips_decoder(
     output logic [4:0] ALUControl
 );
 
-    assign halt = pc == 0;
+    assign Halt = pc == 0;
     // halt when program counter output 0x0
     // should not halt when read from 0x0
 
@@ -143,7 +142,6 @@ module mips_decoder(
                 MemWrite    = 1'b0;
                 MemRead     = 1'b1;
                 ByteEn      = 4'b1111;
-                Buffer      = 1'bx;
                 RegSrc      = 1'bx;
                 RegData     = 2'bxx;
                 RegWrite    = 1'b0;
@@ -158,7 +156,6 @@ module mips_decoder(
                 MemWrite     = 1'b0;
                 MemRead      = 1'b1;
                 ByteEn       = 4'b1111;
-                Buffer       = 1'b1;
                 RegSrc       = ADDIU || ADDU;
                 RegData      = 2'b10;
                 RegWrite     = ADDIU || ADDU;
@@ -167,7 +164,7 @@ module mips_decoder(
                 CntEn        = two_cycle;
                 ALUSrc       = ADDU;
                 ALUControl   = 5'b00000;
-                extra        = three_cycle;
+                Extra        = three_cycle;
             end
             2'b10: begin 
             // state == EXEC2
@@ -175,7 +172,6 @@ module mips_decoder(
                 MemWrite     = store;
                 MemRead      = load;
                 ByteEn       = 4'b1111;
-                Buffer       = 1'b1;
                 RegSrc       = 1'b0;
                 RegData      = 2'b00;
                 RegWrite     = load;

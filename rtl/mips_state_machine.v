@@ -17,8 +17,8 @@ typedef enum logic[1:0] {
 module mips_state_machine(
     input clk,
     input rst,
-    input halt,
-    input extra,
+    input Halt,
+    input Extra,
     input waitrequest,
     output [1:0] s
 );
@@ -32,11 +32,11 @@ module mips_state_machine(
     end
 
     always_ff @(posedge clk) begin 
-        if(halt) begin
+        if(Halt) begin
         // set state to HALT when `halt` is asserted  
             state <= HALT;
         end
-        else if(rst & !halt) begin
+        else if(rst & !Halt) begin
         // reset state to FECTH only when `rst` is asserted and `halt` is disasserted 
             state <= FETCH;
         end 
@@ -48,7 +48,7 @@ module mips_state_machine(
             // `waitrequest`, `halt` and `rst` are all disasserted
                 case(state) 
                     FETCH: state <= EXEC1;
-                    EXEC1: state <= extra ? EXEC2 : FETCH; // move from EXEC1 to EXEC2 when extra is asserted 
+                    EXEC1: state <= Extra ? EXEC2 : FETCH; // move from EXEC1 to EXEC2 when extra is asserted 
                                                            // otherwise FETCH
                     EXEC2: state <= FETCH;
                     HALT:  state <= HALT;
