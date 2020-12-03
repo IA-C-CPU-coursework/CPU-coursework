@@ -17,7 +17,7 @@ module mips_cpu_bus(
     logic[1:0] count;
     initial begin
         active = 1;
-        register_v0 = 8'h00000000;
+        register_v0 = 32'h00000000;
         count = 0;
         address = 0;
         write =0;
@@ -28,7 +28,7 @@ module mips_cpu_bus(
 
     always_ff @(posedge clk)begin
         if(count==2)begin
-            register_v0 = 8'h00000001;
+            register_v0 = 32'h00000001;
             active = 0;
         end
         count<= count + 1;

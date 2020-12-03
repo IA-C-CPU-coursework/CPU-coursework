@@ -1,8 +1,9 @@
-module mips_cpu_bus_tb;
+module mips_cpu_bus_tb(
+);
 timeunit 1ns/10ps;
 
 //the RAM_FILE will change for different testcasese.
-parameter RAM_FILE = "../test/01-intruction_hex/01_addiu.txt";
+parameter RAM_INIT_FILE = "01_addiu1.txt";
 parameter TIMEOUT_CYCLES = 10000;
 
 logic clk;
@@ -35,7 +36,7 @@ mips_cpu_bus CPU(
 
 //create an instance of RAM
 RAM_32x64k_avalon #(RAM_INIT_FILE) ramInst(
-        .rst(rst),
+        .rst(reset),
         .clk(clk),
         .address(address), 
         .write(write), 
@@ -51,9 +52,9 @@ initial begin
     clk=0;
     
     repeat (TIMEOUT_CYCLES) begin
-        #10
+        #1
         clk = !clk;
-        #10
+        #1
         clk = !clk;
     end
     $fatal(2, "Simulation did not finish within %d cycles.", TIMEOUT_CYCLES);
@@ -67,23 +68,21 @@ initial begin
     // value we stored.
     //outpus the the values in register_v0:
 
-    rst <= 0;
+    reset <= 0;
 
     @(posedge clk);
-    rst <= 1;
+    reset <= 1;
 
     @(posedge clk);
-    rest <= 0;
-
+    reset <= 0;
+    #2;
     // test whether the CPU has been correctly evoked after reset
-    @(posedge clk);
-    assert(active==1)
-    else &display("TB: CPU did not set running=1 after reset.");
-
-    while(active) begin
-        &(posedge clk)
-        &display("register_v0: %d",register_v0);
+    while (active) begin
+        @(posedge clk);
+        #1;
     end
+
+    $display("register_v0: %d",register_v0);
 
     // finished the simulation
     
