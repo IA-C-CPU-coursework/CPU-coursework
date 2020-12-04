@@ -13,7 +13,7 @@ module mips_alu_tb;
 
     initial begin 
         $dumpfile("mips_alu_testwave.vcd");
-        $dumpvars(0, mips_alu_testwave);
+        $dumpvars(0, mips_alu_tb);
 
 
         clk=0;
@@ -50,9 +50,9 @@ module mips_alu_tb;
         //@(posedge clk);//testcase for deflut
         //#2;
         //assert(result==32'bxxxxxxxx);
-        //$display("result of input control %1 is %2",$control, $result);
+        //$display("result of input control %d is %d",control, result);
         //else
-        //$display("result of input control %1 failed with result %2",$control, $result);
+        //$display("result of input control %d failed with result %d",control, result);
 
 
 
@@ -60,9 +60,9 @@ module mips_alu_tb;
         control=0;
         #2;
         assert(result==15)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         
         
         
@@ -71,9 +71,9 @@ module mips_alu_tb;
         control=1;
         #2;
         assert(result==0)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);       
+        $display("result of input control %d failed with result %d",control, result);      
         
                 
         
@@ -82,27 +82,27 @@ module mips_alu_tb;
         control=3;//greater
         #1;
         assert(branch==0)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
 
         #1;//equal
         src_1=5;
         src_2=5;
         #1;
         assert(branch==1)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         
         #1;//less
         src_1=5;
         src_2=10;
         #1;
         assert(branch==0)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         
         #1;//get to original value 
         src_1=10;
@@ -117,27 +117,27 @@ module mips_alu_tb;
         control=4;//greater
         #1;
         assert(branch==1)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
 
         #1;//equal
         src_1=5;
         src_2=5;
         #1;
         assert(branch==0)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         
         #1;//less
         src_1=5;
         src_2=10;
         #1;
         assert(branch==0)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         
         #1;//get to original value 
         src_1=10;
@@ -152,27 +152,27 @@ module mips_alu_tb;
         control=5;//greater
         #1;
         assert(branch==1)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
 
         #1;//equal
         src_1=5;
         src_2=5;
         #1;
         assert(branch==1)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         
         #1;//less
         src_1=5;
         src_2=10;
         #1;
         assert(branch==0)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         
         #1;//get to original value 
         src_1=10;
@@ -185,27 +185,27 @@ module mips_alu_tb;
         control=6;//greater
         #1;
         assert(branch==0)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
 
         #1;//equal
         src_1=5;
         src_2=5;
         #1;
         assert(branch==0)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         
         #1;//less
         src_1=5;
         src_2=10;
         #1;
         assert(branch==1)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         
         #1;//get to original value 
         src_1=10;
@@ -218,27 +218,27 @@ module mips_alu_tb;
         control=7;//greater
         #1;
         assert(branch==0)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
 
         #1;//equal
         src_1=5;
         src_2=5;
         #1;
         assert(branch==1)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         
         #1;//less
         src_1=5;
         src_2=10;
         #1;
         assert(branch==1)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         
         #1;//get to original value 
         src_1=10;
@@ -255,27 +255,27 @@ module mips_alu_tb;
         control=9;//greater
         #1;
         assert(branch==1)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
 
         #1;//equal
         src_1=5;
         src_2=5;
         #1;
         assert(branch==0)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         
         #1;//less
         src_1=5;
         src_2=10;
         #1;
         assert(branch==1)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         
         #1;//get to original value 
         src_1=10;
@@ -286,9 +286,9 @@ module mips_alu_tb;
         control=10;
         #2;
         assert(result==15)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
 
 
 
@@ -297,9 +297,9 @@ module mips_alu_tb;
         control=11;
         #2;
         assert(result==320)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
 
 
 
@@ -307,9 +307,9 @@ module mips_alu_tb;
         control=12;
         #2;
         assert(result==0)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
 
 
 
@@ -321,9 +321,9 @@ module mips_alu_tb;
         control=13;
         #2;
         assert(result==0)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);     
+        $display("result of input control %d failed with result %d",control, result);     
 
 
 
@@ -333,9 +333,9 @@ module mips_alu_tb;
         control=14;
         #2;
         assert(result==5)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);          
+        $display("result of input control %d failed with result %d",control, result);          
 
 
 
@@ -345,13 +345,13 @@ module mips_alu_tb;
         @(posedge clk);//testcase for xor
         control=15;
         #2;
-        src_1=12;
+        src_1=11;
         src_2=13;
         #1;
         assert(result==6)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         #1
         control = 16;
 
@@ -362,9 +362,9 @@ module mips_alu_tb;
         control=17;
         #1;
         assert(result==6)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);  
+        $display("result of input control %d failed with result %d",control, result);  
         #1;
         control=18;
 
@@ -374,9 +374,9 @@ module mips_alu_tb;
         control=19;
         #1;
         assert(result==6)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);  
+        $display("result of input control %d failed with result %d",control, result);  
         
         #1;
         control=2;
@@ -392,16 +392,16 @@ module mips_alu_tb;
         control = 17;
         #1;
         assert(result==32'h00000011)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         #1;
         control = 19;
         #1;       
         assert(result==32'h00202020)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result); 
+        $display("result of input control %d failed with result %d",control, result); 
         #1;
         control=8;
 
@@ -411,16 +411,16 @@ module mips_alu_tb;
         control = 17;
         #1;
         assert(result==32'h00000009)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result);
+        $display("result of input control %d failed with result %d",control, result);
         #1;
         control = 19;
         #1;       
         assert(result==32'h11111108)
-        $display("result of input control %1 is %2",$control, $result);
+        $display("result of input control %d is %d",control, result);
         else
-        $display("result of input control %1 failed with result %2",$control, $result); 
+        $display("result of input control %d failed with result %d",control, result); 
         
         $finish(0);
 
