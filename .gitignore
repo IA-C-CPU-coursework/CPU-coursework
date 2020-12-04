@@ -1,0 +1,8 @@
+# The following files will be ignored by git
+
+# iverilog 
+*.vcd 
+a.out 
+
+# ccls
+.ccls-cache
