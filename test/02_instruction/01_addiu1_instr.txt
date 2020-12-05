@@ -1,3 +1,4 @@
-addiu,$v0,$zero,0
-addiu,$v0,$zero,12
-addiu,$v0,$zero,767
+addiu,$v0,$zero,0x123
+addiu,$v0,$zero,0x3453
+addiu,$v0,$zero,0x2432
+jr,$zero

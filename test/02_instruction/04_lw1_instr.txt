@@ -11,3 +11,4 @@ sw,$t0,8($sp)
 lw,$t1,8($sp)
 sw,$t1,12($sp)
 addiu,$v0,$t1,0
+jr,$zero

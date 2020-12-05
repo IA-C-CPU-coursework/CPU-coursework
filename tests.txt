@@ -530,6 +530,7 @@ lui,$t0,2021
 sra,$t1,$t0,10
 addu,$v0,$zero,$t1
 
+
 25.SRAV    |  Shift right arithmetic 
 lui,$t0,A021
 lui,$t1,2

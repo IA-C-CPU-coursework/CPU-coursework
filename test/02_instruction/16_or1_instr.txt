@@ -19,3 +19,4 @@ sw,$t3,16($sp)
 or,$t3,$t0,$t1
 sw,$t3,20($sp)
 addu,$v0,$zero,$t3
+jr,$zero

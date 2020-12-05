@@ -14,3 +14,4 @@ sh,$t0,8($sp)
 addiu,$t0,$t0,12432
 sh,$t0,12($sp)
 addu,$v0,$zero,$t0
+jr,$zero

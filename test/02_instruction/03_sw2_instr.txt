@@ -10,3 +10,4 @@ sw,$t0,4($sp)
 addiu,$t0,$zero,2142
 sw,$t0,8($sp)
 addiu,$v0,$t1,0
+jr,%zero

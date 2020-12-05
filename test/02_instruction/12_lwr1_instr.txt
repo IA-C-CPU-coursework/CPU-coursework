@@ -25,3 +25,4 @@ sw,$t1,20($sp)
 lwr,$t1,17($sp)
 sw,$t1,24($sp)
 addu,$v0,$zero,$t1
+jr,$zero

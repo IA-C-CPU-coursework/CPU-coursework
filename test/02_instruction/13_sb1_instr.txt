@@ -32,3 +32,4 @@ sb,$t0,19($sp)
 lw,$s0,16($sp)
 sw,$s0,28($sp)
 addu,$v0,$zero,$t0
+jr,$zero

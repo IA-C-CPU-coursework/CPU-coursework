@@ -14,3 +14,4 @@ lui,$t5,1680
 sw,$t5,16($sp)
 lui,$t6,1099
 addiu,$v0,$t6,0
+jr,$zero

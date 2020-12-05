@@ -17,3 +17,4 @@ sw,$t1,16($sp)
 xori,$t3,$t0,6546
 sw,$t3,20($sp)
 addu,$v0,$zero,$t3
+jr,$zero
