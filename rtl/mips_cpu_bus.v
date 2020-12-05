@@ -30,6 +30,25 @@ module mips_cpu_bus(
 );
 
     //-------------------------------------------------------------------------
+    // Activation 
+    //-------------------------------------------------------------------------
+
+    initial begin 
+        active = 1'b0;
+    end
+
+    always @(posedge clk) begin
+        if (reset) begin
+            $display("[CPU] : RESET");
+            active <= 1;
+        end
+        if (Halt) begin
+            $display("[CPU] : HALT");
+            active <= 0;
+        end
+    end
+
+    //-------------------------------------------------------------------------
     // Wiring 
     //-------------------------------------------------------------------------
 
@@ -38,32 +57,43 @@ module mips_cpu_bus(
     logic[4:0] rt;
     logic[4:0] rd;
 
-    assign rs = mem_out[25:21];
-    assign rt = mem_out[20:16];
-    assign rd = mem_out[15:11];
+    assign rs = mem_out_buffer[25:21];
+    assign rt = mem_out_buffer[20:16];
+    assign rd = mem_out_buffer[15:11];
 
     // memory
     logic MemWrite;
+        assign write = MemWrite;
     logic MemRead;
+        assign read = MemRead;
     logic[3:0] ByteEn;
-    logic[31:0] mem_in;
+        assign byteenable = ByteEn;
+    assign writedata = read_data_2;
     logic[31:0] mem_out;
+        assign mem_out = readdata;
     // logic waitrequest;
-    logic mem_addr;
+    logic[31:0] mem_addr;
 
     // register file 
     logic RegWrite;
     logic[4:0] write_addr;
     logic[31:0] write_data;
     logic[4:0] read_addr_1;
+        assign read_addr_1 = rs;
     logic[4:0] read_addr_2;
+        assign read_addr_2 = rt;
     logic[31:0] read_data_1;
     logic[31:0] read_data_2;
+    logic[31:0] v0;
+        assign register_v0 = v0;
 
     // ALU
     logic [4:0] ALUControl;
     logic [31:0] alu_src_1;
+        assign alu_src_1 = read_data_1;
     logic [31:0] alu_src_2;
+    logic [4:0] shift_amount;
+        assign shift_amount = signed_offset[10:6];
     logic [31:0] alu_result;
     logic branch;
 
@@ -74,9 +104,11 @@ module mips_cpu_bus(
     // logic [31:0] read_data_1;
     // logic [31:0] signed_offset;
     logic [25:0] target;
+    assign target = mem_out[25:0];
 
     // sign extension
     logic [15:0] offset;
+        assign offset = mem_out_buffer[15:0];
     logic [31:0] signed_offset;
 
     // signals required by mips_state_machines
@@ -89,7 +121,7 @@ module mips_cpu_bus(
     logic MemSrc;
     logic RegSrc;
     logic [1:0]RegData;
-    logic ALUSrc;
+    logic [1:0]ALUSrc;
     logic Buffer;
     // logic MemWrite;
     // logic MemRead;
@@ -108,13 +140,21 @@ module mips_cpu_bus(
     //-------------------------------------------------------------------------
 
     assign mem_addr = MemSrc ? pc : alu_result;
-    assign alu_src_2 = ALUSrc ? read_data_2 : signed_offset;
+    assign address = mem_addr;
+    // assign alu_src_2 = ALUSrc ? read_data_2 : signed_offset;
     assign write_addr = RegSrc ? rt : rd;
     always_comb begin
+        case(ALUSrc)
+            2'b00: alu_src_2[31:0] = read_data_2[31:0]; 
+            2'b01: alu_src_2[31:0] = signed_offset[31:0];
+            2'b10: alu_src_2[31:0] = {27'b0, shift_amount};
+            default: alu_src_2 = 32'hxxxxxxxx;
+        endcase
         case(RegData)
             2'b00: write_data[31:0] = mem_out[31:0];
             2'b01: write_data[31:0] = pc[31:0];
             2'b10: write_data[31:0] = alu_result[31:0];
+            default: write_data = 32'hxxxxxxxx;
         endcase
     end
 
@@ -122,7 +162,19 @@ module mips_cpu_bus(
     // Module Instanciation 
     //-------------------------------------------------------------------------
 
-    //instanciation of instruction register
+    // instantiation of program counter
+    mips_program_counter PC(
+        .clk(clk),
+        .rst(reset),
+        .CntEn(CntEn),
+        .PCControl(PCControl),
+        .read_data_1(read_data_1),
+        .signed_offset(signed_offset),
+        .target(target),
+        .pc(pc)
+    );
+
+    // instantiation of instruction register
     mips_instruction_register instrReg(
         .clk(clk),
         .state(state),
@@ -130,20 +182,21 @@ module mips_cpu_bus(
         .mem_out_buffer(mem_out_buffer)
     );
 
-    // instanciation of mips_reg_file
+    // instantiation of mips_reg_file
     mips_reg_file regFile(
         .rst(reset),
         .clk(clk),
-        .RegWrite(write),
+        .RegWrite(RegWrite),
         .write_addr(write_addr),
         .read_addr_1(read_addr_1),
         .read_addr_2(read_addr_2),
         .write_data(write_data),
         .read_data_1(read_data_1),
-        .read_data_2(read_data_2)
+        .read_data_2(read_data_2),
+        .v0(v0)
     );
 
-    // instanciation of mips_sign_extension
+    // instantiation of mips_sign_extension
     mips_sign_extension signExt(
         .offset(offset),
         .signed_offset(signed_offset)
@@ -163,6 +216,7 @@ module mips_cpu_bus(
     mips_decoder decoder(
         .instruction(mem_out_buffer), // instruction read from memory
         .pc(pc), // instruction location
+        .waitrequest(waitrequest),
         .Halt(Halt), // asserted when trying to execute instruction from 0x0
         .branch(branch),
         // state machine 

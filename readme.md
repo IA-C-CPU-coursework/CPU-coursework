@@ -2,7 +2,7 @@
 
 ## Architecture Overview
 
-![mips32_arch-MIPS_CPU](https://ouikujie-images.oss-cn-shanghai.aliyuncs.com/img/20201202200707.svg)
+![mips32_arch-MIPS_CPU](https://ouikujie-images.oss-cn-shanghai.aliyuncs.com/img/20201205052825.svg)
 
 
 
@@ -34,7 +34,7 @@ XORI    rt, rs, imm     2    Exclusice Or Immediate          rt = rs ^ imm
 SLL     rd, rt, sa      2    Shift Left Logical              rd = rt << sa
 SLLV    rd, rt, rs      2    Shift Left Logical Variable     rd = rt << rs
 SRA     rd, rt, sa      2    Shift Right Arithmetic          rd = rt >> sa 
-SRAV    rd, rt, rs      2    Shift Right Arithmetic          rd = rt >> rs
+SRAV    rd, rt, rs      2    Shift Right Arithmetic Variable rd = rt >> rs
 SRL     rd, rt, sa      2    Shift Right Logical             rd = rt >> sa
 SRLV    rd, rt, rs      2    Shift Right Logical Variable    rd = rt >> rs
 
@@ -91,13 +91,15 @@ SW      rt, offset(rs)  2    Store Word                      mem[rs + offset] = 
 
 ### Decoder Control Signals
 
-Multiplexers: MemSrc, RegSrc, RegData, ALUSrc 
+**Multiplexers**: MemSrc, RegSrc, RegData, ALUSrc 
 
-Storage: MemWrite, MemRead, ByteEn, RegWrite, CntEn
+**Storage**: MemWrite, MemRead, ByteEn, RegWrite, CntEn
 
-ALU: ALUControl
+**ALU**: ALUControl
 
-PC: PCControl
+**PC**: PCControl
+
+
 
 ##### MemWrite
 
@@ -128,13 +130,18 @@ mem_addr[31:0] = MemSrc ? pc[31:0] : alu_result[31:0];
 ##### RegSrc 
 
 ```verilog
-write_addr[4:0] = RegSrc ? mem_out[20:16] : mem_out[15:11]; 
+write_addr[4:0] = RegSrc ? (rt)mem_out[20:16] : (rd)mem_out[15:11]; 
 ```
 
-##### ALUSrc
+##### ALUSrc[1:0]
 
 ```verilog
-alu_src_2[31:0] = ALUSrc ? read_data_2[31:0] : signed_offset[31:0];
+case(ALUSrc) begin
+    2'b00: assign alu_src_2 = read_data_2; 
+    2'b01: assign alu_src_2 = signed_offset;
+    2'b10: assign alu_src_2 = shift_amount;
+    default: assign alu_src_2 = 32'hxxxxxxxx;
+end
 ```
 
 ##### RegData[1:0]
@@ -164,27 +171,28 @@ end
 
 ```verilog
 case(ALUControl) begin
-    5'b00000: alu_result[31:0] = alu_src_1[31:0] +  alu_src_2[31:0]; // unsigned add
-    5'b00001: alu_result[31:0] = alu_src_1[31:0] &  alu_src_2[31:0]; // and
-    5'b00010: HI              <= alu_src_1[31:0] %  alu_src_2[31:0]; // divide
-              LO              <= alu_src_1[31:0] /  alu_src_2[31:0]; // divide
-    5'b00011: branch           = alu_src_1[31:0] == alu_src_2[31:0]; // equal to
-    5'b00100: branch           = alu_src_1[31:0] >  alu_src_2[31:0]; // greater than 
-    5'b00101: branch           = alu_src_1[31:0] >= alu_src_2[31:0]; // greater than or equal to 
-    5'b00110: branch           = alu_src_1[31:0] <  alu_src_2[31:0]; // less than 
-    5'b00111: branch           = alu_src_1[31:0] <= alu_src_2[31:0]; // less than or equal to 
-    5'b01000: HI, LO          <= alu_src_1[31:0] *  alu_src_2[31:0]; // multiply
-    5'b01001: branch           = alu_src_1[31:0] != alu_src_2[31:0]; // not equal to 
-    5'b01010: alu_result[31:0] = alu_src_1[31:0] |  alu_src_2[31:0]; // or 
-    5'b01011: alu_result[31:0] = alu_src_1[31:0] << alu_src_2[31:0]; // shift to left logic 
-    5'b01100: alu_result[31:0] = alu_src_1[31:0] >> alu_src_2[31:0]; // shift to right arithmetic 
-    5'b01101: alu_result[31:0] = alu_src_1[31:0] >> alu_src_2[31:0]; // shift to right logic 
-    5'b01110: alu_result[31:0] = alu_src_1[31:0] -  alu_src_2[31:0]; // subtract
-    5'b01111: alu_result[31:0] = alu_src_1[31:0] ^  alu_src_2[31:0]; // xor
-    5'b10000: HI              <= alu_result[31:0];                   // Move to HI
-    5'b10001: alu_result[31:0] = HI;                                 // Move from HI
-    5'b10010: LO              <= alu_result[31:0];                   // Move to LO
-    5'b10011: alu_result[31:0] = LO;                                 // Move from LO
+    5'b00000: alu_result[31:0] = alu_src_1[31:0] +   alu_src_2[31:0]; // unsigned add
+    5'b00001: alu_result[31:0] = alu_src_1[31:0] &   alu_src_2[31:0]; // and
+    5'b00010: HI              <= alu_src_1[31:0] %   alu_src_2[31:0]; // divide
+              LO              <= alu_src_1[31:0] /   alu_src_2[31:0]; // divide
+    5'b00011: branch           = alu_src_1[31:0] ==  alu_src_2[31:0]; // equal to
+    5'b00100: branch           = alu_src_1[31:0] >   alu_src_2[31:0]; // greater than 
+    5'b00101: branch           = alu_src_1[31:0] >=  alu_src_2[31:0]; // greater than or equal to 
+    5'b00110: branch           = alu_src_1[31:0] <   alu_src_2[31:0]; // less than 
+    5'b00111: branch           = alu_src_1[31:0] <=  alu_src_2[31:0]; // less than or equal to 
+    5'b01000: HI, LO          <= alu_src_1[31:0] *   alu_src_2[31:0]; // multiply
+    5'b01001: branch           = alu_src_1[31:0] !=  alu_src_2[31:0]; // not equal to 
+    5'b01010: alu_result[31:0] = alu_src_1[31:0] |   alu_src_2[31:0]; // or 
+    5'b01011: alu_result[31:0] = alu_src_1[31:0] <<  alu_src_2[31:0]; // shift to left logic 
+    5'b01100: alu_result[31:0] = alu_src_1[31:0] >>  alu_src_2[31:0]; // shift to right arithmetic 
+    5'b01101: alu_result[31:0] = alu_src_1[31:0] >>> alu_src_2[31:0]; // shift to right logic 
+    5'b01110: alu_result[31:0] = alu_src_1[31:0] -   alu_src_2[31:0]; // subtract
+    5'b01111: alu_result[31:0] = alu_src_1[31:0] ^   alu_src_2[31:0]; // xor
+    5'b10000: HI              <= alu_result[31:0];                    // Move to HI
+    5'b10001: alu_result[31:0] = HI;                                  // Move from HI
+    5'b10010: LO              <= alu_result[31:0];                    // Move to LO
+    5'b10011: alu_result[31:0] = LO;                                  // Move from LO
+    5'b10100: alu_result[31:0] = alu_src_1[31:0] << 16;				  // shift the lower half word to upper half
 end
 ```
 
@@ -198,25 +206,38 @@ end
 
 ##### State: FETCH
 
-```
-Instr	MemSrc  MemWrite  MemRead  ByteEnable  RegSrc  RegData  RegWrite  PCControl  CntEn  ALUSrc  ALUControl 
-x       1       0         1        1111        x       x        0         xx         0      x       x
-```
+|    | Instr | MemSrc | MemWrite | MemRead | ByteEn | RegSrc | RegData | RegWrite | PCControl | CntEn | ALUSrc | ALUControl |
+| -- | ----- | ------ | -------- | ------- | ------ | ------ | ------- | -------- | --------- | ----- | ------ | ---------- |
+| ✅ | x     | 1      | 0        | 1       | 1111   | x      | x       | 0        | xx        | 0     | xx     | x          |
 
 ##### State: EXEC1
 
-```
-Instr	MemSrc  MemWrite  MemRead  ByteEnable  RegSrc  RegData  RegWrite  PCControl  CntEn  ALUSrc  ALUControl 
-ADDIU   1       0         1        1111        1       10       1         11         1      0       00000
-ADDU    1       0         1        1111        1       10       1         11         1      1       00000
-LW      1       0         1        1111        x       xx       0         xx         0      0       00000
-SW      0       1         0        1111        x       xx       0         xx         1      0       00000
-JR      1       0         1        1111        x       xx       0         10         1      x       xxxxx
-```
+|    | Instr | MemSrc | MemWrite | MemRead | ByteEn | RegSrc | RegData | RegWrite | PCControl | CntEn | ALUSrc | ALUControl |
+| -- | ----- | ------ | -------- | ------- | ------ | ------ | ------- | -------- | --------- | ----- | ------ | ---------- |
+| ✅ | ADDIU | 1      | 0        | 0       | 1111   | 1      | 10      | 1        | 11        | 1     | 01    | 00000      |
+| ✅ | ADDU  | 1      | 0        | 0       | 1111   | 0     | 10      | 1        | 11        | 1     | 00   | 00000      |
+| ✅ | LW    | 0     | 0        | 1       | 1111   | x      | xx      | 0        | xx        | 0     | 00     | 00000      |
+| ✅ | LUI   | 1      | 0        | 0       | 1111   | 1      | 10      | 1        | 11        | 1     | 01  | 10100 |
+| ✅ | SW    | 0      | 1        | 0       | 1111   | x      | xx      | 0        | 11       | 1     | 01    | 00000      |
+| ✅ | JR    | 1      | 0        | 0       | 1111   | x      | xx      | 0        | 10        | 1     | xx     | xxxxx      |
+| ❌ | J     | 1      | 0        | 0       | 1111   | x      | xx      | 0        | 01        | 1     | xx     | xxxxx      |
+| ❌ | SLL   | 1      | 0        | 0       | 1111   | 1      | 10      | 1        | 11        | 1     | 10    | 01011      |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
 
 ##### State: EXEC2
 
-```
-Instr   MemSrc  MemWrite  MemRead  ByteEnable  RegSrc  RegData RegWrite   PCControl  CntEn  ALUSrc  ALUControl 
-LW      0       0         1        1111        0       00      1          11         1      0       00000
-```
+|    | Instr | MemSrc | MemWrite | MemRead | ByteEn | RegSrc | RegData | RegWrite | PCControl | CntEn | ALUSrc | ALUControl |
+| -- | ----- | ------ | -------- | ------- | ------ | ------ | ------- | -------- | --------- | ----- | ------ | ---------- |
+| ✅ | LW    | 1   | 0        | 0      | 1111   | 1     | 00      | 1        | 11        | 1     | 00     | 00000      |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
