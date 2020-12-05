@@ -483,29 +483,7 @@ srlv,$t2,$t0,$t1
 addu,$v0,$zero,$t2
 
 28 SUBU    |  Subtract unsigned
-addiu,$t0,$zero,BCF0
-sll,$t1,$t0,10
-addiu,$sp,$t1,400
-lw,$t0,0($sp)
-lw,$t1,4($sp)
-lw,$t2,8($sp)
-lw,$t3,12($sp)
-lw,$t4,16($sp)
-subu,$t5,$t0,$t1
-addu,$v0,$zero,$t5
-subu,$t5,$t0,$t2
-addu,$v0,$zero,$t5
-subu,$t5,$t0,$t3
-addu,$v0,$zero,$t5
-subu,$t5,$t0,$t4
-addu,$v0,$zero,$t5
 
-
-FCBFE120
-03CfC020
-10105010
-0120A182
-5023B940
 
 29. J       |  Jump   
 lui,$t0,1023
