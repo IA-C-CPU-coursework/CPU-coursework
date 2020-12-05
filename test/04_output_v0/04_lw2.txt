@@ -1,0 +1,24 @@
+[RAM] : INIT : Loading RAM contents from ../test/01_instruction_hex/04_lw2.txt
+WARNING: RAM_32x64k_avalon.v:87: $readmemh: Standard inconsistency, following 1364-2005.
+WARNING: RAM_32x64k_avalon.v:87: $readmemh(../test/01_instruction_hex/04_lw2.txt): Not enough words in the file for the requested range [0:65535].
+240b5e78
+000b49c0
+00095280
+255d0400
+24080dd7
+afa80000
+8fa90000
+afa90004
+2408256a
+afa80008
+8fa90008
+afa9000c
+25220000
+00000000
+00000000
+[RAM] : RESET 
+[RAM] : INIT : Loading RAM contents from ../test/01_instruction_hex/04_lw2.txt
+WARNING: RAM_32x64k_avalon.v:114: $readmemh: Standard inconsistency, following 1364-2005.
+WARNING: RAM_32x64k_avalon.v:114: $readmemh(../test/01_instruction_hex/04_lw2.txt): Not enough words in the file for the requested range [0:65535].
+register_v0:          1
+TB: finished; running=0
