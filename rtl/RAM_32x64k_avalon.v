@@ -53,6 +53,11 @@ module RAM_32x64k_avalon(
     output logic[31:0] readdata
 );
 
+    logic[29:0] word_address;
+    assign word_address = address[31:2];
+    // `address` is byte based, a word contains 4 byte in 32-bit memory,
+    // thus word based address `word_address` is the most significant 30 bits in `address`
+
     logic pending; 
     // a signal indicating the required operation has finished and await for conformation from master
     // `pending` is just waitrequest being delayed by one cycle
@@ -122,9 +127,9 @@ module RAM_32x64k_avalon(
     //------------------------------------------------------------------------
 
     always @(*) begin
-        assert(!(read && write)); // read and write operation are not allowed to take at the same time
+        assert(!(read & write)); // read and write operation are not allowed to take at the same time
         else begin 
-            $fatal(1, "read and write at the same time.");
+            $error("read and write at the same time. read %b write %b", read, write);
         end
     end
 
@@ -151,20 +156,20 @@ module RAM_32x64k_avalon(
                 // as if all byteenables are asserted. 
                 // When more than one bit of the byteenable signal is asserted, all asserted 
                 // lanes are adjacent." 
-                4'b0001: readdata <= memory[address][07:00]; // ooox
-                4'b0010: readdata <= memory[address][15:08]; // ooxx
-                4'b0100: readdata <= memory[address][23:16]; // oxoo
-                4'b1000: readdata <= memory[address][31:24]; // xooo
-                4'b0011: readdata <= memory[address][15:00]; // ooxx
-                4'b1100: readdata <= memory[address][31:16]; // xxoo
-                4'b1111: readdata <= memory[address][31:00]; // xxxx
-                default: readdata <= memory[address];        // xxxx 
+                4'b0001: readdata <= memory[word_address][07:00]; // ooox
+                4'b0010: readdata <= memory[word_address][15:08]; // ooxx
+                4'b0100: readdata <= memory[word_address][23:16]; // oxoo
+                4'b1000: readdata <= memory[word_address][31:24]; // xooo
+                4'b0011: readdata <= memory[word_address][15:00]; // ooxx
+                4'b1100: readdata <= memory[word_address][31:16]; // xxoo
+                4'b1111: readdata <= memory[word_address][31:00]; // xxxx
+                default: readdata <= memory[word_address];        // xxxx 
             endcase;
         end
         if(read) begin
             $display("[RAM] : LOG : 📚📚📚 receive read instruction");
             $display("[RAM] : LOG : waitrequest %b", waitrequest);
-            $display("[RAM] : LOG : readdata %h, address %h, memory[address] %h, waitrequest %b", readdata, address, memory[address], waitrequest); 
+            $display("[RAM] : LOG : readdata %h, word_address %h, memory[word_address] %h, waitrequest %b", readdata, word_address, memory[word_address], waitrequest); 
         end
     end
 
@@ -176,20 +181,20 @@ module RAM_32x64k_avalon(
         if (!waitrequest && write) begin 
             // $display("[RAM] 📝📝📝📝📝 Writing")
             case(byteenable)
-                4'b0001: memory[address][07:00] <= writedata; // ooox
-                4'b0010: memory[address][15:08] <= writedata; // ooxx
-                4'b0100: memory[address][23:16] <= writedata; // oxoo
-                4'b1000: memory[address][31:24] <= writedata; // xooo
-                4'b0011: memory[address][15:00] <= writedata; // ooxx
-                4'b1100: memory[address][31:16] <= writedata; // xxoo
-                4'b1111: memory[address][31:00] <= writedata; // xxxx
-                default: memory[address]        <= writedata; // xxxx 
+                4'b0001: memory[word_address][07:00] <= writedata; // ooox
+                4'b0010: memory[word_address][15:08] <= writedata; // ooxx
+                4'b0100: memory[word_address][23:16] <= writedata; // oxoo
+                4'b1000: memory[word_address][31:24] <= writedata; // xooo
+                4'b0011: memory[word_address][15:00] <= writedata; // ooxx
+                4'b1100: memory[word_address][31:16] <= writedata; // xxoo
+                4'b1111: memory[word_address][31:00] <= writedata; // xxxx
+                default: memory[word_address]        <= writedata; // xxxx 
             endcase;
         end
         if(write) begin
             $display("[RAM] : LOG : 📝📝📝 receive write instruction");
             $display("[RAM] : LOG : waitrequest %b", waitrequest);
-            $display("[RAM] : LOG : writedata %h, address %h, memory[address] %h, waitrequest %b", writedata, address, memory[address], waitrequest); 
+            $display("[RAM] : LOG : writedata %h, word_address %h, memory[word_address] %h, waitrequest %b", writedata, word_address, memory[word_address], waitrequest); 
         end
     end
 

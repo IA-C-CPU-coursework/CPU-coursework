@@ -1,4 +1,4 @@
-module program_counter(
+module mips_program_counter(
     input clk,
     input rst,
     input CntEn,
@@ -19,7 +19,7 @@ module program_counter(
         else if(CntEn) begin
             case(PCControl)
                 2'b00: pc[31:0] <= pc[31:0]  + signed_offset[15:0] << 2;
-                2'b01: pc[31:0] <= pc[31:28] + target << 2;
+                2'b01: pc[31:0] <= {pc[31:28], target, 2'b00};
                 2'b10: pc[31:0] <= read_data_1[31:0];
                 2'b11: pc[31:0] <= pc[31:0]  + 4;
                 default: pc[31:0] <= 32'hxxxxxxxx;
