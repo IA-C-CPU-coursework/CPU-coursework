@@ -2,7 +2,7 @@
 
 ## Architecture Overview
 
-![mips32_arch-MIPS_CPU](https://ouikujie-images.oss-cn-shanghai.aliyuncs.com/img/20201205052825.svg)
+![mips32_arch-MIPS_CPU](https://ouikujie-images.oss-cn-shanghai.aliyuncs.com/img/20201206023720.svg)
 
 
 
@@ -133,15 +133,16 @@ mem_addr[31:0] = MemSrc ? pc[31:0] : alu_result[31:0];
 write_addr[4:0] = RegSrc ? (rt)mem_out[20:16] : (rd)mem_out[15:11]; 
 ```
 
-##### ALUSrc[1:0]
+##### ALUSrc1
 
 ```verilog
-case(ALUSrc) begin
-    2'b00: assign alu_src_2 = read_data_2; 
-    2'b01: assign alu_src_2 = signed_offset;
-    2'b10: assign alu_src_2 = shift_amount;
-    default: assign alu_src_2 = 32'hxxxxxxxx;
-end
+alu_src_1 = ALUSrc1 ? shift_amount : read_data_1;
+```
+
+##### ALUSrc2
+
+```verilog
+alu_src_2 = ALUSrc2 ? signed_offset : read_data_2;
 ```
 
 ##### RegData[1:0]
@@ -206,38 +207,38 @@ end
 
 ##### State: FETCH
 
-|    | Instr | MemSrc | MemWrite | MemRead | ByteEn | RegSrc | RegData | RegWrite | PCControl | CntEn | ALUSrc | ALUControl |
-| -- | ----- | ------ | -------- | ------- | ------ | ------ | ------- | -------- | --------- | ----- | ------ | ---------- |
-| ✅ | x     | 1      | 0        | 1       | 1111   | x      | x       | 0        | xx        | 0     | xx     | x          |
+|    | Instr | MemSrc | MemWrite | MemRead | ByteEn | RegSrc | RegData | RegWrite | PCControl | CntEn | ALUSrc1 | ALUSrc2 | ALUControl |
+| -- | ----- | ------ | -------- | ------- | ------ | ------ | ------- | -------- | --------- | ----- | ------ | ---------- | ---------- |
+| ✅ | x     | 1      | 0        | 1       | 1111   | x      | x       | 0        | xx        | 0     | x     | x    | x          |
 
 ##### State: EXEC1
 
-|    | Instr | MemSrc | MemWrite | MemRead | ByteEn | RegSrc | RegData | RegWrite | PCControl | CntEn | ALUSrc | ALUControl |
-| -- | ----- | ------ | -------- | ------- | ------ | ------ | ------- | -------- | --------- | ----- | ------ | ---------- |
-| ✅ | ADDIU | 1      | 0        | 0       | 1111   | 1      | 10      | 1        | 11        | 1     | 01    | 00000      |
-| ✅ | ADDU  | 1      | 0        | 0       | 1111   | 0     | 10      | 1        | 11        | 1     | 00   | 00000      |
-| ✅ | LW    | 0     | 0        | 1       | 1111   | x      | xx      | 0        | xx        | 0     | 00     | 00000      |
-| ✅ | LUI   | 1      | 0        | 0       | 1111   | 1      | 10      | 1        | 11        | 1     | 01  | 10100 |
-| ✅ | SW    | 0      | 1        | 0       | 1111   | x      | xx      | 0        | 11       | 1     | 01    | 00000      |
-| ✅ | JR    | 1      | 0        | 0       | 1111   | x      | xx      | 0        | 10        | 1     | xx     | xxxxx      |
-| ❌ | J     | 1      | 0        | 0       | 1111   | x      | xx      | 0        | 01        | 1     | xx     | xxxxx      |
-| ❌ | SLL   | 1      | 0        | 0       | 1111   | 1      | 10      | 1        | 11        | 1     | 10    | 01011      |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
+|    | Instr | MemSrc | MemWrite | MemRead | ByteEn | RegSrc | RegData | RegWrite | PCControl | CntEn | ALUSrc1 | ALUSrc2 | ALUControl |
+| -- | ----- | ------ | -------- | ------- | ------ | ------ | ------- | -------- | --------- | ----- | ------ | ---------- | ---------- |
+| ✅ | ADDIU | 1      | 0        | 0       | 1111   | 1      | 10      | 1        | 11        | 1     | 0    | 1   | 00000      |
+| ✅ | ADDU  | 1      | 0        | 0       | 1111   | 0     | 10      | 1        | 11        | 1     | 0   | 0  | 00000      |
+| ✅ | LW    | 0     | 0        | 1       | 1111   | x      | xx      | 0        | xx        | 0     | 0     | 1    | 00000      |
+| ✅ | LUI   | 1      | 0        | 0       | 1111   | 1      | 10      | 1        | 11        | 1     | 0 | 1 | 10100 |
+| ✅ | SW    | 0      | 1        | 0       | 1111   | x      | xx      | 0        | 11       | 1     | 0   | 1   | 00000      |
+| ✅ | JR    | 1      | 0        | 0       | 1111   | x      | xx      | 0        | 10        | 1     | 0    | x    | xxxxx      |
+| ❌ | J     | 1      | 0        | 0       | 1111   | x      | xx      | 0        | 01        | 1     | 0    | x    | xxxxx      |
+| ✅ | SLL   | 1      | 0        | 0       | 1111   | 1      | 10      | 1        | 11        | 1     | 1    | 0   | 01011      |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
 
 ##### State: EXEC2
 
-|    | Instr | MemSrc | MemWrite | MemRead | ByteEn | RegSrc | RegData | RegWrite | PCControl | CntEn | ALUSrc | ALUControl |
-| -- | ----- | ------ | -------- | ------- | ------ | ------ | ------- | -------- | --------- | ----- | ------ | ---------- |
-| ✅ | LW    | 1   | 0        | 0      | 1111   | 1     | 00      | 1        | 11        | 1     | 00     | 00000      |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |            |
+|    | Instr | MemSrc | MemWrite | MemRead | ByteEn | RegSrc | RegData | RegWrite | PCControl | CntEn | ALUSrc1 | ALUSrc2 | ALUControl |
+| -- | ----- | ------ | -------- | ------- | ------ | ------ | ------- | -------- | --------- | ----- | ------ | ---------- | ---------- |
+| ✅ | LW    | 1   | 0        | 0      | 1111   | 1     | 00      | 1        | 11        | 1     | 0     | 1    | 00000      |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
+| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |

@@ -38,9 +38,9 @@ module mips_alu(
             5'b01000:   ; // in the always_ff block below                       // multiply
             5'b01001:   branch           = alu_src_1[31:0] !=  alu_src_2[31:0]; // not equal to 
             5'b01010:   alu_result[31:0] = alu_src_1[31:0] |   alu_src_2[31:0]; // or 
-            5'b01011:   alu_result[31:0] = alu_src_1[31:0] <<  alu_src_2[31:0]; // shift to left logic 
-            5'b01100:   alu_result[31:0] = alu_src_1[31:0] >>> alu_src_2[31:0]; // shift to right arithmetic 
-            5'b01101:   alu_result[31:0] = alu_src_1[31:0] >>  alu_src_2[31:0]; // shift to right logic 
+            5'b01011:   alu_result[31:0] = alu_src_2[31:0] <<  alu_src_1[31:0]; // shift to left logic 
+            5'b01100:   alu_result[31:0] = alu_src_2[31:0] >>> alu_src_1[31:0]; // shift to right arithmetic 
+            5'b01101:   alu_result[31:0] = alu_src_2[31:0] >>  alu_src_1[31:0]; // shift to right logic 
             5'b01110:   alu_result[31:0] = alu_src_1[31:0] -   alu_src_2[31:0]; // subtract (unsigned)
             5'b01111:   alu_result[31:0] = alu_src_1[31:0] ^   alu_src_2[31:0]; // xor
             5'b10000:   ; // in the always_ff block below                       // Move to HI

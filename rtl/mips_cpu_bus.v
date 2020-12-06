@@ -90,7 +90,6 @@ module mips_cpu_bus(
     // ALU
     logic [4:0] ALUControl;
     logic [31:0] alu_src_1;
-        assign alu_src_1 = read_data_1;
     logic [31:0] alu_src_2;
     logic [4:0] shift_amount;
         assign shift_amount = signed_offset[10:6];
@@ -121,7 +120,8 @@ module mips_cpu_bus(
     logic MemSrc;
     logic RegSrc;
     logic [1:0]RegData;
-    logic [1:0]ALUSrc;
+    logic ALUSrc1;
+    logic ALUSrc2;
     logic Buffer;
     // logic MemWrite;
     // logic MemRead;
@@ -141,15 +141,10 @@ module mips_cpu_bus(
 
     assign mem_addr = MemSrc ? pc : alu_result;
     assign address = mem_addr;
-    // assign alu_src_2 = ALUSrc ? read_data_2 : signed_offset;
+    assign alu_src_1[31:0] = ALUSrc1 ? {27'b0, shift_amount}: read_data_1[31:0];
+    assign alu_src_2[31:0] = ALUSrc2 ? signed_offset[31:0] : read_data_2[31:0];
     assign write_addr = RegSrc ? rt : rd;
     always_comb begin
-        case(ALUSrc)
-            2'b00: alu_src_2[31:0] = read_data_2[31:0]; 
-            2'b01: alu_src_2[31:0] = signed_offset[31:0];
-            2'b10: alu_src_2[31:0] = {27'b0, shift_amount};
-            default: alu_src_2 = 32'hxxxxxxxx;
-        endcase
         case(RegData)
             2'b00: write_data[31:0] = mem_out[31:0];
             2'b01: write_data[31:0] = pc[31:0];
@@ -232,7 +227,8 @@ module mips_cpu_bus(
         // multiplexer 
         .MemSrc(MemSrc),
         .RegSrc(RegSrc),
-        .ALUSrc(ALUSrc),
+        .ALUSrc1(ALUSrc1),
+        .ALUSrc2(ALUSrc2),
         // program counter
         .PCControl(PCControl),
         .CntEn(CntEn),

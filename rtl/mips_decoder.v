@@ -21,7 +21,8 @@ module mips_decoder(
     // multiplexer 
     output logic MemSrc,
     output logic RegSrc,
-    output logic [1:0] ALUSrc,
+    output logic ALUSrc1,
+    output logic ALUSrc2,
     // program counter
     output logic [1:0] PCControl,
     output logic CntEn,
@@ -212,7 +213,8 @@ module mips_decoder(
                 RegWrite    = 1'b0;
                 PCControl   = 2'bxx;
                 CntEn       = 1'b0;
-                ALUSrc      = 2'bx;
+                ALUSrc1     = 2'bx;
+                ALUSrc2     = 2'bx;
                 ALUControl  = 5'bxxxxx;
             end
             2'b01: begin 
@@ -221,14 +223,14 @@ module mips_decoder(
                 MemWrite      = store;
                 MemRead       = load;
                 ByteEn        = 4'b1111;
-                RegSrc        = ADDIU || LUI  || SLL;
+                RegSrc        = ADDIU || LUI;
                 RegData       = 2'b10;
                 RegWrite      = ADDIU || ADDU || LUI || SLL;
                 PCControl[1]  = ADDIU || ADDU || JR  || LUI || SLL || SW;
                 PCControl[0]  = ADDIU || ADDU || J   || LUI || SLL || SW;
                 CntEn         = !waitrequest && two_cycle;
-                ALUSrc[1]     = SLL;
-                ALUSrc[0]     = ADDIU || LUI  || LW  || SW;
+                ALUSrc1       = SLL;
+                ALUSrc2       = ADDIU || LUI  || LW  || SW;
                 ALUControl[4] = LUI;
                 ALUControl[3] = SLL;
                 ALUControl[2] = LUI;
@@ -248,8 +250,8 @@ module mips_decoder(
                 PCControl[1]  = 1'b1;
                 PCControl[0]  = 1'b1;
                 CntEn         = 1'b1;
-                ALUSrc[1]     = 1'b0;
-                ALUSrc[0]     = LW;
+                ALUSrc1       = 1'b0;
+                ALUSrc2       = LW;
                 ALUControl    = 5'b00000;
                 Extra         = three_cycle;
             end
