@@ -187,14 +187,20 @@ module mips_decoder(
         assign SW = opcode == 6'b101011;
 
     // classification of instruction 
-    logic load; // load from memory to register, LUI is excluded 
-        assign load = LB || LBU || LH || LHU || LW || LWL || LWR;
-    logic store;
-        assign store = SB || SH || SW;
-    logic three_cycle;
-        assign three_cycle = load;
-    logic two_cycle;
-        assign two_cycle = !three_cycle;
+    logic load_instr; // load from memory to register, LUI is excluded 
+        assign load_instr = LB || LBU || LH || LHU || LW || LWL || LWR;
+    logic store_instr;
+        assign store_instr = SB || SH || SW;
+    logic jump_instr;
+        assign jump_instr = J || JR || JAL || JALR; 
+    logic branch_instr;
+        assign branch_instr = BEQ || BGEZ || BGEZAL || BLTZ || BLTZAL || BLEZ || BGTZ || BNE;
+    logic shift_instr;
+        assign shift_instr = SLL || SLLV || SRA || SRAV || SRL || SRLV;
+    logic three_cycle_instr;
+        assign three_cycle_instr = load_instr;
+    logic two_cycle_instr;
+        assign two_cycle_instr = !three_cycle_instr;
 
 
     //-------------------------------------------------------------------------
@@ -219,24 +225,24 @@ module mips_decoder(
             end
             2'b01: begin 
             // state == EXEC1
-                MemSrc        = !store && !load || load && !waitrequest;
-                MemWrite      = store;
-                MemRead       = load;
+                MemSrc        = !store_instr && !load_instr || load_instr && !waitrequest;
+                MemWrite      = store_instr;
+                MemRead       = load_instr;
                 ByteEn        = 4'b1111;
                 RegSrc        = ADDIU || LUI;
                 RegData       = 2'b10;
-                RegWrite      = ADDIU || ADDU || LUI || SLL;
-                PCControl[1]  = ADDIU || ADDU || JR  || LUI || SLL || SW;
-                PCControl[0]  = ADDIU || ADDU || J   || LUI || SLL || SW;
-                CntEn         = !waitrequest && two_cycle;
-                ALUSrc1       = SLL;
-                ALUSrc2       = ADDIU || LUI  || LW  || SW;
+                RegWrite      = ADDIU || ADDU || LUI  || shift_instr;
+                PCControl[1]  = !branch_instr;
+                PCControl[0]  = !branch_instr && !(JR || JALR);
+                CntEn         = !waitrequest && two_cycle_instr;
+                ALUSrc1       = SLL   || SRA  || SRL;
+                ALUSrc2       = ADDIU || LUI  || LW   || SW;
                 ALUControl[4] = LUI;
-                ALUControl[3] = SLL;
-                ALUControl[2] = LUI;
-                ALUControl[1] = SLL; 
-                ALUControl[0] = SLL;
-                Extra         = three_cycle;
+                ALUControl[3] = shift_instr;
+                ALUControl[2] = LUI   || SRA  || SRAV || SRL  || SRLV;
+                ALUControl[1] = SLL   || SLLV; 
+                ALUControl[0] = SLL   || SLLV || SRL  || SRLV;
+                Extra         = three_cycle_instr;
             end
             2'b10: begin 
             // state == EXEC2
@@ -244,16 +250,16 @@ module mips_decoder(
                 MemWrite      = 1'b0;
                 MemRead       = 1'b0;
                 ByteEn        = 4'b1111;
-                RegSrc        = load;
+                RegSrc        = load_instr;
                 RegData       = 2'b00;
-                RegWrite      = load;
+                RegWrite      = load_instr;
                 PCControl[1]  = 1'b1;
                 PCControl[0]  = 1'b1;
                 CntEn         = 1'b1;
                 ALUSrc1       = 1'b0;
                 ALUSrc2       = LW;
                 ALUControl    = 5'b00000;
-                Extra         = three_cycle;
+                Extra         = three_cycle_instr;
             end
             2'b11: begin 
             // state == HALT

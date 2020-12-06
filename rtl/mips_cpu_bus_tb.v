@@ -4,9 +4,9 @@
 
 module mips_cpu_bus_tb();
 
-    parameter RAM_INIT_FILE = "../test/binary/cpu_integration.hex.txt";
-    // parameter RAM_INIT_FILE = "../test/binary/sll.hex.txt";
-    parameter TIMEOUT_CYCLES = 50;
+    // parameter RAM_INIT_FILE = "../test/binary/cpu_integration.hex.txt";
+    parameter RAM_INIT_FILE = "../test/binary/shifts.hex.txt";
+    parameter TIMEOUT_CYCLES = 100;
 
     /* Standard signals */
     logic clk;
