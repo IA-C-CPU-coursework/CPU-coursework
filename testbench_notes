@@ -1,0 +1,3 @@
+1.在command line给想要test的instruction 作为参数
+2. 在instruction_hex 中寻找所有含有参数的文件名
+3. 然后把相应的扔进到 ram中测试
