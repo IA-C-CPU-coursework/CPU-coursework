@@ -3,13 +3,13 @@
 //-----------------------------------------------------------------------------
 
 
-`include "mips_alu.v"
-`include "mips_program_counter.v"
-`include "mips_decoder.v"
-`include "mips_state_machine.v"
-`include "mips_sign_extension.v"
-`include "mips_reg_file.v"
-`include "mips_instruction_register.v"
+// `include "mips_alu.v"
+// `include "mips_program_counter.v"
+// `include "mips_decoder.v"
+// `include "mips_state_machine.v"
+// `include "mips_sign_extension.v"
+// `include "mips_reg_file.v"
+// `include "mips_instruction_register.v"
 
 
 module mips_cpu_bus(

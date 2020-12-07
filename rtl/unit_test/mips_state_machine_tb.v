@@ -1,4 +1,4 @@
-`include "mips_state_machine.v"
+`include "../mips_cpu/mips_state_machine.v"
 
 module mips_state_machine_tb;
 
@@ -18,8 +18,8 @@ module mips_state_machine_tb;
     mips_state_machine stateMachine(
         .clk(clk),
         .rst(rst),
-        .halt(halt),
-        .extra(extra),
+        .Halt(halt),
+        .Extra(extra),
         .waitrequest(waitrequest),
         .s(state)
     );

@@ -1,15 +1,13 @@
-`include "RAM_32x64k_avalon.v"
+`include "../mips_cpu/RAM_32x64k_avalon.v"
 
 module RAM_32x64k_avalon_tb;
     // timeunit 1ns / 10ps;
     
-    parameter RAM_INIT_FILE = "../test/binary/RAM_avalon.hex.txt";
+    parameter RAM_INIT_FILE = "instruction_hex/RAM_avalon.hex.txt";
     parameter TIMEOUT_CYCLES = 100;
 
     logic clk;
     logic rst;
-
-    logic running;
 
     logic[31:0] address;
     logic write;
@@ -19,16 +17,18 @@ module RAM_32x64k_avalon_tb;
     logic[31:0] readdata;
     logic[3:0] byteenable;
     logic pending;
+    logic dump;
 
     // logic[31:0] cnt;
     // wire[31:0] cnt_next;
     // assign cnt_next = cnt + 1; 
 
-    // Instanciation of RAM_32x64k_avalon
-    RAM_32x64k_avalon #(RAM_INIT_FILE) ramInst(
+    // Instantiation of RAM_32x64k_avalon
+    RAM_32x64k_avalon #(RAM_INIT_FILE) ram(
         .rst(rst),
         .p(pending),
         .clk(clk),
+        .dump(dump),
         .address(address), 
         .write(write), 
         .read(read), 
@@ -57,11 +57,11 @@ module RAM_32x64k_avalon_tb;
 
     initial begin
         rst <= 0;
-        // cnt <= 0;
+        dump <= 0;
         read <= 0;
         write <= 0;
         address <= 0;
-        byteenable <= 4'b0000;
+        byteenable <= 4'b1111;
         #20
 
         @(posedge clk)
@@ -75,18 +75,18 @@ module RAM_32x64k_avalon_tb;
         $display("[TB] readdata: %h", readdata);
 
         //--------------------------------------------------------------------
-        // Test(1): read from 0x0001 
+        // Test(1): read from 0x0004 
         //--------------------------------------------------------------------
 
         @(posedge clk)
-        address <= 1;
+        address <= 32'h4;
         read <= 1;
         write <= 0;
         $display("[TB] address: %h", address);
         $display("[TB] readdata: %h", readdata);
 
         @(posedge clk)
-        address <= 1;
+        address <= 32'h4;
         read <= 1;
         write <= 0;
         $display("[TB] address: %h", address);
@@ -95,16 +95,16 @@ module RAM_32x64k_avalon_tb;
         @(negedge clk) // compare results
         assert(readdata == 32'h01000000);
         else begin 
-            $fatal(1, "readdata not matched");
+            $fatal(1, "readdata not matched %h", readdata);
         end
 
 
         //--------------------------------------------------------------------
-        // Test(2): read from 0x0002 
+        // Test(2): read from 0x0008 
         //--------------------------------------------------------------------
 
         @(posedge clk)
-        address <= 2;
+        address <= 32'h8;
         read <= 1;
         write <= 0;
         $display("[TB] address: %h", address);
@@ -117,7 +117,7 @@ module RAM_32x64k_avalon_tb;
         //--------------------------------------------------------------------
 
         @(posedge clk)
-        address <= 0;
+        address <= 32'h0;
         read <= 1;
         write <= 0;
 
@@ -128,7 +128,7 @@ module RAM_32x64k_avalon_tb;
         end
 
         @(posedge clk)
-        address <= 0;
+        address <= 32'h0;
         read <= 1;
         write <= 0;
         $display("[TB] address: %h", address);
@@ -143,11 +143,11 @@ module RAM_32x64k_avalon_tb;
         end
 
         //--------------------------------------------------------------------
-        // Test(4): write 0x12345678 to  RAM[0x0002] 
+        // Test(4): write 0x12345678 to  RAM[0x0008] 
         //--------------------------------------------------------------------
 
         @(posedge clk)
-        address <= 2;
+        address <= 32'h8;
         byteenable <= 4'b0011;
         read <= 0;
         write <= 1;
@@ -160,14 +160,14 @@ module RAM_32x64k_avalon_tb;
         $display("[TB] readdata: %h", readdata);
 
         @(posedge clk) // Fetch RAM[0x0002]
-        address <= 2;
+        address <= 32'h8;
         read <= 1;
         write <= 0;
         $display("[TB] address: %h", address);
         $display("[TB] readdata: %h", readdata);
 
         @(posedge clk)
-        address <= 2;
+        address <= 32'h8;
         read <= 1;
         write <= 0;
         $display("[TB] address: %h", address);
