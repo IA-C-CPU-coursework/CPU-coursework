@@ -1,5 +1,8 @@
 # The following files will be ignored by git
 
+# assmebler
+*.hex.txt
+
 # iverilog 
 *.vcd 
 a.out 

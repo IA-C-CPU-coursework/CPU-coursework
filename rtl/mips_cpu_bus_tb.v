@@ -1,7 +1,3 @@
-`include "mips_cpu_bus.v"
-`include "RAM_32x64k_avalon.v"
-
-
 module mips_cpu_bus_tb();
 
     parameter RAM_INIT_FILE = "../test/binary/cpu_integration.hex.txt";

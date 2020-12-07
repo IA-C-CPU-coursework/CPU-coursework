@@ -44,10 +44,8 @@ filename=$(basename $1 .asm.txt) # get filename from fullname
 
 
 mipsel-linux-gnu-as -mips1 $1 -o $filename.o
-mipsel-linux-gnu-objdump -d -j .text $filename.o                        \
-    | sed '1,7d;$d'    `# delete the first 7 lines and the last line`   \
-    | cut -f2          `# cut out the second column`                    \
-    | sed 's/ *$//'    `# delete the trim space`                        \
+mipsel-linux-gnu-objdump -d -j .text $filename.o            \
+    | grep -oP '\s*[0-9a-fA-F]*\:\s*\K([0-9a-fA-F]{8})\s*'  \
     >&1
 
 

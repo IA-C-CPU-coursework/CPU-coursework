@@ -1,4 +1,4 @@
-`include "mips_reg_file.v"
+`include "../mips_cpu/mips_reg_file.v"
 
 module mips_reg_file_tb;
     // timeunit 1ns / 10ps;
@@ -10,12 +10,12 @@ module mips_reg_file_tb;
 
     logic write;
 
-    logic[4:0] write_address;
-    logic[4:0] read_address_1;
-    logic[4:0] read_address_2;
-    logic[31:0] data_in;
-    logic[31:0] data_out_1;
-    logic[31:0] data_out_2;
+    logic[4:0] write_addr;
+    logic[4:0] read_addr_1;
+    logic[4:0] read_addr_2;
+    logic[31:0] write_data;
+    logic[31:0] read_data_1;
+    logic[31:0] read_data_2;
 
 
     logic [4:0] cnt;
@@ -23,17 +23,17 @@ module mips_reg_file_tb;
 
     assign cnt_next = cnt + 1;
 
-    // DUT instanciation of mips_reg_file
+    // DUT instantiation of mips_reg_file
     mips_reg_file regFile(
         .rst(rst),
-        .CLK(clk),
+        .clk(clk),
         .RegWrite(write),
-        .WriteAddress(write_address),
-        .Address1(read_address_1),
-        .Address2(read_address_2),
-        .DataIn(data_in),
-        .DataOut1(data_out_1),
-        .DataOut2(data_out_2)
+        .write_addr(write_addr),
+        .read_addr_1(read_addr_1),
+        .read_addr_2(read_addr_2),
+        .write_data(write_data),
+        .read_data_1(read_data_1),
+        .read_data_2(read_data_2)
     );
 
     initial begin
@@ -70,8 +70,8 @@ module mips_reg_file_tb;
     // reset registers
         rst <=1;
         write <= 0;
-        write_address <= 0;
-        data_in <= 0;
+        write_addr <= 0;
+        write_data <= 0;
         cnt <= 0;
 
         @(posedge clk);
@@ -86,19 +86,19 @@ module mips_reg_file_tb;
 
         repeat(16) begin
             @(posedge clk);
-            read_address_1 <= 2*cnt;
-            read_address_2 <= 2*cnt + 1;
+            read_addr_1 <= 2*cnt;
+            read_addr_2 <= 2*cnt + 1;
             
             @(posedge clk);
             #20;
-            assert(data_out_1 == 32'h0);
+            assert(read_data_1 == 32'h0);
             else begin 
-                $error("❌ reg[%d] is not initialised to 0, but %h", read_address_1, data_out_1);
+                $error("❌ reg[%d] is not initialised to 0, but %h", read_addr_1, read_data_1);
                 correct <= 0;
             end 
-            assert(data_out_2 == 32'h0);
+            assert(read_data_2 == 32'h0);
             else begin 
-                $error("❌ reg[%d] is not initialised to 0, but %h", read_address_2, data_out_2);
+                $error("❌ reg[%d] is not initialised to 0, but %h", read_addr_2, read_data_2);
                 correct <= 0;
             end 
 
@@ -118,64 +118,64 @@ module mips_reg_file_tb;
     task test_write;
         @(posedge clk);
         write <= 1;
-        write_address <= 1;
-        data_in <= 32'h00012345;
+        write_addr <= 1;
+        write_data <= 32'h00012345;
 
         @(posedge clk);
         write <= 0;
-        read_address_1 <= 1;
+        read_addr_1 <= 1;
 
         @(posedge clk);
-        assert(data_out_1 == 32'h00012345) begin 
+        assert(read_data_1 == 32'h00012345) begin 
             $display("✅ reg[1] can be written correctly.");
         end
         else begin 
-            $error("❌ reg[1] can not be written correctly, reg[1] = %h, expects 32'h00012345", data_out_1);
+            $error("❌ reg[1] can not be written correctly, reg[1] = %h, expects 32'h00012345", read_data_1);
         end
     endtask
 
     task test_read_from_the_same_reg_at_the_same_time;
         @(posedge clk);
         write <= 1;
-        write_address <= 2;
-        data_in <= 32'h00123456;
+        write_addr <= 2;
+        write_data <= 32'h00123456;
 
         @(posedge clk);
         write <= 0;
-        read_address_1 <= 2;
-        read_address_2 <= 2;
+        read_addr_1 <= 2;
+        read_addr_2 <= 2;
 
         @(posedge clk);
-        assert(data_out_1 == data_out_2 && data_out_1 == 32'h00123456) begin 
-            $display("✅ reg[2] can be read correctly by data_out_1 and data_out_2 at the same time.");
+        assert(read_data_1 == read_data_2 && read_data_1 == 32'h00123456) begin 
+            $display("✅ reg[2] can be read correctly by read_data_1 and read_data_2 at the same time.");
         end
         else begin 
-            $error("❌ reg[2] can not be written correctly by data_out_1 and data_out_2 at the same time. \n expected: 32'h123456, data_out_1 = %h data_out_2 = %h", data_out_1, data_out_2);
+            $error("❌ reg[2] can not be written correctly by read_data_1 and read_data_2 at the same time. \n expected: 32'h123456, read_data_1 = %h raed_data_2 = %h", read_data_1, read_data_2);
         end
     endtask
 
     task test_read_from_two_regs_at_the_same_time;
         @(posedge clk);
         write <= 1;
-        write_address <= 3;
-        data_in <= 32'h01234567;
+        write_addr <= 3;
+        write_data <= 32'h01234567;
 
         @(posedge clk);
         write <= 1;
-        write_address <= 4;
-        data_in <= 32'h12345678;
+        write_addr <= 4;
+        write_data <= 32'h12345678;
 
         @(posedge clk);
         write <= 0;
-        read_address_1 <= 3;
-        read_address_2 <= 4;
+        read_addr_1 <= 3;
+        read_addr_2 <= 4;
 
         @(posedge clk);
-        assert(data_out_1 == 32'h01234567 && data_out_2 == 32'h12345678) begin 
-            $display("✅ reg[3] and reg[4] can be read correctly by data_out_1 and data_out_2 at the same time.");
+        assert(read_data_1 == 32'h01234567 && read_data_2 == 32'h12345678) begin 
+            $display("✅ reg[3] and reg[4] can be read correctly by read_data_1 and read_data_2 at the same time.");
         end
         else begin 
-            $error("❌ reg[3] and reg[4] can not be written correctly by data_out_1 and data_out_2 at the same time. \n expected: data_out_1 = 32'h1234567, data_out_2 = 32'h12345678, \n data_out_1 = %h data_out_2 = %h", data_out_1, data_out_2);
+            $error("❌ reg[3] and reg[4] can not be written correctly by read_data_1 and read_data_2 at the same time. \n expected: read_data_1 = 32'h1234567, read_data_2 = 32'h12345678, \n read_data_1 = %h read_data_2 = %h", read_data_1, read_data_2);
         end
     endtask
 
@@ -183,19 +183,19 @@ module mips_reg_file_tb;
     // test whether register $zero can be written
         @(posedge clk);
         write <= 1;
-        write_address <= 0;
-        data_in <= 32'h00012345;
+        write_addr <= 0;
+        write_data<= 32'h00012345;
 
         @(posedge clk);
         write <= 0;
-        read_address_1 <= 0;
+        read_addr_1 <= 0;
 
         @(posedge clk);
-        assert(data_out_1 == 32'h0) begin 
+        assert(read_data_1 == 32'h0) begin 
             $display("✅ register zero cannot be changed.");
         end
         else begin 
-            $error("❌ reg[%d] is changed to %h, expects 0", read_address_1, data_out_1);
+            $error("❌ reg[%d] is changed to %h, expects 0", read_addr_1, read_data_1);
         end 
     endtask
 
