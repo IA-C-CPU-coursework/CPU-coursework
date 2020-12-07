@@ -9,3 +9,6 @@ a.out
 
 # ccls
 .ccls-cache
+
+# vscode
+.vscode
