@@ -4,8 +4,8 @@
 
 module mips_cpu_bus_tb();
 
-    // parameter RAM_INIT_FILE = "../test/binary/cpu_integration.hex.txt";
-    parameter RAM_INIT_FILE = "../test/binary/shifts.hex.txt";
+    parameter RAM_INIT_FILE = "../test/binary/cpu_integration.hex.txt";
+    // parameter RAM_INIT_FILE = "../test/binary/shifts.hex.txt";
     parameter TIMEOUT_CYCLES = 100;
 
     /* Standard signals */
@@ -25,6 +25,8 @@ module mips_cpu_bus_tb();
 
     logic pending;
     logic[31:0] simulated_address;
+
+    logic dump;
 
     assign simulated_address = address - 32'hBFC00000; 
     // map the real memory space(2^32) to simulated memory space(2^16)
@@ -51,6 +53,7 @@ module mips_cpu_bus_tb();
     // Instanciation of RAM_32x64k_avalon
     RAM_32x64k_avalon #(RAM_INIT_FILE) ram(
         .rst(reset),
+        .dump(dump), // asserted to cause the RAM to dump content into `RAM.txt`
         .p(pending),
         .clk(clk),
         .address(simulated_address), 
@@ -62,6 +65,10 @@ module mips_cpu_bus_tb();
         .readdata(readdata)
     );
 
+    always_ff @(posedge active) begin
+        dump <= 1;
+    end
+
     always @(posedge clk) begin
     // check the validity of memory address
         if (active) begin
@@ -71,11 +78,22 @@ module mips_cpu_bus_tb();
             else begin
                 assert(address <= 32'hBFC0FFFF && address >= 32'hBFC00000) 
                 begin
-                    $display("[TB] : LOG : ✅ address %h is accessible", address);
+                    // $display("[TB] : LOG : ✅ address %h is accessible", address);
                 end
                 else begin
                     $fatal(1, "[TB] : FATAL : ❌ the requested address %h, which mapped to %h, is out of range.", address, simulated_address);
                 end
+            end
+        end
+    end
+
+    always @(posedge clk) begin
+        if (!waitrequest & active) begin
+            if(read) begin
+                $display("[TB] : MEM : read from memory[%h] %h", address, readdata);
+            end
+            if (write) begin
+                $display("[TB] : MEM : write to  memory[%h] %h", address, writedata);
             end
         end
     end

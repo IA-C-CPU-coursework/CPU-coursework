@@ -43,6 +43,7 @@
 module RAM_32x64k_avalon(
     input logic rst,
     input logic clk,
+    input logic dump,
     input logic[31:0] address,
     input logic write,
     input logic read,
@@ -68,6 +69,7 @@ module RAM_32x64k_avalon(
     // assign waitrequest = (write || read) && !pending || !(write || read) && pending;
 
     parameter RAM_INIT_FILE = "";
+    parameter RAM_OUTPUT_FILE = "RAM.txt";
 
     reg[31:0] memory [2**16-1:0]; // 🚧 2^32 is too huge for simulation: doing so cause error [-1:0]
     // 📒 Note
@@ -167,9 +169,9 @@ module RAM_32x64k_avalon(
             endcase;
         end
         if(read) begin
-            $display("[RAM] : LOG : 📚📚📚 receive read instruction");
-            $display("[RAM] : LOG : waitrequest %b", waitrequest);
-            $display("[RAM] : LOG : readdata %h, word_address %h, memory[word_address] %h, waitrequest %b", readdata, word_address, memory[word_address], waitrequest); 
+            // $display("[RAM] : LOG : 📚📚📚 receive read instruction");
+            // $display("[RAM] : LOG : waitrequest %b", waitrequest);
+            // $display("[RAM] : LOG : readdata %h, word_address %h, memory[word_address] %h, waitrequest %b", readdata, word_address, memory[word_address], waitrequest); 
         end
     end
 
@@ -192,9 +194,24 @@ module RAM_32x64k_avalon(
             endcase;
         end
         if(write) begin
-            $display("[RAM] : LOG : 📝📝📝 receive write instruction");
-            $display("[RAM] : LOG : waitrequest %b", waitrequest);
-            $display("[RAM] : LOG : writedata %h, word_address %h, memory[word_address] %h, waitrequest %b", writedata, word_address, memory[word_address], waitrequest); 
+            // $display("[RAM] : LOG : 📝📝📝 receive write instruction");
+            // $display("[RAM] : LOG : waitrequest %b", waitrequest);
+            // $display("[RAM] : LOG : writedata %h, word_address %h, memory[word_address] %h, waitrequest %b", writedata, word_address, memory[word_address], waitrequest); 
+        end
+    end
+
+
+    //------------------------------------------------------------------------
+    // Dump memory content
+    // This functionality is disable by default, uncomment to enable it.
+    // Dump memory to file can cost about 30s on average not matter whether 
+    // dump the whole memory or just a segment. Cost at least 10s each even 
+    // when running in parallel.
+    //------------------------------------------------------------------------
+    always @(*) begin
+        if (dump) begin
+            // $writememh(RAM_OUTPUT_FILE, memory);
+            // $writememh(RAM_OUTPUT_FILE, memory, 16'h0, 16'h100);
         end
     end
 
