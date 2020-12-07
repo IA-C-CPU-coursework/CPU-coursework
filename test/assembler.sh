@@ -2,7 +2,7 @@
 
 #------------------------------------------------------------------------------
 # This script assembles MIPS1 instruction using `mipsel-linux-gun-as` and
-# `mipsel-linux-gun-objdump`.
+# `mipsel-linux-gun-objdump`, both included in `gcc-mipsel-linux-gnu`.
 # It takes an input ended with `.asm.txt` and write the hex binary output into
 # `$filename.hex.txt`.
 #------------------------------------------------------------------------------
@@ -42,6 +42,11 @@ echo "[ASM] : 📨 receved assembly file $1" >&2
 
 filename=$(basename $1 .asm.txt) # get filename from fullname
 
+#------------------------------------------------------------------------------
+# Main part
+# 1. Assemble input into object file with `mips-linux-gnu-as`.
+# 2. Extract hexidecimal binary from the information displayed by `objdump`
+#------------------------------------------------------------------------------
 
 mipsel-linux-gnu-as -mips1 $1 -o $filename.o
 mipsel-linux-gnu-objdump -d -j .text $filename.o            \

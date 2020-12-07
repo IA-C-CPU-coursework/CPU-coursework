@@ -3,7 +3,7 @@
 module RAM_32x64k_avalon_tb;
     // timeunit 1ns / 10ps;
     
-    parameter RAM_INIT_FILE = "../../test/binary/RAM_avalon.hex.txt";
+    parameter RAM_INIT_FILE = "instruction_hex/RAM_avalon.hex.txt";
     parameter TIMEOUT_CYCLES = 100;
 
     logic clk;
