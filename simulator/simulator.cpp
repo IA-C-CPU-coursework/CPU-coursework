@@ -1,46 +1,32 @@
-#include<iostream>
-#include<string>
-#include<fstream>
-#include<map>
-#include<iterator>
-#include<algorithm>
+#include "simulator.hpp"
 using namespace std;
 
-int main(){
-    // first step is to read data from asm files:
-    //----------------------------setup and read files--------------------------------------
-    uint32_t address = 0xbfc00000; // initialise the starting point of address
-    map<uint32_t,string> asm_ram; // instruction in pure format
-    map<uint32_t,string> hex_ram; // instruction in binaries
-    ifstream ram_file_asm;
-    ram_file_asm.open("01_addiu1_instr.txt");
-    string instruction_line;
-    while(getline(ram_file_asm,instruction_line)){
-        asm_ram[address] = instruction_line;
-        address = address + 0x4;
-    }
-    cout << "read the instructions :  " << endl; 
-    for(auto it = asm_ram.begin(); it != asm_ram.end(); it++){
-        cout << hex << it->first << " " << it->second << endl;
-    }
-    // read hex ----------------
-    address = 0xbfc00000; // read binaries from very begining:
-    ifstream ram_file_hex;
-    ram_file_hex.open("01_addiu.txt");
-    string instruction_binary;
-    while(getline(ram_file_hex,instruction_binary)){
-        hex_ram[address] = instruction_binary;
-        address = address + 0x4;
-    }
-    cout << "read instructions in binary: " << endl;
-      for(auto it = hex_ram.begin(); it != hex_ram.end(); it++){
-        cout << hex << it->first << " " << it->second << endl;
-    }
-    ram_file_hex.close();
-    //---------------------finish reading the data from ram --------------------
 
-    //create register files:
-    map<string,uint32_t> register_file;
-    // initialize registers:
-    
+void Simulate::initialise_register(){
+    register_file["$zero"] = 0x0; register_file["$at"] = 0x0;
+    register_file["$v0"] = 0x0;   register_file["$v1"] = 0x0;
+    register_file["$a0"] = 0x0;   register_file["$a1"] = 0x0;
+    register_file["$a2"] = 0x0;   register_file["$a3"] = 0x0;
+    register_file["$t0"] = 0x0;   register_file["$t1"] = 0x0;
+    register_file["$t2"] = 0x0;   register_file["$t3"] = 0x0;
+    register_file["$t4"] = 0x0;   register_file["$t5"] = 0x0;
+    register_file["$t6"] = 0x0;   register_file["$t7"] = 0x0;
+    register_file["$s0"] = 0x0;   register_file["$s1"] = 0x0;
+    register_file["$s2"] = 0x0;   register_file["$s3"] = 0x0;
+    register_file["$s4"] = 0x0;   register_file["$s5"] = 0x0;
+    register_file["$s6"] = 0x0;   register_file["$s7"] = 0x0;
+    register_file["$t8"] = 0x0;   register_file["$t9"] = 0x0;
+    register_file["$k0"] = 0x0;   register_file["$k1"] = 0x0;
+    register_file["$gp"] = 0x0;   register_file["$sp"] = 0x0;
+    register_file["$fp"] = 0x0;   register_file["$ra"] = 0x0;
+
+}
+
+void Simulate::execution(){
+    //initialise program counter at the beginning:
+    while(pc!=0x00000000){
+        
+    }
+    //when exist the while loop: pc should be equal to 0x00000000
+    //print the final value store in the $v0 register:
 }
