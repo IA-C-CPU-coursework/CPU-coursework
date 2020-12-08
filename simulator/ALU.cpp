@@ -120,11 +120,11 @@ void ALU::mtlo(uint32_t a){
     lo = a;
 }
 
-uint32_t mfhi(uint32_t a){
+uint32_t ALU::mfhi(uint32_t a){
     return hi;
 }
 
-uint32_t mflo(uint32_t a){
+uint32_t ALU::mflo(uint32_t a){
     return lo;
 }
 

@@ -67,13 +67,13 @@ uint32_t zero_extension(uint32_t a){
 int string_number(string instruction){
     int result;
     result = count(instruction.begin(),instruction.end(),',');
-    if(result == 3){
+    if(result == 2){
         return 4;
     }
     else if(result == 2){
         return 3;
     }
-    else if(result == 1){
+    else if(result == 0){
         return 2;
     }
     return 0;

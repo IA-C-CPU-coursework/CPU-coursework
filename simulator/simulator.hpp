@@ -27,7 +27,7 @@ class Simulate{
         instructions = in_instructions;
         binaries = in_binaries;
         //initialize program counter:
-        pc = 0xbcf00000;
+        pc = 0xbfc00000;
     }
 
     void execution();

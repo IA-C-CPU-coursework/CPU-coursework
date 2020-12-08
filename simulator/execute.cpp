@@ -42,7 +42,7 @@ int main(int argc,char* argv[]){
         address = address + 0x4;
     }
     cout << "read instructions in binary: " << endl;
-     /* for(auto it = hex_ram.begin(); it != hex_ram.end(); it++){
+     /*for(auto it = hex_ram.begin(); it != hex_ram.end(); it++){
         cout << hex << it->first << " " << it->second << endl;
     }*/
     ram_file_hex.close();
@@ -59,15 +59,10 @@ int main(int argc,char* argv[]){
     string readdata;
     string writedata;
 
-    // ---------------- execution:
-    //cout << a << " ss " << b << endl; 
-
-    //cout << aa << " ss  " << bb << endl;
-    //cout << c << endl;
     uint32_t a = 0xfffc1222;
     uint32_t b = 0x88221fff;
 
-    ALU *calculator = new ALU();
-    calculator->div(a,b);
-    calculator->divu(a,b);
+    Simulate *trial = new Simulate(asm_ram,hex_ram);
+    trial->execution();
+
 }
