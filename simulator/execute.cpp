@@ -60,31 +60,14 @@ int main(int argc,char* argv[]){
     string writedata;
 
     // ---------------- execution:
-    uint32_t a = 0x2f221102;
-    uint32_t b = 0xc8221102;
     //cout << a << " ss " << b << endl; 
-    uint_fast64_t maska = 0xffffffff00000000;
-    uint_fast64_t maskb = 0x0000000000000000;
-    int bita = a>>31;
-    int bitb = b>>31;
-    int64_t aa;
-    int64_t bb;
-    if(bita == 1){
-         aa = maska + a;
-    }
-    else {
-        aa = maskb + a;
-}
-    if(bitb = 1){
-        bb = maska + b;
-    }else{
-        bb = maskb + b;
-    }
-    int_fast64_t c = aa*bb;
+
     //cout << aa << " ss  " << bb << endl;
     //cout << c << endl;
+    uint32_t a = 0xfffc1222;
+    uint32_t b = 0x88221fff;
 
     ALU *calculator = new ALU();
-    cout << to_hex32(calculator->sll(b,3)) << endl;
-    cout << to_hex32(calculator->srl(b,5)) << endl;
+    calculator->div(a,b);
+    calculator->divu(a,b);
 }

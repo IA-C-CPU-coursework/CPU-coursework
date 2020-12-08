@@ -27,6 +27,28 @@ string to_hex32(uint32_t a){
     return result;
 }
 
+string to_hex64(uint64_t a){
+    char temp[16]={'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+    string result;
+    result.push_back(temp[(a>>60)&0xF]);
+    result.push_back(temp[(a>>56)&0xF]);
+    result.push_back(temp[(a>>52)&0xF]);
+    result.push_back(temp[(a>>48)&0xF]);
+    result.push_back(temp[(a>>44)&0xF]);
+    result.push_back(temp[(a>>40)&0xF]);
+    result.push_back(temp[(a>>36)&0xF]);
+    result.push_back(temp[(a>>32)&0xF]);
+    result.push_back(temp[(a>>28)&0xF]);
+    result.push_back(temp[(a>>24)&0xF]);
+    result.push_back(temp[(a>>20)&0xF]);
+    result.push_back(temp[(a>>16)&0xF]);
+    result.push_back(temp[(a>>12)&0xF]);
+    result.push_back(temp[(a>>8)&0xF]);
+    result.push_back(temp[(a>>4)&0xF]);
+    result.push_back(temp[(a>>0)&0xF]);
+    return result;
+}
+
 uint32_t sign_extension(uint32_t a){
     uint32_t mask = 0x00008000;
     if(mask & a){

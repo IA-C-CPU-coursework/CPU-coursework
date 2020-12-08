@@ -23,6 +23,6 @@ uint32_t sign_extension(uint32_t a);
 
 uint32_t zero_extension(uint32_t a);
 //sign extension for multiplication:
-
+string to_hex64(uint64_t a);
 
 #endif

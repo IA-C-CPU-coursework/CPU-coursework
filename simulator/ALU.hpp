@@ -37,22 +37,22 @@ public:
 // shifts
     uint32_t sll(uint32_t a, int b);
 
-    uint32_t sra(uint32_t a, int b);
+    int32_t sra(int32_t a, int b);
 
     uint32_t srl(uint32_t a, int b);
 
     uint32_t sllv(uint32_t a, uint32_t b);
 
-    uint32_t srav(uint32_t a, uint32_t b);
+    int32_t srav(int32_t a, uint32_t b);
 
     uint32_t srlv(uint32_t a, uint32_t b);
 
 // multiplication and division
-    void mul(uint32_t a,uint32_t b);
+    void mul(int32_t a,int32_t b);
 
     void mulu(uint32_t a, uint32_t b);
 
-    void div(uint32_t a, uint32_t b);
+    void div(int32_t a, int32_t b);
 
     void divu(uint32_t a, uint32_t b);
 
