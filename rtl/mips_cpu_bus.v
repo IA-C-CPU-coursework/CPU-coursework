@@ -104,6 +104,7 @@ module mips_cpu_bus(
     // logic [31:0] signed_offset;
     logic [25:0] target;
     assign target = mem_out[25:0];
+    logic is_branch;
 
     // sign extension
     logic [15:0] offset;
@@ -162,6 +163,7 @@ module mips_cpu_bus(
         .clk(clk),
         .rst(reset),
         .CntEn(CntEn),
+        .is_branch(is_branch),
         .PCControl(PCControl),
         .read_data_1(read_data_1),
         .signed_offset(signed_offset),
@@ -233,7 +235,8 @@ module mips_cpu_bus(
         .PCControl(PCControl),
         .CntEn(CntEn),
         // alu
-        .ALUControl(ALUControl)
+        .ALUControl(ALUControl),
+        .is_branch(is_branch)
     );
 
     // instantiation of mips_alu
