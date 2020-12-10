@@ -232,19 +232,19 @@ module mips_decoder(
                 ByteEn        = 4'b1111;
                 RegSrc        = ADDIU || LUI;
                 RegData       = 2'b10;
-                RegWrite      = ADDIU || ADDU || LUI  || shift_instr;
+                RegWrite      = ADDIU || ADDU || LUI  || shift_instr || SUBU || OR || XOR || AND;
                 PCControl[1]  = !branch_instr;
                 PCControl[0]  = !branch_instr && !(JR || JALR);
                 CntEn         = !waitrequest && two_cycle_instr;
                 ALUSrc1       = SLL   || SRA  || SRL;
                 ALUSrc2       = ADDIU || LUI  || LW   || SW;
                 ALUControl[4] = LUI;
-                ALUControl[3] = shift_instr;
-                ALUControl[2] = LUI   || SRA  || SRAV || SRL  || SRLV;
-                ALUControl[1] = SLL   || SLLV; 
-                ALUControl[0] = SLL   || SLLV || SRL  || SRLV;
+                ALUControl[3] = shift_instr || SUBU || OR || XOR;
+                ALUControl[2] = LUI   || SRA  || SRAV || SRL  || SRLV || SUBU || XOR;
+                ALUControl[1] = SLL   || SLLV || SUBU || OR || XOR;
+                ALUControl[0] = SLL   || SLLV || SRL  || SRLV || AND || XOR;
                 Extra         = three_cycle_instr;
-                is_branch     = J || JAL || JR || JALR;  // needs to be added for conditional branch;
+                is_branch     = J || JAL || JR || JALR || BEQ || BGEZ || BGEZAL || BGTZ || BLEZ || BLTZ || BLTZAL || BNE;
             end
             2'b10: begin 
             // state == EXEC2
