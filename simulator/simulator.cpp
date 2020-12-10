@@ -24,10 +24,23 @@ void Simulate::initialise_register(){
 
 void Simulate::execution(){
     //initialise program counter at the beginning:
+    ALU *calculate = new ALU();
     int n = string_number(instructions[pc]);
-    //cout << n << endl;
+    //when exist the while loop: pc should be equal to 0x00000000
+    //print the final value store in the $v0 register:
     while(pc!=0x00000000){
-        cout << "location read: " << hex << pc << " data: " << binaries[pc] << endl;
+        if(instructions[0][0] == 'b' || instructions[0][0] == 'j'){
+
+        }else{
+            excute_inter(pc);
+            pc = pc + 4;
+        }
+    }
+    cout << "the final value  register_v0 : " << register_v0 << endl;
+}
+
+void Simulate::excute_inter(uint32_t pc){
+    cout << "location read: " << hex << pc << " data: " << binaries[pc] << endl;
         int n = string_number(instructions[pc]);
         if(n==4){
             vector<string> current = extract(instructions[pc]);
@@ -36,14 +49,15 @@ void Simulate::execution(){
             string rs = current[2];
             string rt_im = current[3];
             if(current[0] == "addu"){
-                register_file[rd] = register_file[rs] + register_file[rt_im];
+                register_file[rd] = calculate->addu(register_file[rs],register_file[rt_im]);
+                excute_inter(pc+0x4);
             }
             else if(current[0] == "addiu"){
                 register_file[rd] = register_file[rs] + convert_to_hex(rt_im);
-                pc = pc + 0x4;
+                excute_inter(pc+0x4);
             }
             else if(current[0] == "and"){
-                
+
             }            
             else if(current[0] == "andi"){
                 
@@ -120,11 +134,8 @@ void Simulate::execution(){
 
             }
             else if(current[0] == "jr"){
+
                 pc = register_file["$zero"];
             }
         }
-    }
-    //when exist the while loop: pc should be equal to 0x00000000
-    //print the final value store in the $v0 register:
-    cout << "the final value  register_v0 : " << register_v0 << endl;
-}
+        }

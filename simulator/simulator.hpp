@@ -21,6 +21,7 @@ class Simulate{
     uint32_t readdata;
     uint32_t writedata;
     uint32_t register_v0;
+    ALU *calculate = new ALU();
     public:
     //execution for instruction 2,3, or 4 strings 
     Simulate(map<uint32_t,string> in_instructions,map<uint32_t,string> in_binaries){
@@ -36,4 +37,6 @@ class Simulate{
     void initialise_register();
 
     void print_v0();
+
+    void excute_inter(uint32_t pc);
 };

@@ -26,6 +26,7 @@ int main(int argc,char* argv[]){
         asm_ram[address] = instruction_line;
         address = address + 0x4;
     }
+    asm_ram[0x00000000] = "0";
     cout << "read the instructions :  " << endl; 
     /*for(auto it = asm_ram.begin(); it != asm_ram.end(); it++){
         cout << hex << it->first << " " << it->second << endl;
@@ -45,6 +46,7 @@ int main(int argc,char* argv[]){
      /*for(auto it = hex_ram.begin(); it != hex_ram.end(); it++){
         cout << hex << it->first << " " << it->second << endl;
     }*/
+    hex_ram[0x00000000] = "0";
     ram_file_hex.close();
     //---------------------finish reading the data from ram --------------------
 
