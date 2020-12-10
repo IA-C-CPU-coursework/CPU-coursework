@@ -54,6 +54,8 @@ module mips_alu(
             5'b10101:   alu_result[31:0] = alu_src_1[31:0]           & (alu_src_2[31:0] & 32'h0000ffff); // andi
             5'b10110:   alu_result[31:0] = alu_src_1[31:0]         |  (alu_src_2[31:0] & 32'h0000ffff); // ori
             5'b10111:   alu_result[31:0] = alu_src_1[31:0]         ^ (alu_src_2[31:0] & 32'h0000ffff); // xori
+            5'b11000:   alu_result[31:0] = ($signed(alu_src_1[31:0])    <   $signed(alu_src_2[31:0])); // for slt and slti
+            5'b11001:   alu_result[31:0] = (alu_src_1[31:0]    <   alu_src_2[31:0]);
             default:    alu_result[31:0] = 32'bxxxxxxxx; 
             // output unknown signal as default behaviour
         endcase;
