@@ -1,0 +1,5 @@
+
+
+lw $t1,0($sp)
+lw $t1,8($sp)/home/yinglong/yw2919/test/00_instruction_asm/04_lw1.asm.txt
+jr $zero

@@ -1,0 +1,4 @@
+
+sll $v0,$t0,6
+sll $v0,$t0,
+jr $zero

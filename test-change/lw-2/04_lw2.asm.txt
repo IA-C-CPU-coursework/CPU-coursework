@@ -1,0 +1,5 @@
+
+
+lw $t1,0($sp)
+lw $t1,8($sp)
+jr $zero
