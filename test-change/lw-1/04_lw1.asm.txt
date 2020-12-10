@@ -1,5 +1,4 @@
-
-
-lw $t1,0($sp)
-lw $t1,8($sp)/home/yinglong/yw2919/test/00_instruction_asm/04_lw1.asm.txt
+addiu $t1,$zero,24184
+lw $t1,8($sp)
+addiu $v0,$t1,0
 jr $zero
