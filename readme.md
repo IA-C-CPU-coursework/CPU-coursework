@@ -208,7 +208,11 @@ case(ALUControl) begin
     5'b10001: alu_result[31:0] = HI;                                  // Move from HI
     5'b10010: LO              <= alu_result[31:0];                    // Move to LO
     5'b10011: alu_result[31:0] = LO;                                  // Move from LO
-    5'b10100: alu_result[31:0] = alu_src_1[31:0] << 16;				  // shift the lower half word to upper half
+    5'b10100: alu_result[31:0] = alu_src_1[31:0] << 16;				  // shift the lower half word to upper 
+    5'b10101:   alu_result[31:0] = alu_src_1[31:0] & (alu_src_2[31:0] & 32'h0000ffff); // and immediate
+    5'b10110:   alu_result[31:0] = alu_src_1[31:0] | (alu_src_2[31:0] & 32'h0000ffff); // or immediate
+    5'b10111:   alu_result[31:0] = alu_src_1[31:0] ^ (alu_src_2[31:0] & 32'h0000ffff); // xor immediate
+    half
 end
 ```
 
@@ -249,6 +253,9 @@ end
 | ✅ | AND | 1 | 0 | 0 | 1111 | 0 | 10 | 1 | 11 | 1 | 0 | 0 | 00001 |
 | ✅ | OR | 1 | 0 | 0 | 1111 | 0 | 10 | 1 | 11 | 1 | 0 | 0 | 01010 |
 | ✅ | XOR | 1 | 0 | 0 | 1111 | 0 | 10 | 1 | 11 | 1 | 0 | 0 | 01111 |
+| ✅ | ANDI | 1 | 0 | 0 | 1111 | 1 | 10 | 1 | 11 | 1 | 0 | 1 | 10101 |
+| ✅ | ORI | 1 | 0 | 0 | 1111 | 1 | 10 | 1 | 11 | 1 | 0 | 1 | 10110 |
+| ✅ | XORI | 1 | 0 | 0 | 1111 | 1 | 10 | 1 | 11 | 1 | 0 | 1 | 10111 |
 
 ##### State: EXEC2
 

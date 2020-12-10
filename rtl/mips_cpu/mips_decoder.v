@@ -230,19 +230,19 @@ module mips_decoder(
                 MemWrite      = store_instr;
                 MemRead       = load_instr;
                 ByteEn        = 4'b1111;
-                RegSrc        = ADDIU || LUI;
+                RegSrc        = ADDIU || LUI || ORI || ANDI || XORI;
                 RegData       = 2'b10;
-                RegWrite      = ADDIU || ADDU || LUI  || shift_instr || SUBU || OR || XOR || AND;
+                RegWrite      = ADDIU || ADDU || LUI  || shift_instr || SUBU || OR || XOR || AND || ORI || ANDI || XORI;
                 PCControl[1]  = !branch_instr;
                 PCControl[0]  = !branch_instr && !(JR || JALR);
                 CntEn         = !waitrequest && two_cycle_instr;
                 ALUSrc1       = SLL   || SRA  || SRL;
-                ALUSrc2       = ADDIU || LUI  || LW   || SW;
-                ALUControl[4] = LUI;
+                ALUSrc2       = ADDIU || LUI  || LW   || SW || ORI || ANDI ||XORI;
+                ALUControl[4] = LUI || ANDI || ORI || XORI;
                 ALUControl[3] = shift_instr || SUBU || OR || XOR;
-                ALUControl[2] = LUI   || SRA  || SRAV || SRL  || SRLV || SUBU || XOR;
-                ALUControl[1] = SLL   || SLLV || SUBU || OR || XOR;
-                ALUControl[0] = SLL   || SLLV || SRL  || SRLV || AND || XOR;
+                ALUControl[2] = LUI   || SRA  || SRAV || SRL  || SRLV || SUBU || XOR || ANDI || ORI || XORI;
+                ALUControl[1] = SLL   || SLLV || SUBU || OR || XOR || ORI || XORI;
+                ALUControl[0] = SLL   || SLLV || SRL  || SRLV || AND || XOR || ANDI || XORI;
                 Extra         = three_cycle_instr;
                 is_branch     = J || JAL || JR || JALR || BEQ || BGEZ || BGEZAL || BGTZ || BLEZ || BLTZ || BLTZAL || BNE;
             end

@@ -51,6 +51,9 @@ module mips_alu(
             5'b10010:   ; // in the always_ff block below                                 // Move to LO
             5'b10011:   alu_result[31:0] = LO;                                            // Move from LO
             5'b10100:   alu_result[31:0] = alu_src_2[31:0]          << 16'h10;            // shift lower 4 byte to upper
+            5'b10101:   alu_result[31:0] = alu_src_1[31:0]           & (alu_src_2[31:0] & 32'h0000ffff); // andi
+            5'b10110:   alu_result[31:0] = alu_src_1[31:0]         |  (alu_src_2[31:0] & 32'h0000ffff); // ori
+            5'b10111:   alu_result[31:0] = alu_src_1[31:0]         ^ (alu_src_2[31:0] & 32'h0000ffff); // xori
             default:    alu_result[31:0] = 32'bxxxxxxxx; 
             // output unknown signal as default behaviour
         endcase;
