@@ -1,8 +1,12 @@
 module mips_cpu_bus_tb();
 
-    parameter RAM_INIT_FILE = "../test/beq1.txt";
-    // parameter RAM_INIT_FILE = "../test/binary/shifts.hex.txt";
-    parameter TIMEOUT_CYCLES = 100;
+    parameter RAM_INSTR_INIT_FILE = "unit_test/instruction_hex/cpu_integration.hex.txt";
+    parameter RAM_INSTR_SIZE= 10;
+    parameter RAM_DATA_INIT_FILE = "unit_test/instruction_hex/cpu_integration.hex.txt";
+    parameter RAM_DATA_SIZE= 10;
+
+    parameter VCD_OUTPUT = "mips_cpu_bus_tb.vcd";
+    parameter TIMEOUT_CYCLES = 1000;
 
     /* Standard signals */
     logic clk;
@@ -22,10 +26,11 @@ module mips_cpu_bus_tb();
 
     logic pending;
     logic[31:0] simulated_address;
+    logic[31:0] inspected_address;
 
     logic dump;
 
-    assign simulated_address = address - 32'hBFC00000; 
+    assign simulated_address = (dump ? inspected_address : address) - 32'hBFC00000; 
     // map the real memory space(2^32) to simulated memory space(2^16)
     // the simulated memory space only contain [0x0000, 0xFFFF]
     // so it can only simulate a range of the real memory [0xBFC00000, 0xBFC0FFFF]
@@ -48,9 +53,13 @@ module mips_cpu_bus_tb();
     );
 
     // Instanciation of RAM_32x64k_avalon
-    RAM_32x64k_avalon #(RAM_INIT_FILE) ram(
+    RAM_32x64k_avalon #(
+        .RAM_INSTR_INIT_FILE(RAM_INSTR_INIT_FILE), 
+        .RAM_INSTR_SIZE(RAM_INSTR_SIZE), 
+        .RAM_DATA_INIT_FILE(RAM_DATA_INIT_FILE), 
+        .RAM_DATA_SIZE(RAM_DATA_SIZE)
+    ) ram(
         .rst(reset),
-        .dump(dump), // asserted to cause the RAM to dump content into `RAM.txt`
         .p(pending),
         .clk(clk),
         .address(simulated_address), 
@@ -62,7 +71,7 @@ module mips_cpu_bus_tb();
         .readdata(readdata)
     );
 
-    always_ff @(posedge active) begin
+    always_ff @(negedge active) begin
         dump <= 1;
     end
 
@@ -98,7 +107,7 @@ module mips_cpu_bus_tb();
     initial begin
     // Generate clock
         clk=0;
-        $dumpfile("mips_cpu_bus_tb.vcd");
+        $dumpfile(VCD_OUTPUT);
         $dumpvars(0, mips_cpu_bus_tb);
 
         repeat (TIMEOUT_CYCLES) begin
@@ -112,6 +121,8 @@ module mips_cpu_bus_tb();
     end
 
     initial begin
+        dump <= 0;
+        inspected_address <= 32'hBFC00400;
         $display("Start integration test of cpu");
         reset <= 0;
 
@@ -124,7 +135,7 @@ module mips_cpu_bus_tb();
         @(posedge clk);
         assert(active == 1); 
         else begin
-            $error("[TB]: CPU did not assert `avtive` after reset.");
+            $fatal(1, "[TB]: CPU did not assert `avtive` after reset.");
         end
 
         @(posedge clk);
@@ -133,8 +144,25 @@ module mips_cpu_bus_tb();
         end
 
         $display("[TB] : LOG : 🥳 Finished, register_v0 = %h", register_v0);
+        dump_mem();
 
         $finish;
     end
+
+task dump_mem;
+    logic [32:0] cnt;
+    cnt <= 32'h0;
+
+    $display("==== [Start] Content in the data section after execution ============");
+    repeat(RAM_DATA_SIZE) begin
+        @(posedge clk);
+            inspected_address <= 32'hBFC00400 + cnt;
+        @(negedge waitrequest) begin
+            $display("DATA_MEM[%h] = %h", inspected_address, readdata);
+        end
+        cnt += 32'h4;
+    end
+    $display("==== [End]   Content in the data section after execution ============");
+endtask
 
 endmodule

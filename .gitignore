@@ -1,5 +1,10 @@
 # The following files will be ignored by git
 
+# ignore files without extension
+*
+!/**/
+!*.*
+
 # assmebler
 *.hex.txt
 
@@ -12,3 +17,9 @@ a.out
 
 # vscode
 .vscode
+
+# testbench
+*.bin
+*.hex
+*.elf
+*.out
