@@ -43,9 +43,12 @@ module mips_cpu_bus(
             active <= 1;
         end
         if (Halt) begin
-            $display("[CPU] : HALT");
             active <= 0;
         end
+    end
+
+    always @(negedge active) begin
+        $display("[CPU] : HALT");
     end
 
     //-------------------------------------------------------------------------

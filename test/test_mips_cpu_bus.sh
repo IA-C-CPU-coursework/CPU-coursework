@@ -1,5 +1,25 @@
 #! /bin/bash
 
+# Set root directory of the project 
+
+# The specification mentions:
+# > To keep things simple, you can assume that your test-script will always be 
+# > called from the base directory of your submission. This just means that 
+# > your script is always invoked as `test/test_mips_cpu_bus.sh`.
+
+dir="./"
+root=`cd $dir && pwd`
+echo "Detected root directorty of the project: ${root}"
+
+# There is a file `this_is_root` in the project root directory
+if [[ -f "this_is_root" ]]; then
+    echo "✅ Executing in the project root directory"
+else 
+    echo "❌ Executing in the wrong directory"
+    echo "    - not in the project root directory"
+    exit 1
+fi
+
 testbench="
      ______          __  __                    __
     /_  __/__  _____/ /_/ /_  ___  ____  _____/ /_
@@ -7,8 +27,8 @@ testbench="
     / / /  __(__  ) /_/ /_/ /  __/ / / / /__/ / / /
    /_/  \___/____/\__/_.___/\___/_/ /_/\___/_/ /_/
 "
-source_directory=$1 # default should be rtl/mips_cpu_bus.v
-instruction=$2
+source_directory="$1" # default should be rtl/mips_cpu_bus.v
+instruction="$2"
 
 function help {
     # Display help information
@@ -22,29 +42,102 @@ function line {
     printf %"$(tput cols)"s |tr " " "="
 }
 
-echo "$testbench"
+echo "${testbench}"
 
 
 #-----------------------------------------------------------------------------
 # Argument handling
 #-----------------------------------------------------------------------------
 
-if [[ $source_directory == "" ]]
+if [[ ${source_directory} == "" ]]
 then
     echo "❌ source_directory not provided"
     help
     exit 1
 else
-    if [[ -d $source_directory ]]; then
-        echo "source_directory: $source_directory"
+    if [[ -d ${source_directory} ]]; then
+        echo "source_directory: ${source_directory}"
     else
-        echo "❌ directory \" $source_directory \" is not found"
+        echo "❌ directory \" ${source_directory} \" is not found"
         help
         exit 1
     fi
 fi
 
-if [[ $instruction != "" ]]
+if [[ ${instruction} != "" ]]
 then
-    echo "instruction: $instruction"
+    echo "instruction: ${instruction}"
 fi
+
+
+#------------------------------------------------------------------------------
+# Create separated directory for each testcase
+#------------------------------------------------------------------------------
+
+echo ""
+echo "Start to create separated directories for testcases"
+
+set -e
+
+DIR="${root}/test/testcases"
+
+if [ -d "${DIR}" ]; then
+    echo " - target ${DIR} exists"
+    newDIR="${DIR}_moved_at_$(date '+%d_%m_%Y_%H_%M_%S')"
+    mv "${DIR}" "${newDIR}"
+    echo " - 📦 move content in ${DIR} to" 
+    echo "   ${newDIR}"
+else
+    echo " - ${DIR} does not exist"
+    echo " - create directory: ${DIR}"
+fi
+
+mkdir "${DIR}"
+
+echo " - create sub directories in ${DIR} for test cases"
+
+for asm_file in ${root}/test/all_testcases/*.asm.txt; do
+    testcase=$(basename ${asm_file} .asm.txt) 
+    >&2 echo "    - creating directory ${testcase}"
+    mkdir ${DIR}/${testcase}
+    cp ${asm_file} ${DIR}/${testcase}
+done
+
+echo "✅ Finished creating separated directories for testcases"
+
+#-----------------------------------------------------------------------------
+# Assemble all testcases 
+#-----------------------------------------------------------------------------
+
+echo ""
+echo "Start to assemble all test cases in ${root}/test/testcases"
+
+for testcase in ${root}/test/testcases/*; do
+    >&2 echo " - assembling ${testcase}"
+    cd "${testcase}"
+    testcase_name="${PWD##*/}"
+
+    OUT=$(${root}/test/assembler.sh ${testcase}/${testcase_name}.asm.txt 2> \
+        ${testcase_name}.objdump.log)
+    result=$?
+    ERR=$(<${testcase_name}.objdump.log)
+
+    if [[ "${result}" -ne 0 ]];then
+        echo "❌ Error in assembling Test Cases"
+        echo "${ERR}"
+        exit 1
+    else
+        echo "${OUT}" > ${testcase_name}.hex.txt
+    fi
+done
+
+cd "${root}"
+
+echo "✅ Finished assembling all test cases in ${root}/test/testcases"
+
+#------------------------------------------------------------------------------
+# Start to test instruction 
+#------------------------------------------------------------------------------
+
+
+#$root/test/test_mips_cpu_bus_one_instruction.sh $instruction 

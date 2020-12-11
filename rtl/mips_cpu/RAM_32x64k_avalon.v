@@ -43,7 +43,6 @@
 module RAM_32x64k_avalon(
     input logic rst,
     input logic clk,
-    input logic dump,
     input logic[31:0] address,
     input logic write,
     input logic read,
@@ -68,10 +67,12 @@ module RAM_32x64k_avalon(
     assign waitrequest = rst || (write || read) && !pending;
     // assign waitrequest = (write || read) && !pending || !(write || read) && pending;
 
-    parameter RAM_INIT_FILE = "";
-    parameter RAM_OUTPUT_FILE = "RAM.txt";
+    parameter RAM_INSTR_INIT_FILE = "";
+    parameter RAM_INSTR_SIZE= 10; 
+    parameter RAM_DATA_INIT_FILE = "";
+    parameter RAM_DATA_SIZE= 10;
 
-    reg[31:0] memory [2**16-1:0]; // 🚧 2^32 is too huge for simulation: doing so cause error [-1:0]
+    reg[31:0] memory [0:2**16-1]; // 🚧 2^32 is too huge for simulation: doing so cause error [-1:0]
     // 📒 Note
     // bit [31:0] memory[int]; 
     // associative array(likes dictionary in python) might be more efficient to simulate large memory, 
@@ -88,16 +89,30 @@ module RAM_32x64k_avalon(
             memory[i]=0;
         end
 
-        if (RAM_INIT_FILE != "") begin
-        // Load contents from file if specified
-            $display("[RAM] : INIT : Loading RAM contents from %s", RAM_INIT_FILE);
-            $readmemh(RAM_INIT_FILE, memory);
+        if (RAM_INSTR_INIT_FILE != "") begin
+        // Load instruction contents from file if specified 
+            $display("[RAM] : INIT : Loading instruction contents from %s", RAM_INSTR_INIT_FILE);
+            $readmemh(RAM_INSTR_INIT_FILE, memory, 0, RAM_INSTR_SIZE-1);
         end
 
-        for (int j=0; j<15; j++) begin
-        // dump the first 15 lines of the RAM content 
-            $display("%h", memory[j]);
+        if (RAM_DATA_INIT_FILE != "") begin
+        // Load data contents from file if specified 
+            $display("[RAM] : INIT : Loading data contents from %s", RAM_DATA_INIT_FILE);
+            $readmemh(RAM_DATA_INIT_FILE, memory, 32'h100, 32'h100+RAM_DATA_SIZE-1);
         end
+
+        $display("==== [Start] Content in the instruction section before execution ====");
+        for (int j=0; j<RAM_INSTR_SIZE; j++) begin
+            $display("PRE_INSTR_MEM[%h] = %h", (j*4 + 32'hBFC00000), memory[j + 32'h000]);
+        end
+        $display("==== [End]   Content in the instruction section before execution ====");
+
+        $display("==== [Start] Content in the data section before execution ===========");
+        for (int j=0; j<RAM_DATA_SIZE; j++) begin
+            $display("PRE_DATA_MEM[%h] = %h", (j*4 + 32'hBFC00400), memory[j + 32'h100]);
+        end
+        $display("==== [End] Content in the data section before execution =============");
+
         pending <= 1'b0;
     end
 
@@ -115,10 +130,16 @@ module RAM_32x64k_avalon(
                 memory[i]=0;
             end
 
-            if (RAM_INIT_FILE != "") begin
-            // Load contents from file if specified 
-                $display("[RAM] : INIT : Loading RAM contents from %s", RAM_INIT_FILE);
-                $readmemh(RAM_INIT_FILE, memory);
+            if (RAM_INSTR_INIT_FILE != "") begin
+            // Load instruction content from file if specified 
+                $display("[RAM] : INIT : Loading instruction contents from %s", RAM_INSTR_INIT_FILE);
+                $readmemh(RAM_INSTR_INIT_FILE, memory, 0, RAM_INSTR_SIZE-1);
+            end
+
+            if (RAM_DATA_INIT_FILE != "") begin
+            // Load data content from file if specified 
+                $display("[RAM] : INIT : Loading data contents from %s", RAM_DATA_INIT_FILE);
+                $readmemh(RAM_DATA_INIT_FILE, memory, 32'h100, 32'h100+RAM_DATA_SIZE-1);
             end
         end
     end
@@ -129,9 +150,9 @@ module RAM_32x64k_avalon(
     //------------------------------------------------------------------------
 
     always @(*) begin
-        assert(!(read & write)); // read and write operation are not allowed to take at the same time
+        assert(!(read===1 & write===1)); // read and write operation are not allowed to take at the same time
         else begin 
-            $error("read and write at the same time. read %b write %b", read, write);
+            $fatal(1, "read and write at the same time. read %b write %b", read, write);
         end
     end
 
@@ -197,21 +218,6 @@ module RAM_32x64k_avalon(
             // $display("[RAM] : LOG : 📝📝📝 receive write instruction");
             // $display("[RAM] : LOG : waitrequest %b", waitrequest);
             // $display("[RAM] : LOG : writedata %h, word_address %h, memory[word_address] %h, waitrequest %b", writedata, word_address, memory[word_address], waitrequest); 
-        end
-    end
-
-
-    //------------------------------------------------------------------------
-    // Dump memory content
-    // This functionality is disable by default, uncomment to enable it.
-    // Dump memory to file can cost about 30s on average not matter whether 
-    // dump the whole memory or just a segment. Cost at least 10s each even 
-    // when running in parallel.
-    //------------------------------------------------------------------------
-    always @(*) begin
-        if (dump) begin
-            // $writememh(RAM_OUTPUT_FILE, memory);
-            // $writememh(RAM_OUTPUT_FILE, memory, 16'h0, 16'h100);
         end
     end
 

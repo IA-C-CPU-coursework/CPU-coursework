@@ -12,3 +12,6 @@ a.out
 
 # vscode
 .vscode
+
+# testbench
+test/testcases

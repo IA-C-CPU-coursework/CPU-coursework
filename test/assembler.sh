@@ -48,15 +48,19 @@ filename=$(basename $1 .asm.txt) # get filename from fullname
 # 2. Extract hexidecimal binary from the information displayed by `objdump`
 #------------------------------------------------------------------------------
 
-mipsel-linux-gnu-as -mips1 $1 -o $filename.o
-mipsel-linux-gnu-objdump -d -j .text $filename.o            \
-    | grep -oP '\s*[0-9a-fA-F]*\:\s*\K([0-9a-fA-F]{8})\s*'  \
-    >&1
+mipsel-linux-gnu-as -mips1 $1 -o $filename.elf
+temp=$(mipsel-linux-gnu-objdump -d -j .text $filename.elf)
+
+echo "" >&2
+echo "===== start of objdump output =====" >&2
+echo "$temp" >&2
+echo "=====  end of objdump output  =====" >&2
+echo "" >&2
+
+echo "$temp" | grep -oP "\s*[0-9a-fA-F]*\:\s*\K([0-9a-fA-F]{8})\s*" >&1
 
 
 if [[ $? -eq 0  ]]
 then
     echo "[ASM] : ✅ $1 is assembled and the hex result is sent to stdout" >&2
 fi
-
-rm $filename.o
