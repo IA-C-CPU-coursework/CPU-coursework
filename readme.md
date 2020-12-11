@@ -7,6 +7,16 @@
 
 
 ## Instruction in details
+Changes:
+1. Added more cases in ALU, and changed some of comparions with zero, rather than second input
+2. added one input signal to program counter to indicate whether it is needed to jump 
+   is_branch  ---> input of PC
+   is_branch  ---> output of decoder
+   is_branch     = J || JAL || JR || JALR || (BEQ & branch) || (BGEZ & branch) || (BGEZAL & branch) || (BGTZ & branch) || (BLEZ & branch) || (BLTZ & branch) || (BLTZAL & branch) || (BNE & branch);
+   [branch signal is the output of ALU]
+   and PCControl is only used to determine the cases when we need to jump, just like the ALU control
+3. added signed multiplication and division in ALU; 
+
 
 ```
 //-----------------------------------------------------------------------------
@@ -77,7 +87,7 @@ BLEZ    rs, offset      2    Branch On <= 0                  pc = (rs <= 0) ? (p
 BLTZ    rs, offset      2    Branch On <  0                  pc = (rs < 0) ? (pc + offset*4) : (pc + 4)
 BLTZAL  rs, offset      2    Branch On <  0 And Link         reg[31] = pc; 
                                                              pc = (rs < 0) ? (pc + offset*4) : (pc + 4)
-BNE     rs, offset      2    Branch On not equal             pc = (rs != rt) ? (pc + offset*4) : (pc + 4)
+BNE     rs, rt, offset  2    Branch On not equal             pc = (rs != rt) ? (pc + offset*4) : (pc + 4)
 J       target          2    Jump                            pc = pc[31:28] | (target << 2)
 JAL     target          2    Jump And Link                   reg[31] = pc; pc = pc[31:28] | (target << 2)
 JALR    rs              3    Jump And Link Register          rd = pc; pc = rs
@@ -112,7 +122,7 @@ SW      rt, offset(rs)  2    Store Word                      mem[rs + offset] = 
 
 **ALU**: ALUControl
 
-**PC**: PCControl
+**PC**: PCControl, is_branch
 
 
 
@@ -187,32 +197,36 @@ end
 
 ```verilog
 case(ALUControl) begin
-    5'b00000: alu_result[31:0] = alu_src_1[31:0] +   alu_src_2[31:0]; // unsigned add
-    5'b00001: alu_result[31:0] = alu_src_1[31:0] &   alu_src_2[31:0]; // and
-    5'b00010: HI              <= alu_src_1[31:0] %   alu_src_2[31:0]; // divide
-              LO              <= alu_src_1[31:0] /   alu_src_2[31:0]; // divide
-    5'b00011: branch           = alu_src_1[31:0] ==  alu_src_2[31:0]; // equal to
-    5'b00100: branch           = alu_src_1[31:0] >   alu_src_2[31:0]; // greater than 
-    5'b00101: branch           = alu_src_1[31:0] >=  alu_src_2[31:0]; // greater than or equal to 
-    5'b00110: branch           = alu_src_1[31:0] <   alu_src_2[31:0]; // less than 
-    5'b00111: branch           = alu_src_1[31:0] <=  alu_src_2[31:0]; // less than or equal to 
-    5'b01000: HI, LO          <= alu_src_1[31:0] *   alu_src_2[31:0]; // multiply
-    5'b01001: branch           = alu_src_1[31:0] !=  alu_src_2[31:0]; // not equal to 
-    5'b01010: alu_result[31:0] = alu_src_1[31:0] |   alu_src_2[31:0]; // or 
-    5'b01011: alu_result[31:0] = alu_src_1[31:0] <<  alu_src_2[31:0]; // shift to left logic 
-    5'b01100: alu_result[31:0] = alu_src_1[31:0] >>  alu_src_2[31:0]; // shift to right arithmetic 
-    5'b01101: alu_result[31:0] = alu_src_1[31:0] >>> alu_src_2[31:0]; // shift to right logic 
-    5'b01110: alu_result[31:0] = alu_src_1[31:0] -   alu_src_2[31:0]; // subtract
-    5'b01111: alu_result[31:0] = alu_src_1[31:0] ^   alu_src_2[31:0]; // xor
-    5'b10000: HI              <= alu_result[31:0];                    // Move to HI
-    5'b10001: alu_result[31:0] = HI;                                  // Move from HI
-    5'b10010: LO              <= alu_result[31:0];                    // Move to LO
-    5'b10011: alu_result[31:0] = LO;                                  // Move from LO
-    5'b10100: alu_result[31:0] = alu_src_1[31:0] << 16;				  // shift the lower half word to upper 
-    5'b10101:   alu_result[31:0] = alu_src_1[31:0] & (alu_src_2[31:0] & 32'h0000ffff); // and immediate
-    5'b10110:   alu_result[31:0] = alu_src_1[31:0] | (alu_src_2[31:0] & 32'h0000ffff); // or immediate
-    5'b10111:   alu_result[31:0] = alu_src_1[31:0] ^ (alu_src_2[31:0] & 32'h0000ffff); // xor immediate
-
+       always_comb begin
+        5'b00000:   alu_result[31:0] = alu_src_1[31:0]          +   alu_src_2[31:0];  // add (unsigned)
+        5'b00001:   alu_result[31:0] = alu_src_1[31:0]          &   alu_src_2[31:0];  // and
+        5'b00010:   ; // in the always_ff block below                                 // divide
+        5'b00011:   branch           = alu_src_1[31:0]          ==  alu_src_2[31:0];  // equal to
+        5'b00100:   branch           = $signed(alu_src_1[31:0]) >   0;  // greater than zero
+        5'b00101:   branch           = $signed(alu_src_1[31:0]) >=  0;  // greater than or equal to zero, signed greater
+        5'b00110:   branch           = $signed(alu_src_1[31:0]) <   0; // less than zero
+        5'b00111:   branch           = $signed(alu_src_1[31:0]) <=  0;  // less than or equal to zero, signed comparison
+        5'b01000:   ; // in the always_ff block below                                 // multiply
+        5'b01001:   branch           = alu_src_1[31:0]          !=  alu_src_2[31:0];  // not equal to 
+        5'b01010:   alu_result[31:0] = alu_src_1[31:0]          |   alu_src_2[31:0];  // or 
+        5'b01011:   alu_result[31:0] = alu_src_2[31:0]          <<  shift_amount;     // shift to left logic 
+        5'b01100:   alu_result[31:0] = $signed(alu_src_2[31:0]) >>> shift_amount;     // shift to right arithmetic 
+        5'b01101:   alu_result[31:0] = alu_src_2[31:0]          >>  shift_amount;     // shift to right logic 
+        5'b01110:   alu_result[31:0] = alu_src_1[31:0]          -   alu_src_2[31:0];  // subtract (unsigned)
+        5'b01111:   alu_result[31:0] = alu_src_1[31:0]          ^   alu_src_2[31:0];  // xor
+        5'b10000:   ; // in the always_ff block below                                 // Move to HI
+        5'b10001:   alu_result[31:0] = HI;                                            // Move from HI
+        5'b10010:   ; // in the always_ff block below                                 // Move to LO
+        5'b10011:   alu_result[31:0] = LO;                                            // Move from LO
+        5'b10100:   alu_result[31:0] = alu_src_2[31:0]          << 16'h10;            // shift lower 4 byte to upper
+        5'b10101:   alu_result[31:0] = alu_src_1[31:0]           & (alu_src_2[31:0] & 32'h0000ffff); // andi
+        5'b10110:   alu_result[31:0] = alu_src_1[31:0]         |  (alu_src_2[31:0] & 32'h0000ffff); // ori
+        5'b10111:   alu_result[31:0] = alu_src_1[31:0]         ^ (alu_src_2[31:0] & 32'h0000ffff); // xori
+        5'b11000:   alu_result[31:0] = ($signed(alu_src_1[31:0])    <   $signed(alu_src_2[31:0])); // (signed)for slt and slti
+        5'b11001:   alu_result[31:0] = (alu_src_1[31:0]    <   alu_src_2[31:0]); // (usigned comparison) sltu and sltui
+        5'b11010:   ; // add logics at the bottom block (signed multiplication calculation)
+        5'b11011:   ; // add logics at the bottom block (signed division calculation)
+        default:    alu_result[31:0] = 32'bxxxxxxxx; 
     half
 end
 ```
