@@ -238,10 +238,10 @@ module mips_decoder(
                 CntEn         = !waitrequest && two_cycle_instr;
                 ALUSrc1       = SLL   || SRA  || SRL;
                 ALUSrc2       = ADDIU || LUI  || LW   || SW || ORI || ANDI ||XORI || SLTI || SLTIU;
-                ALUControl[4] = LUI || ANDI || ORI || XORI || SLT || SLTI || SLTU || SLTIU || MFHI || MFLO || MULT || DIV;
+                ALUControl[4] = LUI || ANDI || ORI || XORI || SLT || SLTI || SLTU || SLTIU || MFHI || MFLO || MULT || DIV || MTHI || MTLO;
                 ALUControl[3] = shift_instr || SUBU || OR || XOR || SLT || SLTI || SLTU || SLTIU || MULTU || MULT || DIV;
                 ALUControl[2] = LUI   || SRA  || SRAV || SRL  || SRLV || SUBU || XOR || ANDI || ORI || XORI;
-                ALUControl[1] = SLL   || SLLV || SUBU || OR || XOR || ORI || XORI || DIVU || MFLO || MULT || DIV;
+                ALUControl[1] = SLL   || SLLV || SUBU || OR || XOR || ORI || XORI || DIVU || MFLO || MULT || DIV || MTLO;
                 ALUControl[0] = SLL   || SLLV || SRL  || SRLV || AND || XOR || ANDI || XORI || SLTU || SLTIU  || MFHI || MFLO || DIV;
                 Extra         = three_cycle_instr;
                 is_branch     = J || JAL || JR || JALR || BEQ || BGEZ || BGEZAL || BGTZ || BLEZ || BLTZ || BLTZAL || BNE;
