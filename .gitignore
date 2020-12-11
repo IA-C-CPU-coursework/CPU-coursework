@@ -14,4 +14,5 @@ a.out
 .vscode
 
 # testbench
-test/testcases
+*.bin
+*.hex

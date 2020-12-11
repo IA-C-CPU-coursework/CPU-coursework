@@ -70,41 +70,6 @@ then
 fi
 
 
-#------------------------------------------------------------------------------
-# Create separated directory for each testcase
-#------------------------------------------------------------------------------
-
-echo ""
-echo "Start to create separated directories for testcases"
-
-set -e
-
-DIR="${root}/test/testcases"
-
-if [ -d "${DIR}" ]; then
-    echo " - target ${DIR} exists"
-    newDIR="${DIR}_moved_at_$(date '+%d_%m_%Y_%H_%M_%S')"
-    mv "${DIR}" "${newDIR}"
-    echo " - 📦 move content in ${DIR} to" 
-    echo "   ${newDIR}"
-else
-    echo " - ${DIR} does not exist"
-    echo " - create directory: ${DIR}"
-fi
-
-mkdir "${DIR}"
-
-echo " - create sub directories in ${DIR} for test cases"
-
-for asm_file in ${root}/test/all_testcases/*.asm.txt; do
-    testcase=$(basename ${asm_file} .asm.txt) 
-    >&2 echo "    - creating directory ${testcase}"
-    mkdir ${DIR}/${testcase}
-    cp ${asm_file} ${DIR}/${testcase}
-done
-
-echo "✅ Finished creating separated directories for testcases"
-
 #-----------------------------------------------------------------------------
 # Assemble all testcases 
 #-----------------------------------------------------------------------------
@@ -117,7 +82,7 @@ for testcase in ${root}/test/testcases/*; do
     cd "${testcase}"
     testcase_name="${PWD##*/}"
 
-    OUT=$(${root}/test/assembler.sh ${testcase}/${testcase_name}.asm.txt 2> \
+    OUT=$(${root}/test/assembler.sh ${testcase}/${testcase_name}.S 2> \
         ${testcase_name}.objdump.log)
     result=$?
     ERR=$(<${testcase_name}.objdump.log)
