@@ -14,7 +14,7 @@ dependencies=(gcc-mipsel-linux-gnu)
 for pkg in "${dependencies[@]}"
 do
     # echo $pkg
-    dpkg -s $pkg > /dev/null
+    dpkg -s ${pkg} > /dev/null
     if [[ $? -eq 1  ]]
     then
         echo "[ASM] : missing dependencies, $i is not installed." >&2
@@ -25,40 +25,52 @@ done
 if [[ $1 == "" ]]
 # check input exists
 then
-    echo "[ASM] : no input found, please supply an assembly file ended in .asm.txt" >&2
+    echo "[ASM] : no input found, please supply an assembly file ended in .S" >&2
     exit 1
 fi
 
 
-if [[ ${1: -8} != ".asm.txt" ]]
+if [[ ${1: -2} != ".S" ]]
 # check file extension
 then
-    echo "[ASM] : invalid file extension, please supply an assembly file ended in .asm.txt" >&2
+    echo "[ASM] : invalid file extension, please supply an assembly file ended in .S" >&2
     exit 1
 fi
 
 echo "[ASM] : 📨 receved assembly file $1" >&2
 
 
-filename=$(basename $1 .asm.txt) # get filename from fullname
+filename=$(basename $1 .S) # get filename from fullname
+parentdir=$(dirname $1)    # get parent directory from fullname
 
 #------------------------------------------------------------------------------
 # Main part
-# 1. Assemble input into object file with `mips-linux-gnu-as`.
-# 2. Extract hexidecimal binary from the information displayed by `objdump`
 #------------------------------------------------------------------------------
 
-mipsel-linux-gnu-as -mips1 $1 -o $filename.elf
-temp=$(mipsel-linux-gnu-objdump -d -j .text $filename.elf)
+linker_parameters=" -Ttext 0xBFC00000 -Tdata 0xBFC00400 "
+# start points for instruction section and data section
 
-echo "" >&2
-echo "===== start of objdump output =====" >&2
-echo "$temp" >&2
-echo "=====  end of objdump output  =====" >&2
-echo "" >&2
+mipsel-linux-gnu-gcc ${parentdir}/${filename}.S \
+    -O3 -g -nostdlib                            \
+    -Wl,--build-id=none ${linker_parameters}    \
+    -o ${parentdir}/${filename}.elf
+    # -g generates debug information
+    # -nostdlib do not use the standard system startup files when linking
+    # -Wl pass <options> on to the linker
+    # -T read linker script
+    # -Ttext set the address of .text section 
 
-echo "$temp" | grep -oP "\s*[0-9a-fA-F]*\:\s*\K([0-9a-fA-F]{8})\s*" >&1
+mipsel-linux-gnu-objcopy --output-target binary \
+    --only-section=.text                        \
+    "${filename}".elf                           \
+    "${filename}".bin                           \
 
+hexdump -v -e '1/4 "%08x" "\n"' \
+    "${filename}".bin           \
+    > "${filename}".hex
+    # -v show repeated lines
+    # -e '1/4' read 4 byte at a time
+    #    '"%08x"' fprintf format, 8 digits prefix with 0 in hexidecimal
 
 if [[ $? -eq 0  ]]
 then

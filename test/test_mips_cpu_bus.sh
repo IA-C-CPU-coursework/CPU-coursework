@@ -1,24 +1,6 @@
 #! /bin/bash
 
-# Set root directory of the project 
-
-# The specification mentions:
-# > To keep things simple, you can assume that your test-script will always be 
-# > called from the base directory of your submission. This just means that 
-# > your script is always invoked as `test/test_mips_cpu_bus.sh`.
-
-dir="./"
-root=`cd $dir && pwd`
-echo "Detected root directorty of the project: ${root}"
-
-# There is a file `this_is_root` in the project root directory
-if [[ -f "this_is_root" ]]; then
-    echo "✅ Executing in the project root directory"
-else 
-    echo "❌ Executing in the wrong directory"
-    echo "    - not in the project root directory"
-    exit 1
-fi
+set -e
 
 testbench="
      ______          __  __                    __
@@ -28,7 +10,33 @@ testbench="
    /_/  \___/____/\__/_.___/\___/_/ /_/\___/_/ /_/
 "
 source_directory="$1" # default should be rtl/mips_cpu_bus.v
-instruction="$2"
+input_instruction="$2"
+
+test_instruction=()
+
+instructions=(
+    # Arithmetic and logic
+    "addu" "addiu"
+    "and" "andi"
+    "lui"
+    "or" "ori"
+    "slt" "slti" "sltiu" "sltu" 
+    "subu"
+    "xor" "xori"
+    # Shift
+    "sll" "sllv" 
+    "sra" "srav" "srl" "srlv"
+    # Multiplication and division
+    "div" "divu" 
+    "mult" "multu"
+    "mthi" "mtlo" 
+    # Branch
+    "beq" "bgez" "bgezal" "bgtz" "blez" "bltz" "bltzal" "bne" 
+    "j" "jal" "jalr" "jr"
+    # Memory access
+    "lb" "lbu" "lh" "lhu" "lui" "lw" "lwl" "lwr" 
+    "sb" "sh" "sw"
+    )
 
 function help {
     # Display help information
@@ -42,6 +50,8 @@ function line {
     printf %"$(tput cols)"s |tr " " "="
 }
 
+
+line
 echo "${testbench}"
 
 
@@ -51,22 +61,63 @@ echo "${testbench}"
 
 if [[ ${source_directory} == "" ]]
 then
-    echo "❌ source_directory not provided"
+    echo "❌ source directory is not provided"
     help
     exit 1
+elif [[ ${source_directory} == "--help" ]]
+then
+    help
+    exit 0
 else
-    if [[ -d ${source_directory} ]]; then
-        echo "source_directory: ${source_directory}"
+    if [[ -d ${source_directory} ]]
+    then
+        echo "source directory: ${source_directory}/"
     else
-        echo "❌ directory \" ${source_directory} \" is not found"
+        echo "❌ source directory ${source_directory}/ is not found"
         help
         exit 1
     fi
 fi
 
-if [[ ${instruction} != "" ]]
+if [[ ${input_instruction} != "" ]]
 then
-    echo "instruction: ${instruction}"
+    if [[ "${instructions[@]}" =~ "${input_instruction}" ]]
+    then
+        test_instruction+=(${input_instruction})
+        echo "test instruction: ${test_instruction[@]}"
+    else
+        echo "instruction required to test: ${input_instruction} is not included in ISA"
+        exit 1
+    fi
+else 
+    test_instruction=(${instructions[@]})
+    echo "test instruction: ${test_instruction[@]}"
+fi
+
+
+#------------------------------------------------------------------------------
+# Check working directory
+#------------------------------------------------------------------------------
+
+# The specification mentions:
+# > To keep things simple, you can assume that your test-script will always be 
+# > called from the base directory of your submission. This just means that 
+# > your script is always invoked as `test/test_mips_cpu_bus.sh`.
+
+dir="./"
+root=`cd ${dir} && pwd`
+
+echo ""
+echo "1. Detected working directorty: ${root}"
+
+# There is a file `this_is_root` in the project root directory
+if [[ -f "this_is_root" ]]
+then
+    echo "✅ Working in the project root directory"
+else 
+    echo "❌ Working in the wrong directory"
+    echo "    - not in the project root directory"
+    exit 1
 fi
 
 
@@ -75,34 +126,59 @@ fi
 #-----------------------------------------------------------------------------
 
 echo ""
-echo "Start to assemble all test cases in ${root}/test/testcases"
+echo "2. Start to assemble all test cases in ${root}/test/testcases"
 
-for testcase in ${root}/test/testcases/*; do
-    >&2 echo " - assembling ${testcase}"
-    cd "${testcase}"
-    testcase_name="${PWD##*/}"
-
-    OUT=$(${root}/test/assembler.sh ${testcase}/${testcase_name}.S 2> \
-        ${testcase_name}.objdump.log)
-    result=$?
-    ERR=$(<${testcase_name}.objdump.log)
-
-    if [[ "${result}" -ne 0 ]];then
-        echo "❌ Error in assembling Test Cases"
-        echo "${ERR}"
+for instruction in "${root}/test/testcases/"*
+do
+    instruction_name=`cd $instruction && echo "$(basename $PWD)"`
+    
+    if [[ ! "${instructions[@]}" =~ "${instruction_name}" ]]
+    then
+        echo "❌ Encounter unknown instruction ${instruction_name}"
+        echo "${instructions[@]}"
         exit 1
-    else
-        echo "${OUT}" > ${testcase_name}.hex.txt
     fi
+
+    >&2 echo " - assembling test cases for ${instruction_name}"
+    cd "${instruction}"
+
+    for testcase in "${instruction}/"*
+    do
+        testcase_name=`cd $testcase && echo "$(basename $PWD)"`
+        cd "${testcase}"
+        >&2 echo "    - assembling test case ${testcase_name}"
+        ${root}/test/assembler.sh ${testcase}/${testcase_name}.S
+        result=$?
+
+        if [[ "${result}" -ne 0 ]]
+        then
+            echo "❌ Error in assembling Test Cases"
+            exit 1
+        fi
+    done
 done
 
 cd "${root}"
 
-echo "✅ Finished assembling all test cases in ${root}/test/testcases"
+echo "✅ Finished assembling all test cases"
+
 
 #------------------------------------------------------------------------------
 # Start to test instruction 
 #------------------------------------------------------------------------------
 
+printf "\n"
+echo "3. Start to compile/run/compare test cases"
 
-#$root/test/test_mips_cpu_bus_one_instruction.sh $instruction 
+for instruction in "${test_instruction[@]}"
+do
+    if [[ -d "${root}/test/testcases/${instruction}" ]]
+    then
+        >&2 printf "🔍 found test cases for %-6s\n" "${instruction}"
+        $root/test/test_mips_cpu_bus_one_instruction.sh "${instruction}"
+    else
+        >&2 printf "⛔ can not find test cases for %-6s\n" "${instruction}"
+    fi
+done
+
+

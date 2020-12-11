@@ -6,7 +6,7 @@ module mips_cpu_bus_tb();
     parameter RAM_DATA_SIZE= 10;
 
     parameter VCD_OUTPUT = "mips_cpu_bus_tb.vcd";
-    parameter TIMEOUT_CYCLES = 100;
+    parameter TIMEOUT_CYCLES = 1000;
 
     /* Standard signals */
     logic clk;
@@ -56,8 +56,8 @@ module mips_cpu_bus_tb();
         .RAM_INSTR_INIT_FILE(RAM_INSTR_INIT_FILE), 
         .RAM_INSTR_SIZE(RAM_INSTR_SIZE), 
         .RAM_DATA_INIT_FILE(RAM_DATA_INIT_FILE), 
-        .RAM_DATA_SIZE(RAM_DATA_SIZE)) 
-        ram(
+        .RAM_DATA_SIZE(RAM_DATA_SIZE)
+    ) ram(
         .rst(reset),
         .p(pending),
         .clk(clk),
@@ -134,7 +134,7 @@ module mips_cpu_bus_tb();
         @(posedge clk);
         assert(active == 1); 
         else begin
-            $error("[TB]: CPU did not assert `avtive` after reset.");
+            $fatal(1, "[TB]: CPU did not assert `avtive` after reset.");
         end
 
         @(posedge clk);

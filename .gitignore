@@ -1,5 +1,10 @@
 # The following files will be ignored by git
 
+# ignore files without extension
+*
+!/**/
+!*.*
+
 # assmebler
 *.hex.txt
 
@@ -16,3 +21,5 @@ a.out
 # testbench
 *.bin
 *.hex
+*.elf
+*.out
