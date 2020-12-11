@@ -27,7 +27,8 @@ module mips_decoder(
     output logic [1:0] PCControl,
     output logic CntEn,
     // alu
-    output logic [4:0] ALUControl
+    output logic [4:0] ALUControl,
+    output logic is_branch
 );
 
     assign Halt = pc == 0;
@@ -243,6 +244,7 @@ module mips_decoder(
                 ALUControl[1] = SLL   || SLLV; 
                 ALUControl[0] = SLL   || SLLV || SRL  || SRLV;
                 Extra         = three_cycle_instr;
+                is_branch     = J || JAL || JR || JALR;  // needs to be added for conditional branch;
             end
             2'b10: begin 
             // state == EXEC2
