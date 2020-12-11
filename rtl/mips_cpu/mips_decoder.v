@@ -230,21 +230,21 @@ module mips_decoder(
                 MemWrite      = store_instr;
                 MemRead       = load_instr;
                 ByteEn        = 4'b1111;
-                RegSrc        = ADDIU || LUI;
+                RegSrc        = ADDIU || LUI || ORI || ANDI || XORI || SLTI || SLTIU;
                 RegData       = 2'b10;
-                RegWrite      = ADDIU || ADDU || LUI  || shift_instr;
-                PCControl[1]  = !branch_instr;
-                PCControl[0]  = !branch_instr && !(JR || JALR);
+                RegWrite      = ADDIU || ADDU || LUI  || shift_instr || SUBU || OR || XOR || AND || ORI || ANDI || XORI || SLT || SLTI || SLTU || SLTIU || MFHI || MFLO || DIVU || MULTU || MULT || DIV;
+                PCControl[1]  = JR;
+                PCControl[0]  = J;
                 CntEn         = !waitrequest && two_cycle_instr;
                 ALUSrc1       = SLL   || SRA  || SRL;
-                ALUSrc2       = ADDIU || LUI  || LW   || SW;
-                ALUControl[4] = LUI;
-                ALUControl[3] = shift_instr;
-                ALUControl[2] = LUI   || SRA  || SRAV || SRL  || SRLV;
-                ALUControl[1] = SLL   || SLLV; 
-                ALUControl[0] = SLL   || SLLV || SRL  || SRLV;
+                ALUSrc2       = ADDIU || LUI  || LW   || SW || ORI || ANDI ||XORI || SLTI || SLTIU;
+                ALUControl[4] = LUI || ANDI || ORI || XORI || SLT || SLTI || SLTU || SLTIU || MFHI || MFLO || MULT || DIV || MTHI || MTLO;
+                ALUControl[3] = shift_instr || SUBU || OR || XOR || SLT || SLTI || SLTU || SLTIU || MULTU || MULT || DIV || BNE;
+                ALUControl[2] = LUI   || SRA  || SRAV || SRL  || SRLV || SUBU || XOR || ANDI || ORI || XORI || BGEZ || BGTZ || BLEZ || BLTZ;
+                ALUControl[1] = SLL   || SLLV || SUBU || OR || XOR || ORI || XORI || DIVU || MFLO || MULT || DIV || MTLO || BEQ || BLEZ || BLTZ;
+                ALUControl[0] = SLL   || SLLV || SRL  || SRLV || AND || XOR || ANDI || XORI || SLTU || SLTIU  || MFHI || MFLO || DIV || BEQ || BGEZ || BLEZ || BNE;
                 Extra         = three_cycle_instr;
-                is_branch     = J || JAL || JR || JALR;  // needs to be added for conditional branch;
+                is_branch     = J || JAL || JR || JALR || (BEQ & branch) || (BGEZ & branch) || (BGEZAL & branch) || (BGTZ & branch) || (BLEZ & branch) || (BLTZ & branch) || (BLTZAL & branch) || (BNE & branch);
             end
             2'b10: begin 
             // state == EXEC2

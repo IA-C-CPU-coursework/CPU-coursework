@@ -23,6 +23,7 @@ module mips_cpu_bus_tb();
     logic[3:0] byteenable;
     logic[31:0] readdata;
 
+
     logic pending;
     logic[31:0] simulated_address;
     logic[31:0] inspected_address;
