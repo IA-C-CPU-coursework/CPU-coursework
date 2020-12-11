@@ -24,7 +24,8 @@ module mips_alu(
     assign LO = HILO[31:0];
 
     logic [4:0] shift_amount;
-        assign shift_amount = alu_src_1[4:0];
+    assign shift_amount = alu_src_1[4:0];
+
 
     always_comb begin
         case(ALUControl)

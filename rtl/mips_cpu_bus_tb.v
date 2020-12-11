@@ -1,6 +1,6 @@
 module mips_cpu_bus_tb();
 
-    parameter RAM_INIT_FILE = "../test/sltiu1.txt";
+    parameter RAM_INIT_FILE = "../test/div1.txt";
     // parameter RAM_INIT_FILE = "../test/binary/shifts.hex.txt";
     parameter TIMEOUT_CYCLES = 100;
 
@@ -18,6 +18,7 @@ module mips_cpu_bus_tb();
     logic[31:0] writedata;
     logic[3:0] byteenable;
     logic[31:0] readdata;
+
 
     logic pending;
     logic[31:0] simulated_address;
