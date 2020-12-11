@@ -24,7 +24,8 @@ module mips_alu(
     assign LO = HILO[31:0];
 
     logic [4:0] shift_amount;
-        assign shift_amount = alu_src_1[4:0];
+    assign shift_amount = alu_src_1[4:0];
+
 
     always_comb begin
         case(ALUControl)
@@ -34,10 +35,10 @@ module mips_alu(
             5'b00001:   alu_result[31:0] = alu_src_1[31:0]          &   alu_src_2[31:0];  // and
             5'b00010:   ; // in the always_ff block below                                 // divide
             5'b00011:   branch           = alu_src_1[31:0]          ==  alu_src_2[31:0];  // equal to
-            5'b00100:   branch           = alu_src_1[31:0]          >   alu_src_2[31:0];  // greater than 
-            5'b00101:   branch           = alu_src_1[31:0]          >=  alu_src_2[31:0];  // greater than or equal to 
-            5'b00110:   branch           = alu_src_1[31:0]          <   alu_src_2[31:0];  // less than 
-            5'b00111:   branch           = alu_src_1[31:0]          <=  alu_src_2[31:0];  // less than or equal to 
+            5'b00100:   branch           = $signed(alu_src_1[31:0]) >   0;  // greater than zero
+            5'b00101:   branch           = $signed(alu_src_1[31:0]) >=  0;  // greater than or equal to zero, signed greater
+            5'b00110:   branch           = $signed(alu_src_1[31:0]) <   0; // less than zero
+            5'b00111:   branch           = $signed(alu_src_1[31:0]) <=  0;  // less than or equal to zero, signed comparison
             5'b01000:   ; // in the always_ff block below                                 // multiply
             5'b01001:   branch           = alu_src_1[31:0]          !=  alu_src_2[31:0];  // not equal to 
             5'b01010:   alu_result[31:0] = alu_src_1[31:0]          |   alu_src_2[31:0];  // or 
@@ -51,6 +52,13 @@ module mips_alu(
             5'b10010:   ; // in the always_ff block below                                 // Move to LO
             5'b10011:   alu_result[31:0] = LO;                                            // Move from LO
             5'b10100:   alu_result[31:0] = alu_src_2[31:0]          << 16'h10;            // shift lower 4 byte to upper
+            5'b10101:   alu_result[31:0] = alu_src_1[31:0]           & (alu_src_2[31:0] & 32'h0000ffff); // andi
+            5'b10110:   alu_result[31:0] = alu_src_1[31:0]         |  (alu_src_2[31:0] & 32'h0000ffff); // ori
+            5'b10111:   alu_result[31:0] = alu_src_1[31:0]         ^ (alu_src_2[31:0] & 32'h0000ffff); // xori
+            5'b11000:   alu_result[31:0] = ($signed(alu_src_1[31:0])    <   $signed(alu_src_2[31:0])); // (signed)for slt and slti
+            5'b11001:   alu_result[31:0] = (alu_src_1[31:0]    <   alu_src_2[31:0]); // (usigned comparison) sltu and sltui
+            5'b11010:   ; // add logics at the bottom block (signed multiplication calculation)
+            5'b11011:   ; // add logics at the bottom block (signed division calculation)
             default:    alu_result[31:0] = 32'bxxxxxxxx; 
             // output unknown signal as default behaviour
         endcase;
@@ -61,12 +69,17 @@ module mips_alu(
         // carry out required calculations based on ALUControl signal 
         // following are calculations/operations involving HILO register
             5'b00010:   begin 
-                            HILO[63:32] <= alu_src_1[31:0] %  alu_src_2[31:0]; // divide
-                            HILO[31:0]  <= alu_src_1[31:0] /  alu_src_2[31:0]; // divide
+                            HILO[63:32] <= alu_src_1[31:0] %  alu_src_2[31:0]; // unsigned divide
+                            HILO[31:0]  <= alu_src_1[31:0] /  alu_src_2[31:0]; // unsigned divide
                         end
-            5'b01000:   HILO[63:0]      <= alu_src_1[31:0] *  alu_src_2[31:0]; // multiply
+            5'b01000:   HILO[63:0]      <= alu_src_1[31:0] *  alu_src_2[31:0]; // unsigned multiply
             5'b10000:   HILO[63:32]     <= alu_result[31:0];                   // Move to HI
             5'b10010:   HILO[31:0]      <= alu_result[31:0];                   // Move to LO
+            5'b11010:   HILO[63:0]      <= $signed(alu_src_1[31:0]) *  $signed(alu_src_2[31:0]); // signed multiply;
+            5'b11011:   begin 
+                            HILO[63:32] <= $signed(alu_src_1[31:0]) %  $signed(alu_src_2[31:0]); // signed divide
+                            HILO[31:0]  <= $signed(alu_src_1[31:0]) /  $signed(alu_src_2[31:0]); // signed divide
+                        end
         endcase;
     end
 endmodule
