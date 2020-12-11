@@ -35,10 +35,10 @@ module mips_alu(
             5'b00001:   alu_result[31:0] = alu_src_1[31:0]          &   alu_src_2[31:0];  // and
             5'b00010:   ; // in the always_ff block below                                 // divide
             5'b00011:   branch           = alu_src_1[31:0]          ==  alu_src_2[31:0];  // equal to
-            5'b00100:   branch           = alu_src_1[31:0]          >   alu_src_2[31:0];  // greater than 
-            5'b00101:   branch           = alu_src_1[31:0]          >=  alu_src_2[31:0];  // greater than or equal to 
-            5'b00110:   branch           = alu_src_1[31:0]          <   alu_src_2[31:0];  // less than 
-            5'b00111:   branch           = alu_src_1[31:0]          <=  alu_src_2[31:0];  // less than or equal to 
+            5'b00100:   branch           = $signed(alu_src_1[31:0]) >   0;  // greater than zero
+            5'b00101:   branch           = $signed(alu_src_1[31:0]) >=  0;  // greater than or equal to zero, signed greater
+            5'b00110:   branch           = $signed(alu_src_1[31:0]) <   0; // less than zero
+            5'b00111:   branch           = $signed(alu_src_1[31:0]) <=  0;  // less than or equal to zero, signed comparison
             5'b01000:   ; // in the always_ff block below                                 // multiply
             5'b01001:   branch           = alu_src_1[31:0]          !=  alu_src_2[31:0];  // not equal to 
             5'b01010:   alu_result[31:0] = alu_src_1[31:0]          |   alu_src_2[31:0];  // or 
@@ -59,6 +59,7 @@ module mips_alu(
             5'b11001:   alu_result[31:0] = (alu_src_1[31:0]    <   alu_src_2[31:0]); // (usigned comparison) sltu and sltui
             5'b11010:   ; // add logics at the bottom block (signed multiplication calculation)
             5'b11011:   ; // add logics at the bottom block (signed division calculation)
+        
             default:    alu_result[31:0] = 32'bxxxxxxxx; 
             // output unknown signal as default behaviour
         endcase;
