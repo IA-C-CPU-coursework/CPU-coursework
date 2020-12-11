@@ -1,5 +1,5 @@
 addiu $t0,$zero,123
-addiu $sp,$t0,1024
+addiu $sp,$zero,0x00400
 sw $t0,0($sp)
 addiu $v0,$t0,0
 jr $zero

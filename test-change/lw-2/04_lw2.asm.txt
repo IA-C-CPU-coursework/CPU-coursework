@@ -1,3 +1,4 @@
+addiu $sp,$zero,0x00400
 addiu $t1,$zero,24184
 lw $t1,0($sp)
 addiu $v0,$t1,0

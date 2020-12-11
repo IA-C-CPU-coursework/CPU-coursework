@@ -1,2 +1,2 @@
-addiu $v0,$zero,0
+addiu $v0,$zero,3443
 jr $zero
