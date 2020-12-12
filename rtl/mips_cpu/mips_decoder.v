@@ -28,7 +28,8 @@ module mips_decoder(
     output logic CntEn,
     // alu
     output logic [4:0] ALUControl,
-    output logic is_branch
+    output logic is_branch,
+    output logic link
 );
 
     assign Halt = pc == 0;
@@ -231,20 +232,24 @@ module mips_decoder(
                 MemRead       = load_instr;
                 ByteEn        = 4'b1111;
                 RegSrc        = ADDIU || LUI || ORI || ANDI || XORI || SLTI || SLTIU;
-                RegData       = 2'b10;
-                RegWrite      = ADDIU || ADDU || LUI  || shift_instr || SUBU || OR || XOR || AND || ORI || ANDI || XORI || SLT || SLTI || SLTU || SLTIU || MFHI || MFLO || DIVU || MULTU || MULT || DIV;
-                PCControl[1]  = JR;
+                //RegData       = 2'b10;
+                RegData[0]    = 0;
+                RegData[1]    = BGEZAL || BLTZAL || JALR;
+                RegWrite      = ADDIU || ADDU || LUI  || shift_instr || SUBU || OR || XOR || AND || ORI || ANDI || XORI || SLT || SLTI || SLTU || SLTIU || MFHI || MFLO || DIVU || MULTU || MULT || DIV || BGEZAL || BLTZAL || JALR;
+                PCControl[1]  = JR || JALR;
                 PCControl[0]  = J;
                 CntEn         = !waitrequest && two_cycle_instr;
                 ALUSrc1       = SLL   || SRA  || SRL;
                 ALUSrc2       = ADDIU || LUI  || LW   || SW || ORI || ANDI ||XORI || SLTI || SLTIU;
                 ALUControl[4] = LUI || ANDI || ORI || XORI || SLT || SLTI || SLTU || SLTIU || MFHI || MFLO || MULT || DIV || MTHI || MTLO;
                 ALUControl[3] = shift_instr || SUBU || OR || XOR || SLT || SLTI || SLTU || SLTIU || MULTU || MULT || DIV || BNE;
-                ALUControl[2] = LUI   || SRA  || SRAV || SRL  || SRLV || SUBU || XOR || ANDI || ORI || XORI || BGEZ || BGTZ || BLEZ || BLTZ;
-                ALUControl[1] = SLL   || SLLV || SUBU || OR || XOR || ORI || XORI || DIVU || MFLO || MULT || DIV || MTLO || BEQ || BLEZ || BLTZ;
-                ALUControl[0] = SLL   || SLLV || SRL  || SRLV || AND || XOR || ANDI || XORI || SLTU || SLTIU  || MFHI || MFLO || DIV || BEQ || BGEZ || BLEZ || BNE;
+                ALUControl[2] = LUI   || SRA  || SRAV || SRL  || SRLV || SUBU || XOR || ANDI || ORI || XORI || BGEZ || BGTZ || BLEZ || BLTZ || BGEZAL || BLTZAL;
+                ALUControl[1] = SLL   || SLLV || SUBU || OR || XOR || ORI || XORI || DIVU || MFLO || MULT || DIV || MTLO || BEQ || BLEZ || BLTZ || BLTZAL;
+                ALUControl[0] = SLL   || SLLV || SRL  || SRLV || AND || XOR || ANDI || XORI || SLTU || SLTIU  || MFHI || MFLO || DIV || BEQ || BGEZ || BLEZ || BNE || BGEZAL || BLTZAL;
                 Extra         = three_cycle_instr;
                 is_branch     = J || JAL || JR || JALR || (BEQ & branch) || (BGEZ & branch) || (BGEZAL & branch) || (BGTZ & branch) || (BLEZ & branch) || (BLTZ & branch) || (BLTZAL & branch) || (BNE & branch);
+                link = (BGEZAL & branch) || (BLTZAL & branch);
+                // needs to be confirmed, the value of ra will or not change if the condition is not true;
             end
             2'b10: begin 
             // state == EXEC2

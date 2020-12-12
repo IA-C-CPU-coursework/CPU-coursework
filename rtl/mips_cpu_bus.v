@@ -127,6 +127,7 @@ module mips_cpu_bus(
     logic ALUSrc1;
     logic ALUSrc2;
     logic Buffer;
+    logic link;
     // logic MemWrite;
     // logic MemRead;
     // logic ByteEn;
@@ -147,12 +148,12 @@ module mips_cpu_bus(
     assign address = mem_addr;
     assign alu_src_1[31:0] = ALUSrc1 ? {27'b0, shift_amount}: read_data_1[31:0];
     assign alu_src_2[31:0] = ALUSrc2 ? signed_offset[31:0] : read_data_2[31:0];
-    assign write_addr = RegSrc ? rt : rd;
+    assign write_addr = link ? (5'b11111):(RegSrc ? rt : rd);
     always_comb begin
         case(RegData)
-            2'b00: write_data[31:0] = mem_out[31:0];
-            2'b01: write_data[31:0] = pc[31:0];
-            2'b10: write_data[31:0] = alu_result[31:0];
+            2'b00: write_data[31:0] = alu_result[31:0]; //write_data[31:0] = mem_out[31:0];
+            2'b01: write_data[31:0] = mem_out[31:0];//write_data[31:0] = pc[31:0];
+            2'b10: write_data[31:0] = pc[31:0]+8;
             default: write_data = 32'hxxxxxxxx;
         endcase
     end
@@ -239,7 +240,8 @@ module mips_cpu_bus(
         .CntEn(CntEn),
         // alu
         .ALUControl(ALUControl),
-        .is_branch(is_branch)
+        .is_branch(is_branch),
+        .link(link)
     );
 
     // instantiation of mips_alu
