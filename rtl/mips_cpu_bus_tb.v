@@ -158,7 +158,7 @@ task dump_mem;
         @(posedge clk);
             inspected_address <= 32'hBFC00400 + cnt;
         @(negedge waitrequest) begin
-            $display("DATA_MEM[%h] = %h", inspected_address, readdata);
+            $display("POST_DATA_MEM[%h] = %h", inspected_address, readdata);
         end
         cnt += 32'h4;
     end

@@ -15,9 +15,9 @@ for pkg in "${dependencies[@]}"
 do
     # echo $pkg
     dpkg -s ${pkg} > /dev/null
-    if [[ $? -eq 1  ]]
+    if [[ $? -ne 0  ]]
     then
-        echo "[ASM] : missing dependencies, $i is not installed." >&2
+        echo "missing dependencies, $i is not installed." >&2
     fi
 done
 
@@ -25,7 +25,7 @@ done
 if [[ $1 == "" ]]
 # check input exists
 then
-    echo "[ASM] : no input found, please supply an assembly file ended in .S" >&2
+    echo "no input found, please supply an assembly file ended in .S" >&2
     exit 1
 fi
 
@@ -33,11 +33,11 @@ fi
 if [[ ${1: -2} != ".S" ]]
 # check file extension
 then
-    echo "[ASM] : invalid file extension, please supply an assembly file ended in .S" >&2
+    echo "invalid file extension, please supply an assembly file ended in .S" >&2
     exit 1
 fi
 
-echo "[ASM] : 📨 receved assembly file $1" >&2
+echo "📨 receved assembly file $1" >&2
 
 
 filename=$(basename $1 .S) # get filename from fullname
@@ -74,5 +74,5 @@ hexdump -v -e '1/4 "%08x" "\n"' \
 
 if [[ $? -eq 0  ]]
 then
-    echo "[ASM] : ✅ $1 is assembled and the hex result is sent to stdout" >&2
+    echo "✅ $1 is assembled and the hex result is sent to stdout" >&2
 fi
