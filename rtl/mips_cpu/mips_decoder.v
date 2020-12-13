@@ -226,6 +226,7 @@ module mips_decoder(
                 ALUSrc1     = 2'bx;
                 ALUSrc2     = 2'bx;
                 ALUControl  = 5'bxxxxx;
+                unaligned = 0;
             end
             2'b01: begin 
             // state == EXEC1
@@ -264,12 +265,12 @@ module mips_decoder(
                 MemSrc        = 1'b1;
                 MemWrite      = 1'b0;
                 MemRead       = 1'b0;
-                ByteEn_de        = 4'b1111;
+                ByteEn_de      = 4'b1111;
                 RegSrc        = load_instr;
                // RegData       = 2'b00;
                 RegData[0]    = load_instr;
                 RegData[1]    = LH || LB;
-                RegWrite      = load_instr || LH || LB;
+                RegWrite      = load_instr;
                 PCControl[1]  = 1'b1;
                 PCControl[0]  = 1'b1;
                 CntEn         = 1'b1;
@@ -278,7 +279,7 @@ module mips_decoder(
                 ALUControl    = 5'b00000;
                 Extra         = three_cycle_instr;
                 extension_control = LB;
-                unaligned = LB;
+                unaligned = 0;
             end
             2'b11: begin 
             // state == HALT
