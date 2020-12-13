@@ -16,6 +16,9 @@ Changes:
    [branch signal is the output of ALU]
    and PCControl is only used to determine the cases when we need to jump, just like the ALU control
 3. added signed multiplication and division in ALU; 
+4. add the link signal output in the decoder, this is used to control the write-address of register file
+   it is only high for link address instructions
+5. when dealing with the data transfer, we need to take the offset as the signed value, add one more case in the alu for signed case'
 
  要问的：
  link的时候ra的值是在condition成立的情况下才存值 还是说无论condition成不成立都要存值
@@ -254,9 +257,9 @@ end
 | -- | ----- | ------ | -------- | ------- | ------ | ------ | ------- | -------- | --------- | ----- | ------ | ---------- | ---------- |
 | ✅ | ADDIU | 1      | 0        | 0       | 1111   | 1      | 00      | 1        | 11        | 1     | 0    | 1   | 00000      |
 | ✅ | ADDU  | 1      | 0        | 0       | 1111   | 0     | 00      | 1        | 11        | 1     | 0   | 0  | 00000      |
-| ✅ | LW    | 0     | 0        | 1       | 1111   | x      | xx      | 0        | xx        | 0     | 0     | 1    | 00000      |
+| ✅ | LW    | 0     | 0        | 1       | 1111   | x      | xx      | 0        | xx        | 0     | 0     | 1    | 11100      |
 | ✅ | LUI   | 1      | 0        | 0       | 1111   | 1      | 00      | 1        | 11        | 1     | 0 | 1 | 10100 |
-| ✅ | SW    | 0      | 1        | 0       | 1111   | x      | xx      | 0        | 11       | 1     | 0   | 1   | 00000      |
+| ✅ | SW    | 0      | 1        | 0       | 1111   | x      | xx      | 0        | 11       | 1     | 0   | 1   | 11100      |
 | ✅ | JR    | 1      | 0        | 0       | 1111   | x      | xx      | 0        | 10        | 1     | 0    | x    | xxxxx      |
 | ❌ | J     | 1      | 0        | 0       | 1111   | x      | xx      | 0        | 01        | 1     | 0    | x    | xxxxx      |
 | ✅ | SLL   | 1      | 0        | 0       | 1111   | 1      | 00      | 1        | 11        | 1     | 1    | 0   | 01011      |
@@ -295,16 +298,20 @@ end
 |  ✅| BGEZAL | 1 | 0 | 0 | 1111 | 0 | 10 | 1 | 00 | 1 | 0 | 0 | 00101 |
 |  ✅| BLTZAL | 1 | 0 | 0 | 1111 | 0 | 10 | 1 | 00 | 1 | 0 | 0 | 00111 |
 |  ✅| JALR | 1 | 0 | 0 | 1111 | 0 | 10 | 1 | 10 | 1 | 0 | 0 | 00000 |
+| ✅ | LH | 0 | 0 | 1 | 0011 | x | xx | 0 | xx | 0 | 0 | 1 | 11100 |
+| ✅ | LHU | 0 | 0 | 1 | 0011 | x | xx | 0 | xx | 0 | 0 | 1 | 11100 |
+| ✅ | SW    | 0      | 1        | 0       | 0011   | x      | xx      | 0        | 11       | 1     | 0   | 1   | 11100      |
+| ✅ | SB    | 0      | 1        | 0       | by calculation   | x      | xx      | 0        | 11       | 1     | 0   | 1   | 11101      |
+| ✅ | LB | 0 | 0 | 1 | bycalculation | x | xx | 0 | xx | 0 | 0 | 1 | 11101 |
+| ✅ | LBU | 0 | 0 | 1 | bycalculation | x | xx | 0 | xx | 0 | 0 | 1 | 11101 |
 
 
 ##### State: EXEC2
 
 |    | Instr | MemSrc | MemWrite | MemRead | ByteEn | RegSrc | RegData | RegWrite | PCControl | CntEn | ALUSrc1 | ALUSrc2 | ALUControl |
 | -- | ----- | ------ | -------- | ------- | ------ | ------ | ------- | -------- | --------- | ----- | ------ | ---------- | ---------- |
-| ✅ | LW    | 1   | 0        | 0      | 1111   | 1     | 00      | 1        | 11        | 1     | 0     | 1    | 00000      |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
-| ❌ |       |        |          |         |        |        |         |          |           |       |        |        |            |
+| ✅ | LW    | 1   | 0        | 0      | 1111   | 1     | 00      | 1        | 11        | 1     | x     | x    | xxxxx     |
+| ✅ | LH | 1 | 0 | 0 | 0011 | 1 | 11 | 1 | 11 | 1 | 0 | 1 | xxxxx |
+| ✅ | LHU | 1 | 0 | 0 | 0011 | 1 | 01 | 1 | 01 | 1 | 0 | 1 | xxxxx |
+| ✅ | LB | 0 | 0 | 1 | xxxx | x | xx | 0 | 11 | 0 | 0 | 1 | 11101 |
+| ✅ | LBU | 0 | 0 | 1 | xxxx | x | xx | 0 | 01 | 0 | 0 | 1 | 11101 |    调用8bit的sign extension
