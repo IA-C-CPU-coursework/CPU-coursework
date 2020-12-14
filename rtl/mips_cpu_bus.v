@@ -130,6 +130,7 @@ module mips_cpu_bus(
     logic Buffer;
     logic link;
     logic unaligned;
+    logic alu_src_mem;
     // logic MemWrite;
     // logic MemRead;
     // logic ByteEn;
@@ -153,7 +154,7 @@ module mips_cpu_bus(
     assign byteenable = unaligned ? byte_remainder : ByteEn_de;
     assign mem_addr = MemSrc ? pc : alu_result;
     assign address = mem_addr;
-    assign alu_src_1[31:0] = ALUSrc1 ? {27'b0, shift_amount}: read_data_1[31:0];
+    assign alu_src_1[31:0] = alu_src_mem ? (mem_out[31:0]) : (ALUSrc1 ? {27'b0, shift_amount}: read_data_1[31:0]);
     assign alu_src_2[31:0] = ALUSrc2 ? signed_offset[31:0] : read_data_2[31:0];
     assign write_addr = link ? (5'b11111):(RegSrc ? rt : rd);
     always_comb begin
@@ -252,7 +253,8 @@ module mips_cpu_bus(
         .is_branch(is_branch),
         .link(link),
         .extension_control(extension_control),
-        .unaligned(unaligned)
+        .unaligned(unaligned),
+        .alu_src_mem(alu_src_mem)
     );
 
     // instantiation of mips_alu
