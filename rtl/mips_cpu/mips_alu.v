@@ -19,13 +19,14 @@ module mips_alu(
     //  |__HI__|__LO__|
 
     logic [31:0] HI;
-    logic [31:0] LO;
+    logic [31:0] LO; 
     assign HI = HILO[63:32];
     assign LO = HILO[31:0];
 
     logic [4:0] shift_amount;
     assign shift_amount = alu_src_1[4:0];
-
+    integer load_enable = 0;
+    integer load_byte;
 
     always_comb begin
         case(ALUControl)
@@ -59,14 +60,42 @@ module mips_alu(
             5'b11001:   alu_result[31:0] = (alu_src_1[31:0]    <   alu_src_2[31:0]); // (usigned comparison) sltu and sltui
             5'b11010:   ; // add logics at the bottom block (signed multiplication calculation)
             5'b11011:   ; // add logics at the bottom block (signed division calculation)
-            5'b11100:   alu_result[31:0] = alu_src_1[31:0]          +   $signed(alu_src_2[31:0]); //used for data transfer instructions; --- word aligned instructions only
-            5'b11101:   alu_result[31:0] = alu_src_1[31:0]          + 4*($signed(alu_src_2[31:0])/4);
+            5'b11100:   alu_result[31:0] = alu_src_1[31:0]          +   $signed(alu_src_2[31:0] & 32'hfffffffc); //used for data transfer instructions; --- word aligned instructions only
+            // for lwl and lwr
+            5'b11101:   begin
+                alu_result[31:0] = alu_src_1[31:0]          +   $signed(alu_src_2[31:0] & 32'hfffffffc);
+            end 
+            // this is for lwl instruction
+            5'b11110:   begin
+                case(load_byte)
+                0: alu_result[31:0] = (alu_src_2[31:0] & 32'h00ffffff) + (alu_src_1[31:0] << 24);
+                1: alu_result[31:0] = (alu_src_2[31:0] & 32'h0000ffff) + (alu_src_1[31:0] << 16);
+                2: alu_result[31:0] = (alu_src_2[31:0] & 32'h000000ff) + (alu_src_1[31:0] << 8);
+                3: alu_result[31:0] = alu_src_1[31:0];
+                default: alu_result[31:0] = alu_src_1[31:0];
+                endcase
+                load_enable = 0;
+            end 
+             5'b11111:   begin
+                case(load_byte)
+                0: alu_result[31:0] = alu_src_1[31:0];
+                1: alu_result[31:0] = (alu_src_2[31:0] & 32'hff000000) + (alu_src_1[31:0] >> 8);
+                2: alu_result[31:0] = (alu_src_2[31:0] & 32'hffff0000) + (alu_src_1[31:0] >> 16);
+                3: alu_result[31:0] = (alu_src_2[31:0] & 32'hffffff00) + (alu_src_1[31:0] >> 24);
+                default: alu_result[31:0] = alu_src_1[31:0];
+                endcase
+                load_enable = 0;
+            end
             default:    alu_result[31:0] = 32'bxxxxxxxx; 
             // output unknown signal as default behaviour
         endcase;
     end
 
     always_ff @(posedge clk)begin
+        if((ALUControl == 5'b11101) && load_enable ==0)begin
+            load_byte = alu_src_2[31:0] % 4;
+            load_enable = 1;
+        end
         case(ALUControl)
         // carry out required calculations based on ALUControl signal 
         // following are calculations/operations involving HILO register

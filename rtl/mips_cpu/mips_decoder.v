@@ -31,7 +31,8 @@ module mips_decoder(
     output logic is_branch,
     output logic link,
     output logic extension_control,
-    output logic unaligned
+    output logic unaligned,
+    output logic alu_src_mem
 );
 
     assign Halt = pc == 0;
@@ -227,6 +228,7 @@ module mips_decoder(
                 ALUSrc2     = 2'bx;
                 ALUControl  = 5'bxxxxx;
                 unaligned = 0;
+                alu_src_mem = 0;
             end
             2'b01: begin 
             // state == EXEC1
@@ -247,17 +249,18 @@ module mips_decoder(
                 PCControl[0]  = J;
                 CntEn         = !waitrequest && two_cycle_instr;
                 ALUSrc1       = SLL   || SRA  || SRL;
-                ALUSrc2       = ADDIU || LUI  || LW   || SW || ORI || ANDI ||XORI || SLTI || SLTIU || LH || LHU || SH || SB || LB || LBU;
+                ALUSrc2       = ADDIU || LUI  || LW   || SW || ORI || ANDI ||XORI || SLTI || SLTIU || LH || LHU || SH || SB || LB || LBU || LWL || LWR;
                 ALUControl[4] = LUI || ANDI || ORI || XORI || SLT || SLTI || SLTU || SLTIU || MFHI || MFLO || MULT || DIV || MTHI || MTLO || load_instr || store_instr;
                 ALUControl[3] = shift_instr || SUBU || OR || XOR || SLT || SLTI || SLTU || SLTIU || MULTU || MULT || DIV || BNE || load_instr || store_instr;
                 ALUControl[2] = LUI   || SRA  || SRAV || SRL  || SRLV || SUBU || XOR || ANDI || ORI || XORI || BGEZ || BGTZ || BLEZ || BLTZ || BGEZAL || BLTZAL || load_instr || store_instr;
                 ALUControl[1] = SLL   || SLLV || SUBU || OR || XOR || ORI || XORI || DIVU || MFLO || MULT || DIV || MTLO || BEQ || BLEZ || BLTZ || BLTZAL;
-                ALUControl[0] = SLL   || SLLV || SRL  || SRLV || AND || XOR || ANDI || XORI || SLTU || SLTIU  || MFHI || MFLO || DIV || BEQ || BGEZ || BLEZ || BNE || BGEZAL || BLTZAL || SB || LB || LBU;
-                Extra         = three_cycle_instr;
+                ALUControl[0] = SLL   || SLLV || SRL  || SRLV || AND || XOR || ANDI || XORI || SLTU || SLTIU  || MFHI || MFLO || DIV || BEQ || BGEZ || BLEZ || BNE || BGEZAL || BLTZAL || LWL || LWR;
+                Extra         = three_cycle_instr || LWL || LWR;
                 is_branch     = J || JAL || JR || JALR || (BEQ & branch) || (BGEZ & branch) || (BGEZAL & branch) || (BGTZ & branch) || (BLEZ & branch) || (BLTZ & branch) || (BLTZAL & branch) || (BNE & branch);
                 link = (BGEZAL & branch) || (BLTZAL & branch);
                 extension_control = 0; 
                 unaligned = SB || LB || LBU; 
+                alu_src_mem = 0;
                 // needs to be confirmed, the value of ra will or not change if the condition is not true;
             end
             2'b10: begin 
@@ -268,7 +271,7 @@ module mips_decoder(
                 ByteEn_de      = 4'b1111;
                 RegSrc        = load_instr;
                // RegData       = 2'b00;
-                RegData[0]    = load_instr;
+                RegData[0]    = LB || LBU || LH || LHU || LW;
                 RegData[1]    = LH || LB;
                 RegWrite      = load_instr;
                 PCControl[1]  = 1'b1;
@@ -276,10 +279,11 @@ module mips_decoder(
                 CntEn         = 1'b1;
                 ALUSrc1       = 1'b0;
                 ALUSrc2       = LW ||LH || LHU;
-                ALUControl    = 5'b00000;
-                Extra         = three_cycle_instr;
+                ALUControl    = LWL? 5'b11110 : 5'b11111;
+                Extra         = three_cycle_instr || LWL || LWR;
                 extension_control = LB;
                 unaligned = 0;
+                alu_src_mem = LWL || LWR;
             end
             2'b11: begin 
             // state == HALT
