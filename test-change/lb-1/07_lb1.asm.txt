@@ -1,5 +1,0 @@
-addiu $t0,$zero,24184
-addiu $sp,$zero,0x00400
-lb $t1,16($sp)
-addu $v0,$zero,$t1
-jr $zero
