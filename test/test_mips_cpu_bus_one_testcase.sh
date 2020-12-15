@@ -29,9 +29,10 @@ iverilog -g 2012 \
 -P mips_cpu_bus_tb.RAM_DATA_SIZE=$(wc -l "${testcase_path}/${TESTCASE}_data.init" | cut -d " " -f 1) \
 -P mips_cpu_bus_tb.VCD_OUTPUT=\""${testcase_path}/${TESTCASE}.vcd"\" \
 -o "${testcase_path}/${TESTCASE}" \
-$root/rtl/mips_cpu_bus.v \
-$root/rtl/mips_cpu_bus_tb.v \
-$root/rtl/mips_cpu/*.v
+"${root}/rtl/mips_cpu_bus.v" \
+"${root}/rtl/mips_cpu/"*.v \
+"${root}/test/mips_cpu_bus_tb.v" \
+"${root}/test/RAM_32x64k_avalon.v"
 
 if [[ $? -ne 0 ]]
 then
