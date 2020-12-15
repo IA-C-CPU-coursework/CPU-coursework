@@ -1,5 +1,5 @@
-addiu $t0,$zero,5000
-addiu $t1,$zero,10
+addiu $t0,$zero,5000000
+addiu $t1,$zero,-4800000
 addiu $sp,$zero,0x400
 mult $t0,$t1
 mfhi $t2
