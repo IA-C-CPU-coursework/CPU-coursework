@@ -1,0 +1,9 @@
+addiu $t0,$zero,5000
+addiu $t1,$zero,10
+addiu $sp,$zero,0x400
+mult $t0,$t1
+mthi $t2
+mtlo $t3
+sw $t2,0x0($sp)
+sw $t3,0x4($sp)
+jr zero
