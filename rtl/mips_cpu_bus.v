@@ -69,8 +69,8 @@ module mips_cpu_bus(
         assign write = MemWrite;
     logic MemRead;
         assign read = MemRead;
-    logic[3:0] ByteEn;
-        assign byteenable = ByteEn;
+    //logic[3:0] ByteEn;
+      //  assign byteenable = ByteEn;
     assign writedata = read_data_2;
     logic[31:0] mem_out;
         assign mem_out = readdata;
@@ -111,8 +111,9 @@ module mips_cpu_bus(
 
     // sign extension
     logic [15:0] offset;
-        assign offset = mem_out_buffer[15:0];
+        assign offset = mem_out[15:0];
     logic [31:0] signed_offset;
+    logic extension_control;
 
     // signals required by mips_state_machines
     logic Halt;
@@ -127,6 +128,9 @@ module mips_cpu_bus(
     logic ALUSrc1;
     logic ALUSrc2;
     logic Buffer;
+    logic link;
+    logic unaligned;
+    logic alu_src_mem;
     // logic MemWrite;
     // logic MemRead;
     // logic ByteEn;
@@ -139,20 +143,26 @@ module mips_cpu_bus(
     // logic [31:0] mem_out;
     logic [31:0] mem_out_buffer;
 
+
+    // to calculate the remaider of  address offset
+    logic [3:0] byte_remainder;
+    logic [3:0] ByteEn_de;
     //-------------------------------------------------------------------------
     // Multiplexer
     //-------------------------------------------------------------------------
 
+    assign byteenable = unaligned ? byte_remainder : ByteEn_de;
     assign mem_addr = MemSrc ? pc : alu_result;
     assign address = mem_addr;
-    assign alu_src_1[31:0] = ALUSrc1 ? {27'b0, shift_amount}: read_data_1[31:0];
+    assign alu_src_1[31:0] = alu_src_mem ? (mem_out[31:0]) : (ALUSrc1 ? {27'b0, shift_amount}: read_data_1[31:0]);
     assign alu_src_2[31:0] = ALUSrc2 ? signed_offset[31:0] : read_data_2[31:0];
-    assign write_addr = RegSrc ? rt : rd;
+    assign write_addr = link ? (5'b11111):(RegSrc ? rt : rd);
     always_comb begin
         case(RegData)
-            2'b00: write_data[31:0] = mem_out[31:0];
-            2'b01: write_data[31:0] = pc[31:0];
-            2'b10: write_data[31:0] = alu_result[31:0];
+            2'b00: write_data[31:0] = alu_result[31:0]; //write_data[31:0] = mem_out[31:0];
+            2'b01: write_data[31:0] = mem_out[31:0];//write_data[31:0] = pc[31:0];
+            2'b10: write_data[31:0] = pc[31:0]+8;
+            2'b11: write_data[31:0] = signed_offset[31:0];
             default: write_data = 32'hxxxxxxxx;
         endcase
     end
@@ -199,6 +209,7 @@ module mips_cpu_bus(
     // instantiation of mips_sign_extension
     mips_sign_extension signExt(
         .offset(offset),
+        .extension_control(extension_control),
         .signed_offset(signed_offset)
     );
 
@@ -225,7 +236,7 @@ module mips_cpu_bus(
         // momery
         .MemWrite(MemWrite),
         .MemRead(MemRead),
-        .ByteEn(ByteEn),
+        .ByteEn_de(ByteEn_de),
         // register file 
         .RegWrite(RegWrite),
         .RegData(RegData),
@@ -239,7 +250,11 @@ module mips_cpu_bus(
         .CntEn(CntEn),
         // alu
         .ALUControl(ALUControl),
-        .is_branch(is_branch)
+        .is_branch(is_branch),
+        .link(link),
+        .extension_control(extension_control),
+        .unaligned(unaligned),
+        .alu_src_mem(alu_src_mem)
     );
 
     // instantiation of mips_alu
@@ -250,6 +265,12 @@ module mips_cpu_bus(
         .alu_src_2(alu_src_2),
         .alu_result(alu_result),
         .branch(branch)
+    );
+
+    //to calculate specific byte location
+    mips_remainder byte_calculation(
+        .alu_src_2(alu_src_2),
+        .byte_remainder(byte_remainder)
     );
 
 endmodule

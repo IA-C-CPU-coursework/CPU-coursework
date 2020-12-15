@@ -1,8 +1,8 @@
 module mips_cpu_bus_tb();
 
-    parameter RAM_INSTR_INIT_FILE = "unit_test/instruction_hex/cpu_integration.hex.txt";
+    parameter RAM_INSTR_INIT_FILE = "unit_test/instruction_hex/ins.txt";
     parameter RAM_INSTR_SIZE= 10;
-    parameter RAM_DATA_INIT_FILE = "unit_test/instruction_hex/cpu_integration.hex.txt";
+    parameter RAM_DATA_INIT_FILE = "unit_test/instruction_hex/data.txt";
     parameter RAM_DATA_SIZE= 10;
 
     parameter VCD_OUTPUT = "mips_cpu_bus_tb.vcd";

@@ -185,6 +185,8 @@ module RAM_32x64k_avalon(
                 4'b1000: readdata <= memory[word_address][31:24]; // xooo
                 4'b0011: readdata <= memory[word_address][15:00]; // ooxx
                 4'b1100: readdata <= memory[word_address][31:16]; // xxoo
+                4'b1110: readdata <= memory[word_address][31:08]; // xxxo
+                4'b0111: readdata <= memory[word_address][23:00]; // 0xxx
                 4'b1111: readdata <= memory[word_address][31:00]; // xxxx
                 default: readdata <= memory[word_address];        // xxxx 
             endcase;
