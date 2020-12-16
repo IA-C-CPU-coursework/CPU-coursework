@@ -51,7 +51,7 @@ module mips_alu(
             5'b10000:   ; // in the always_ff block below                                 // Move to HI
             5'b10001:   alu_result[31:0] = HI;                                            // Move from HI
             5'b10010:   ; // in the always_ff block below                                 // Move to LO
-            5'b10011:   alu_result[31:0] = LO;                                            // Move from LO
+            5'b10011:   alu_result[31:0] = LO;                                           // Move from LO
             5'b10100:   alu_result[31:0] = alu_src_2[31:0]          << 16'h10;            // shift lower 4 byte to upper
             5'b10101:   alu_result[31:0] = alu_src_1[31:0]           & (alu_src_2[31:0] & 32'h0000ffff); // andi
             5'b10110:   alu_result[31:0] = alu_src_1[31:0]         |  (alu_src_2[31:0] & 32'h0000ffff); // ori
@@ -104,8 +104,8 @@ module mips_alu(
                             HILO[31:0]  <= alu_src_1[31:0] /  alu_src_2[31:0]; // unsigned divide
                         end
             5'b01000:   HILO[63:0]      <= alu_src_1[31:0] *  alu_src_2[31:0]; // unsigned multiply
-            5'b10000:   HILO[63:32]     <= alu_result[31:0];                   // Move to HI
-            5'b10010:   HILO[31:0]      <= alu_result[31:0];                   // Move to LO
+            5'b10000:   HILO[63:32]    <= alu_src_1[31:0];                   // Move to HI
+            5'b10010:   HILO[31:0]     <= alu_src_1[31:0];                   // Move to LO
             5'b11010:   HILO[63:0]      <= $signed(alu_src_1[31:0]) *  $signed(alu_src_2[31:0]); // signed multiply;
             5'b11011:   begin 
                             HILO[63:32] <= $signed(alu_src_1[31:0]) %  $signed(alu_src_2[31:0]); // signed divide
