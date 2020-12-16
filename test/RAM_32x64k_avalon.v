@@ -179,16 +179,16 @@ module RAM_32x64k_avalon(
                 // as if all byteenables are asserted. 
                 // When more than one bit of the byteenable signal is asserted, all asserted 
                 // lanes are adjacent." 
-                4'b0001: readdata <= memory[word_address][07:00]; // ooox
-                4'b0010: readdata <= memory[word_address][15:08]; // ooxx
-                4'b0100: readdata <= memory[word_address][23:16]; // oxoo
-                4'b1000: readdata <= memory[word_address][31:24]; // xooo
-                4'b0011: readdata <= memory[word_address][15:00]; // ooxx
-                4'b1100: readdata <= memory[word_address][31:16]; // xxoo
-                4'b1110: readdata <= memory[word_address][31:08]; // xxxo
-                4'b0111: readdata <= memory[word_address][23:00]; // 0xxx
-                4'b1111: readdata <= memory[word_address][31:00]; // xxxx
-                default: readdata <= memory[word_address];        // xxxx 
+                4'b0001: readdata[07:00] <= memory[word_address][07:00]; // ooox
+                4'b0010: readdata[15:08] <= memory[word_address][15:08]; // ooxx
+                4'b0100: readdata[23:16] <= memory[word_address][23:16]; // oxoo
+                4'b1000: readdata[31:24] <= memory[word_address][31:24]; // xooo
+                4'b0011: readdata[15:00] <= memory[word_address][15:00]; // ooxx
+                4'b1100: readdata[31:16] <= memory[word_address][31:16]; // xxoo
+                4'b1110: readdata[31:08] <= memory[word_address][31:08]; // xxxo
+                4'b0111: readdata[23:00] <= memory[word_address][23:00]; // 0xxx
+                4'b1111: readdata[31:00] <= memory[word_address][31:00]; // xxxx
+                default: readdata[31:00] <= memory[word_address][31:00]; // xxxx 
             endcase;
         end
         if(read) begin
@@ -206,14 +206,14 @@ module RAM_32x64k_avalon(
         if (!waitrequest && write) begin 
             // $display("[RAM] 📝📝📝📝📝 Writing")
             case(byteenable)
-                4'b0001: memory[word_address][07:00] <= writedata; // ooox
-                4'b0010: memory[word_address][15:08] <= writedata; // ooxx
-                4'b0100: memory[word_address][23:16] <= writedata; // oxoo
-                4'b1000: memory[word_address][31:24] <= writedata; // xooo
-                4'b0011: memory[word_address][15:00] <= writedata; // ooxx
-                4'b1100: memory[word_address][31:16] <= writedata; // xxoo
-                4'b1111: memory[word_address][31:00] <= writedata; // xxxx
-                default: memory[word_address]        <= writedata; // xxxx 
+                4'b0001: memory[word_address][07:00] <= writedata[07:00]; // ooox
+                4'b0010: memory[word_address][15:08] <= writedata[07:00]; // ooxx
+                4'b0100: memory[word_address][23:16] <= writedata[07:00]; // oxoo
+                4'b1000: memory[word_address][31:24] <= writedata[07:00]; // xooo
+                4'b0011: memory[word_address][15:00] <= writedata[15:00]; // ooxx
+                4'b1100: memory[word_address][31:16] <= writedata[15:00]; // xxoo
+                4'b1111: memory[word_address][31:00] <= writedata[31:00]; // xxxx
+                default: memory[word_address][31:00] <= writedata[31:00]; // xxxx 
             endcase;
         end
         if(write) begin
