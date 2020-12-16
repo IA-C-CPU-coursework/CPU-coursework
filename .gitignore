@@ -18,6 +18,9 @@ a.out
 # vscode
 .vscode
 
+# windows
+.DS_Store
+
 # testbench
 *.bin
 *.hex

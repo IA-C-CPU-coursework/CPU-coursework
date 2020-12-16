@@ -77,7 +77,7 @@ fi
 
 if [[ $? -ne 0 ]]
 then
-    printf "%-8s %-6s Fail\n" "${TESTCASE}" "${INSTRUCTION}"
+    printf "%-8s %-6s Fail # ❌\n" "${TESTCASE}" "${INSTRUCTION}"
 else
-    printf "%-8s %-6s Pass\n" "${TESTCASE}" "${INSTRUCTION}"
+    printf "%-8s %-6s Pass # ✅\n" "${TESTCASE}" "${INSTRUCTION}"
 fi

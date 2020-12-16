@@ -19,7 +19,6 @@ instructions=(
     # Arithmetic and logic
     "addu" "addiu"
     "and" "andi"
-    "lui"
     "or" "ori"
     "slt" "slti" "sltiu" "sltu" 
     "subu"
@@ -153,6 +152,7 @@ do
         if [[ -f "${instruction}/readme.md" ]]
         then
             >&2 echo "generating test cases from ${instruction_name}/readme.md"
+            cd "${root}"
             "${root}/test/generate_testcases.sh" "${instruction}/readme.md"
         fi
 
