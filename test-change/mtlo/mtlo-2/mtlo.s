@@ -1,5 +1,7 @@
-addiu $t0,$zero,0x11111111
+addiu $t0,$zero,0x1231
 mtlo $t0
+addiu $t1,$zero,0x1222
+mthi $t1
 mflo $t2
 addiu $v0,$t2,0
 jr zero

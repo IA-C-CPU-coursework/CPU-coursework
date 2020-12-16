@@ -1,9 +1,5 @@
-addiu $t0,$zero,5000000
-addiu $t1,$zero,4800000
-addiu $sp,$zero,0x400
+lui $t0,2361
+addiu $t1,$zero,20000
 mult $t0,$t1
-mfhi $t2
-mflo $t3
-sw $t2,0x0($sp)
-sw $t3,0x4($sp)
+mfhi $v0
 jr zero
