@@ -1,14 +1,4 @@
-addiu $t3,$zero,24184
-sll $t1,$t3,7
-sll $t2,$t1,10
-addiu $sp,$t2,1024
-addiu $s0,$zero,1234
-addiu $s1,$zero,2432
-addu $t0,$s0,$s1
-sw $t0,0($sp)
-addiu $s0,$zero,543
-addiu $s1,$zero,6464
-addu $t0,$s0,$s1
-sw $t0,4($sp)
-addiu $v0,$t0,0
-jr $zero
+addiu $t0,$t0,0x1
+addu $v0,$t0,$t0
+jr $ra
+nop

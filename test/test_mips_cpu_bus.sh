@@ -1,6 +1,7 @@
 #! /bin/bash
 
-set -e
+#set -e
+#set -eou pipefail
 
 testbench="
      ______          __  __                    __
@@ -18,7 +19,6 @@ instructions=(
     # Arithmetic and logic
     "addu" "addiu"
     "and" "andi"
-    "lui"
     "or" "ori"
     "slt" "slti" "sltiu" "sltu" 
     "subu"
@@ -71,9 +71,9 @@ then
 else
     if [[ -d ${source_directory} ]]
     then
-        echo "source directory: ${source_directory}/"
+        echo "source directory: ${source_directory}"
     else
-        echo "❌ source directory ${source_directory}/ is not found"
+        echo "❌ source directory ${source_directory} is not found"
         help
         exit 1
     fi
@@ -81,7 +81,7 @@ fi
 
 if [[ ${input_instruction} != "" ]]
 then
-    if [[ "${instructions[@]}" =~ "${input_instruction}" ]]
+    if [[ " ${instructions[@]} " =~ " ${input_instruction} " ]]
     then
         test_instruction+=(${input_instruction})
         echo "test instruction: ${test_instruction[@]}"
@@ -121,6 +121,13 @@ else
 fi
 
 
+#------------------------------------------------------------------------------
+# Clean previously generated files in testcase directory
+#------------------------------------------------------------------------------
+
+"${root}/test/"clean_all.sh
+
+
 #-----------------------------------------------------------------------------
 # Assemble all testcases 
 #-----------------------------------------------------------------------------
@@ -130,32 +137,46 @@ echo "2. Start to assemble all test cases in ${root}/test/testcases"
 
 for instruction in "${root}/test/testcases/"*
 do
-    instruction_name=`cd $instruction && echo "$(basename $PWD)"`
-    
-    if [[ ! "${instructions[@]}" =~ "${instruction_name}" ]]
+    if [[ -d ${instruction} ]]
     then
-        echo "❌ Encounter unknown instruction ${instruction_name}"
-        echo "${instructions[@]}"
-        exit 1
-    fi
-
-    >&2 echo " - assembling test cases for ${instruction_name}"
-    cd "${instruction}"
-
-    for testcase in "${instruction}/"*
-    do
-        testcase_name=`cd $testcase && echo "$(basename $PWD)"`
-        cd "${testcase}"
-        >&2 echo "    - assembling test case ${testcase_name}"
-        ${root}/test/assembler.sh ${testcase}/${testcase_name}.S
-        result=$?
-
-        if [[ "${result}" -ne 0 ]]
+        instruction_name=`cd $instruction && echo "$(basename $PWD)"`
+        
+        if [[ ! " ${instructions[@]} " =~ " ${instruction_name} " ]]
         then
-            echo "❌ Error in assembling Test Cases"
+            echo "❌ Encounter unknown instruction ${instruction_name}"
+            echo "${instructions[@]}"
             exit 1
         fi
-    done
+
+        #echo "${instruction}/readme.md"
+        if [[ -f "${instruction}/readme.md" ]]
+        then
+            >&2 echo "generating test cases from ${instruction_name}/readme.md"
+            cd "${root}"
+            "${root}/test/generate_testcases.sh" "${instruction}/readme.md"
+        fi
+
+        >&2 echo "assembling test cases for ${instruction_name}"
+        cd "${instruction}"
+
+        for testcase in "${instruction}/"*
+        do
+            if [[ -d ${testcase} ]]
+            then
+                testcase_name=`cd $testcase && echo "$(basename $PWD)"`
+                cd "${testcase}"
+                >&2 echo "assembling test case ${testcase_name}"
+                ${root}/test/assembler.sh ${testcase}/${testcase_name}.S
+                result=$?
+
+                if [[ "${result}" -ne 0 ]]
+                then
+                    echo "❌ Error in assembling Test Cases"
+                    exit 1
+                fi
+            fi
+        done
+    fi
 done
 
 cd "${root}"
