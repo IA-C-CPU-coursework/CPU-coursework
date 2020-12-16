@@ -1,12 +1,6 @@
-addiu $t3,$zero,24184
-sll $t1,$t3,7
-sll $t2,$t1,10
-addiu $sp,$t2,1024
-addiu $t0,$zero,123
-sw $t0,0($sp)
-addiu $t0,$zero,9014
-sw $t0,4($sp)
-addiu $t0,$zero,4565
-sw $t0,8($sp)
-addiu $v0,$t1,0
+lui $t3,0x1234
+addiu $t3,$t3,0x5678
+lui $sp,0xbfc0
+addiu $sp,$sp,0x0400
+sw $t3,0($sp)
 jr $zero

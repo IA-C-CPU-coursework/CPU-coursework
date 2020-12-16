@@ -1,4 +1,2 @@
-addiu $v0,$zero,0x123
-addiu $v0,$zero,0x3453
-addiu $v0,$zero,0x2432
-jr $zero
+addiu $v0,$t0,0x0
+jr $ra
