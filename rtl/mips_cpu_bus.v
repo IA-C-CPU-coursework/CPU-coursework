@@ -91,7 +91,7 @@ module mips_cpu_bus(
         assign register_v0 = v0;
 
     // ALU
-    logic [4:0] ALUControl;
+    logic [5:0] ALUControl;
     logic [31:0] alu_src_1;
     logic [31:0] alu_src_2;
     logic [4:0] shift_amount;

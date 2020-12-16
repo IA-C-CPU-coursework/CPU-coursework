@@ -9,17 +9,18 @@
 
 set -e
 
-dependencies=(gcc-mipsel-linux-gnu)
+# dependencies=(gcc-mipsel-linux-gnu)
 
-for pkg in "${dependencies[@]}"
-do
-    # echo $pkg
-    dpkg -s ${pkg} > /dev/null
-    if [[ $? -ne 0  ]]
-    then
-        echo "missing dependencies, $i is not installed." >&2
-    fi
-done
+# dpkg is not supported in MacOS
+# for pkg in "${dependencies[@]}"
+# do
+#     # echo $pkg
+#     dpkg -s ${pkg} > /dev/null
+#     if [[ $? -ne 0  ]]
+#     then
+#         echo "missing dependencies, $i is not installed." >&2
+#     fi
+# done
 
 
 if [[ $1 == "" ]]
