@@ -179,14 +179,14 @@ module RAM_32x64k_avalon(
                 // as if all byteenables are asserted. 
                 // When more than one bit of the byteenable signal is asserted, all asserted 
                 // lanes are adjacent." 
-                4'b0001: readdata[07:00] <= memory[word_address][07:00]; // ooox
-                4'b0010: readdata[15:08] <= memory[word_address][15:08]; // ooxx
-                4'b0100: readdata[23:16] <= memory[word_address][23:16]; // oxoo
-                4'b1000: readdata[31:24] <= memory[word_address][31:24]; // xooo
-                4'b0011: readdata[15:00] <= memory[word_address][15:00]; // ooxx
-                4'b1100: readdata[31:16] <= memory[word_address][31:16]; // xxoo
-                4'b1110: readdata[31:08] <= memory[word_address][31:08]; // xxxo
-                4'b0111: readdata[23:00] <= memory[word_address][23:00]; // 0xxx
+                4'b0001: readdata[31:00] <= memory[word_address][31:00] & 32'h000000ff; // ooox
+                4'b0010: readdata[31:00] <= memory[word_address][31:00] & 32'h0000ff00; // ooxx
+                4'b0100: readdata[31:00] <= memory[word_address][31:00] & 32'h00ff0000; // oxoo
+                4'b1000: readdata[31:00] <= memory[word_address][31:00] & 32'hff000000; // xooo
+                4'b0011: readdata[31:00] <= memory[word_address][31:00] & 32'h0000ffff; // ooxx
+                4'b1100: readdata[31:00] <= memory[word_address][31:00] & 32'hffff0000; // xxoo
+                4'b1110: readdata[31:00] <= memory[word_address][31:00] & 32'hffffff00; // xxxo
+                4'b0111: readdata[31:00] <= memory[word_address][31:00] & 32'h00ffffff; // 0xxx
                 4'b1111: readdata[31:00] <= memory[word_address][31:00]; // xxxx
                 default: readdata[31:00] <= memory[word_address][31:00]; // xxxx 
             endcase;
