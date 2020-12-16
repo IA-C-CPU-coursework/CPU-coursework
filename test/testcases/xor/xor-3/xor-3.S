@@ -1,0 +1,8 @@
+lui $t0,0xcccc
+addiu $t0,$t0,0x5555
+addiu $t0,$t0,0x7777
+lui $t1,0xaaaa
+addiu $t1,$t1,0x3333
+addiu $t1,$t1,0x7777
+xor $v0,$t0,$t1
+jr $ra
