@@ -24,17 +24,17 @@ JR      rs              2    Jump Register                   pc = rs
 //-----------------------------------------------------------------------------
 LB      rt, offset(rs)  3    Load Byte                       rt[31:00] = {24{mem[rs + offset][7]}, mem[rs + offset]} ///done
 LBU     rt, offset(rs)  3    Load Byte Unsigned              rt[31:00] = {24{0}, mem[rs + offset]} //done
-LH      rt, offset(rs)  3    Load Halfword                   rt[31:00] = {16{mem[rs + offset]}, mem[rs + offset]}
+LH      rt, offset(rs)  3    Load Halfword                   rt[31:00] = {16{mem[rs + offset]}, mem[rs + offset]} //done
                              half aligned word
-LHU     rt, offset(rs)  3    Load Halfword Unsigned          rt[31:00] = {16[0], mem[rs + offset]}
-LUI     rt, imm         3    Load Upper Immediate            rt[31:00] = immediate << 16
-LW      rt, offset(rs)  3    Load Word                       rt[31:00] = mem[rs + offset]
-LWL     rt, offset(rs)  3    Load Word Left                  rt[31:16] = mem[rs + offset]
+LHU     rt, offset(rs)  3    Load Halfword Unsigned          rt[31:00] = {16[0], mem[rs + offset]}   //done
+LUI     rt, imm         3    Load Upper Immediate            rt[31:00] = immediate << 16  //done
+LW      rt, offset(rs)  3    Load Word                       rt[31:00] = mem[rs + offset] //done
+LWL     rt, offset(rs)  3    Load Word Left                  rt[31:16] = mem[rs + offset]  //done
                              possibly unaligned word        
                              possibly unaligned word        
-SB      rt, offset(rs)  2    Store Byte                      mem[rs + offset] = rt[07:00]
-SH  ls    rt, offset(rs)  2    Store Halfword                  mem[rs + offset] = rt[15:00]
+SB      rt, offset(rs)  2    Store Byte                      mem[rs + offset] = rt[07:00]   //done
+SH  ls    rt, offset(rs)  2    Store Halfword                  mem[rs + offset] = rt[15:00]  //done
                              aligned location
-SW      rt, offset(rs)  2    Store Word                      mem[rs + offset] = rt[31:00]
+SW      rt, offset(rs)  2    Store Word                      mem[rs + offset] = rt[31:00]    //done
 ```
  
