@@ -7,4 +7,4 @@
 
 readme=$1
 
-python3 test/generate_testcases.py $1 1>/dev/null
+#python3 test/generate_testcases.py $1 1>/dev/null
