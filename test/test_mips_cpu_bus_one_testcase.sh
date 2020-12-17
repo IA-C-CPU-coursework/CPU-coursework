@@ -24,9 +24,11 @@ testcase_path="${root}/test/testcases/${INSTRUCTION}/${TESTCASE}"
 iverilog -g 2012 \
 -s mips_cpu_bus_tb \
 -P mips_cpu_bus_tb.RAM_INSTR_INIT_FILE=\""${testcase_path}/${TESTCASE}.hex"\" \
--P mips_cpu_bus_tb.RAM_INSTR_SIZE=$(wc -l "${testcase_path}/${TESTCASE}.hex" | cut -d " " -f 1) \
+-P mips_cpu_bus_tb.RAM_INSTR_INIT_SIZE=$(wc -l "${testcase_path}/${TESTCASE}.hex" | cut -d " " -f 1) \
 -P mips_cpu_bus_tb.RAM_DATA_INIT_FILE=\""${testcase_path}/${TESTCASE}_data.init"\" \
--P mips_cpu_bus_tb.RAM_DATA_SIZE=$(wc -l "${testcase_path}/${TESTCASE}_data.init" | cut -d " " -f 1) \
+-P mips_cpu_bus_tb.RAM_DATA_INIT_SIZE=$(wc -l "${testcase_path}/${TESTCASE}_data.init" | cut -d " " -f 1) \
+-P mips_cpu_bus_tb.RAM_DATA_REF_FILE=\""${testcase_path}/${TESTCASE}_data.ref"\" \
+-P mips_cpu_bus_tb.RAM_DATA_REF_SIZE=$(wc -l "${testcase_path}/${TESTCASE}_data.ref" | cut -d " " -f 1) \
 -P mips_cpu_bus_tb.VCD_OUTPUT=\""${testcase_path}/${TESTCASE}.vcd"\" \
 -o "${testcase_path}/${TESTCASE}" \
 "${root}/rtl/mips_cpu_bus.v" \
