@@ -40,6 +40,7 @@ logic[31:0] branch_address;
             endcase
                 pc[31:0] <= pc[31:0] + 4;
             end
+            
         end
     end
 endmodule

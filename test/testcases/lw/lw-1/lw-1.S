@@ -1,4 +1,5 @@
-lui $sp,0xbfc0
-addiu $sp,$sp,0x0400
-lw $v0,0($sp)
-jr $zero
+lui $s0,0xbfc0
+addiu $s0,$s0,0x0400
+addiu $v0,$zero,0x1234
+lw $v0,0($s0)
+jr $ra

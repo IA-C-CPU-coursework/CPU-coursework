@@ -52,7 +52,7 @@ linker_parameters=" -Ttext 0xBFC00000 -Tdata 0xBFC00400 "
 # start points for instruction section and data section
 
 mipsel-linux-gnu-gcc ${parentdir}/${filename}.S \
-    -O3 -g -nostdlib                            \
+    -O3 -g -nostdlib  -mplt                          \
     -Wl,--build-id=none ${linker_parameters}    \
     -o ${parentdir}/${filename}.elf
     # -g generates debug information
