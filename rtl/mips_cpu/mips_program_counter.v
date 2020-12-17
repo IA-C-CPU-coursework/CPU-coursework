@@ -35,11 +35,12 @@ logic[31:0] branch_address;
                 case(PCControl)
                 2'b00: branch_address[31:0] <= pc[31:0] + 4 + (signed_offset[31:0] << 2);
                 2'b01: branch_address[31:0] <= {pc[31:28], target, 2'b00};
-                2'b10: branch_address[31:0] <= read_data_1[31:0];
+                2'b10: branch_address[31:0] <= read_data_1[31:0] & 32'hfffffffc;
                 default: branch_address[31:0] <= 32'hxxxxxxxx;
             endcase
                 pc[31:0] <= pc[31:0] + 4;
             end
+            
         end
     end
 endmodule

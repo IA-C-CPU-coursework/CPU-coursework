@@ -1,6 +1,9 @@
-jal labela
-addiu $v0,$v0,0x0055
+main:
+jal sub
+addiu $v0,$v0,0x55
 addiu $v0,$v0,-0x1
 jr $zero
-labela:addiu $v0,$v0,0x0055
+
+sub:
+addiu $v0,$v0,0x55
 jr $ra
