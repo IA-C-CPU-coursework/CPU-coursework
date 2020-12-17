@@ -1,9 +1,4 @@
-main:
-jal sub
-addiu $v0,$v0,0x55
-addiu $v0,$v0,-0x1
+addiu $v0,$v0,0x0055
 jr $zero
-
-sub:
-addiu $v0,$v0,0x55
+addiu $v0,$zero,0x00aa
 jr $ra
