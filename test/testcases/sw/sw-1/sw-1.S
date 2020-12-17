@@ -1,6 +1,7 @@
-lui $t3,0x1234
-addiu $t3,$t3,0x5678
-lui $sp,0xbfc0
-addiu $sp,$sp,0x0400
-sw $t3,0($sp)
-jr $zero
+lui $s0,0xbfc0
+addiu $s0,$s0,0x0400
+lui $t1,0x1234
+addiu $t1,$t1,0x7653
+sw $t1,16($s0)
+lw $v0,16($s0)
+jr $ra

@@ -1,8 +1,4 @@
-addiu $t3,$zero,0xf234
-sll $t3,$t3,16
-addiu $t3,$t3,0x5678
-lui $sp,0xbfc0
-addiu $sp,$sp,0x0400
-sw $t3,0($sp)
-lbu $v0,3($sp)
-jr $zero
+lui $s0,0xbfc0
+addiu $s0,$s0,0x0400
+lbu $v0,0($s0)
+jr $ra
