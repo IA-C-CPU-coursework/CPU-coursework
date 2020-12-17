@@ -1,4 +1,7 @@
-addiu $v0,$v0,0x0055
+lui $t1,0xbfc0
+addiu $t1,$t1,0x0014
+jalr $t0,$t1
+addiu $v0,$v0,0x0044
 jr $zero
-labela:addiu $v0,$zero,0x0055
-jr $t1
+labela:addiu $v0,$zero,0x0066
+jr $t0

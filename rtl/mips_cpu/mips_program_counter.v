@@ -33,7 +33,7 @@ logic[31:0] branch_address;
             else if(is_branch)begin
                 in_branch_delay = 1;
                 case(PCControl)
-                2'b00: branch_address[31:0] <= pc[31:0] + (signed_offset[31:0] << 2);
+                2'b00: branch_address[31:0] <= pc[31:0] + 4 +(signed_offset[31:0] << 2);
                 2'b01: branch_address[31:0] <= {pc[31:28], target, 2'b00};
                 2'b10: branch_address[31:0] <= read_data_1[31:0];
                 default: branch_address[31:0] <= 32'hxxxxxxxx;
