@@ -94,10 +94,10 @@ for testcase in testcases:
 
 
     print("File: " + testcase_name + "_data.init")
-    data_init_hex = "00000000\n"*3+"00000000"
+    data_init_hex = "00000000\n"*4
     data_init = re.search(data_init_re, testcase, re.M)
     if data_init:
-        data_init_hex = data_init.group(1).rstrip()
+        data_init_hex = data_init.group(1).rstrip()+"\n"
     else:
         err.write("WARNING {testcase_name}_data.init is not specified\n".format(testcase_name=testcase_name))
     print(data_init_hex)
@@ -107,10 +107,10 @@ for testcase in testcases:
 
 
     print("File: " + testcase_name + "_data.ref")
-    data_ref_hex = "00000000\n"*3+"00000000"
+    data_ref_hex = "00000000\n"*4
     data_ref = re.search(data_ref_re, testcase, re.M)
     if data_ref:
-        data_ref_hex = data_ref.group(1).rstrip()
+        data_ref_hex = data_ref.group(1).rstrip()+"\n"
     else:
         err.write("WARNING {testcase_name}_data.ref is not specified\n".format(testcase_name=testcase_name))
     print(data_ref_hex)

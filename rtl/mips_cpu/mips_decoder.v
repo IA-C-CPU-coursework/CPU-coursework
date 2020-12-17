@@ -243,7 +243,7 @@ module mips_decoder(
                 RegSrc        = ADDIU || LUI || ORI || ANDI || XORI || SLTI || SLTIU;
                 //RegData       = 2'b10;
                 RegData[0]    = 0;
-                RegData[1]    = BGEZAL || BLTZAL || JALR ;
+                RegData[1]    = BGEZAL || BLTZAL || JALR || JAL;
                 RegWrite      = ADDIU || ADDU || LUI  || shift_instr || SUBU || OR || XOR || AND || ORI || ANDI || XORI || SLT || SLTI || SLTU || SLTIU || MFHI || MFLO || DIVU || MULTU || MULT || DIV || BGEZAL || BLTZAL || JALR || JAL;
                 PCControl[1]  = JR || JALR;
                 PCControl[0]  = J || JAL;
