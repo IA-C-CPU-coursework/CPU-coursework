@@ -232,7 +232,7 @@ module mips_decoder(
             end
             2'b01: begin 
             // state == EXEC1
-                MemSrc        = !store_instr && !load_instr || load_instr && !waitrequest;
+                MemSrc        = !store_instr && !load_instr;
                 MemWrite      = store_instr;
                 MemRead       = load_instr;
                 //ByteEn_de        = 4'b1111;
