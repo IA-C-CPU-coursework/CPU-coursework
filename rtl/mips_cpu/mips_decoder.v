@@ -255,7 +255,7 @@ module mips_decoder(
                 ALUControl[3] = shift_instr || SUBU || OR || XOR || SLT || SLTI || SLTU || SLTIU || MULTU || MULT || DIV || BNE || load_instr || store_instr;
                 ALUControl[2] = LUI   || SRA  || SRAV || SRL  || SRLV || SUBU || XOR || ANDI || ORI || XORI || BGEZ || BGTZ || BLEZ || BLTZ || BGEZAL || BLTZAL || load_instr || store_instr;
                 ALUControl[1] = SLL   || SLLV || SUBU || OR || XOR || ORI || XORI || DIVU || MFLO || MULT || DIV || MTLO || BEQ || BLEZ || BLTZ || BLTZAL;
-                ALUControl[0] = SLL   || SLLV || SRL  || SRLV || AND || XOR || ANDI || XORI || SLTU || SLTIU  || MFHI || MFLO || DIV || BEQ || BGEZ || BLEZ || BNE || BGEZAL || BLTZAL || LWL || LWR || LB || LBU;
+                ALUControl[0] = SLL   || SLLV || SRL  || SRLV || AND || XOR || ANDI || XORI || SLTU || SLTIU  || MFHI || MFLO || DIV || BEQ || BGEZ || BLEZ || BNE || BGEZAL || LWL || LWR || LB || LBU || LH;
                 Extra         = three_cycle_instr || LWL || LWR;
                 is_branch     = J || JAL || JR || JALR || (BEQ & branch) || (BGEZ & branch) || (BGEZAL & branch) || (BGTZ & branch) || (BLEZ & branch) || (BLTZ & branch) || (BLTZAL & branch) || (BNE & branch);
                 link = BGEZAL|| BLTZAL || JAL || JALR;
@@ -272,8 +272,8 @@ module mips_decoder(
                 ByteEn_de      = 4'b1111;
                 RegSrc        = load_instr;
                // RegData       = 2'b00;
-                RegData[0]    = LH || LHU || LW;
-                RegData[1]    = LH ;
+                RegData[0]    = LHU || LW;
+                RegData[1]    = 0;
                 RegWrite      = load_instr;
                 PCControl[1]  = 1'b1;
                 PCControl[0]  = 1'b1;
@@ -281,16 +281,16 @@ module mips_decoder(
                 ALUSrc1       = 1'b0;
                 ALUSrc2       = LW ||LH || LHU;
                 //ALUControl    = LWL? 5'b11110 : 5'b11111;
-                ALUControl[5] = LB || LBU;
+                ALUControl[5] = LB || LBU || LH;
                 ALUControl[4] = LWL || LWR;
                 ALUControl[3] = LWL || LWR;
                 ALUControl[2] = LWL || LWR;
-                ALUControl[1] = LWL || LWR;
+                ALUControl[1] = LWL || LWR || LH;
                 ALUControl[0] = LWR || LBU;
                 Extra         = three_cycle_instr || LWL || LWR;
                 extension_control = LB;
                 unaligned = 0;
-                alu_src_mem = LWL || LWR || LB || LBU;
+                alu_src_mem = LWL || LWR || LB || LBU || LH;
             end
             2'b11: begin 
             // state == HALT
