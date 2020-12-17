@@ -121,6 +121,10 @@ module mips_alu(
                 load_enable = 0;
             end
 
+            6'b100010: begin
+                alu_result[31:0] = byte_two ? (alu_src_1[31:0] | 32'hffff0000) : alu_src_1[31:0]; 
+                load_enable = 0;
+            end
             default:    alu_result[31:0] = 32'bxxxxxxxx; 
             // output unknown signal as default behaviour
         endcase;
