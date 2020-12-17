@@ -1,4 +1,3 @@
-addiu $v0,$zero,0
-addiu $v0,$zero,45
-addiu $v0,$zero,890
-jr $zero
+addiu $t0,$t0,0x1
+addiu $v0,$t0,0x0
+jr $ra
