@@ -1,3 +1,4 @@
+.set noreorder
 addiu $t0,$t0,0x0
 mthi $t0
 nop

@@ -1,3 +1,4 @@
+.set noreorder
 lui $t0,0xffff
 mthi $t0
 nop

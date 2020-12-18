@@ -1,3 +1,4 @@
+.set noreorder
 lui $s0,0xbfc0
 addiu $s0,$s0,0x0408
 lui $t1,0x1234

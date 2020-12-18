@@ -1,8 +1,10 @@
-addiu $t2,$zero,0x1234
-addiu $t3,$zero,0x1234
-beq $t3,$t2,labela
-addiu $v0,$v0,0x00bb
-jr $zero
-addiu $v0,$v0,0x1234
-labela:addiu $v0,$v0,0x00aa
-jr $zero
+.set noreorder
+addiu $t0,$t0,0xffff
+addiu $t1,$t1,0xffff
+addiu $v0,$v0,0x1
+beq $t0,$t1,l1
+addiu $v0,$v0,0x10
+addiu $v0,$v0,0x100
+l1:
+jr $ra
+addiu $v0,$v0,0x1000

@@ -31,7 +31,7 @@ iverilog -g 2012 \
 -P mips_cpu_bus_tb.RAM_DATA_REF_SIZE=$(wc -l "${testcase_path}/${TESTCASE}_data.ref" | cut -d " " -f 1) \
 -P mips_cpu_bus_tb.VCD_OUTPUT=\""${testcase_path}/${TESTCASE}.vcd"\" \
 -o "${testcase_path}/${TESTCASE}" \
-"${RTL_PATH}/mips_cpu_bus.v" \
+"${RTL_PATH}/mips_cpu_"*.v \
 "${RTL_PATH}/mips_cpu/"*.v \
 "${ROOT}/test/mips_cpu_bus_tb.v" \
 "${ROOT}/test/RAM_32x64k_avalon.v"
