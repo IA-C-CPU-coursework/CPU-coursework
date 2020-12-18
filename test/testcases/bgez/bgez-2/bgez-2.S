@@ -1,7 +1,8 @@
-addiu $t2,$zero,0x1234
-bgez $t2,labela
-addiu $v0,$zero,0x00bb
-jr $zero
-addiu $v0,$v0,0
-labela:addiu $v0,$zero,0x00aa
-jr $zero
+addiu $t0,$t0,0x1
+addiu $v0,$v0,0x1
+bgez $t0,l1
+addiu $v0,$v0,0x10
+addiu $v0,$v0,0x100
+l1:
+addiu $v0,$v0,0x1000
+jr $ra
