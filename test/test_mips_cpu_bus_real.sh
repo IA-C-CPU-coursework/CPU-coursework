@@ -154,7 +154,7 @@ do
         then
             >&2 echo "generating test cases from ${instruction_name}/readme.md"
             cd "${ROOT}"
-            "${ROOT}/test/generate_testcases.sh" "${instruction}/readme.md"
+            "${ROOT}/test/generate_testcases.sh" "${ROOT}" "${instruction}/readme.md"
         fi
 
         >&2 echo "assembling test cases for ${instruction_name}"
