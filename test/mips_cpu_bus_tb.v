@@ -1,9 +1,11 @@
 module mips_cpu_bus_tb();
 
     parameter RAM_INSTR_INIT_FILE = "unit_test/instruction_hex/ins.txt";
-    parameter RAM_INSTR_SIZE= 10;
+    parameter RAM_INSTR_INIT_SIZE= 10;
     parameter RAM_DATA_INIT_FILE = "unit_test/instruction_hex/data.txt";
-    parameter RAM_DATA_SIZE= 10;
+    parameter RAM_DATA_INIT_SIZE= 10;
+    parameter RAM_DATA_REF_FILE = "unit_test/instruction_hex/data.txt";
+    parameter RAM_DATA_REF_SIZE= 10;
 
     parameter VCD_OUTPUT = "mips_cpu_bus_tb.vcd";
     parameter TIMEOUT_CYCLES = 1000;
@@ -55,9 +57,9 @@ module mips_cpu_bus_tb();
     // Instanciation of RAM_32x64k_avalon
     RAM_32x64k_avalon #(
         .RAM_INSTR_INIT_FILE(RAM_INSTR_INIT_FILE), 
-        .RAM_INSTR_SIZE(RAM_INSTR_SIZE), 
+        .RAM_INSTR_INIT_SIZE(RAM_INSTR_INIT_SIZE), 
         .RAM_DATA_INIT_FILE(RAM_DATA_INIT_FILE), 
-        .RAM_DATA_SIZE(RAM_DATA_SIZE)
+        .RAM_DATA_INIT_SIZE(RAM_DATA_INIT_SIZE)
     ) ram(
         .rst(reset),
         .p(pending),
@@ -154,7 +156,7 @@ task dump_mem;
     cnt <= 32'h0;
 
     $display("==== [Start] Content in the data section after execution ============");
-    repeat(RAM_DATA_SIZE) begin
+    repeat(RAM_DATA_REF_SIZE) begin
         @(posedge clk);
             inspected_address <= 32'hBFC00400 + cnt;
         @(negedge waitrequest) begin

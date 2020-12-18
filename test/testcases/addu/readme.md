@@ -16,7 +16,7 @@ GPR[rs] + GPR[rt] = 0x8000
 #### Test cases
 
 ```assembly
-addu 1
+# addu 1
 # 0=0+0
 addiu $t0,$zero,0x0
 addiu $t1,$zero,0x0
@@ -29,7 +29,7 @@ jr $ra
 ```
 
 ```assembly
-addu 2
+# addu 2
 # 1=0+1
 addiu $t0,$zero,0x0
 addiu $t1,$zero,0x1
@@ -42,7 +42,7 @@ jr $ra
 ```
 
 ```assembly
-addu 3
+# addu 3
 # 0=-1+0
 addiu $t0,$zero,-0x1
 addiu $t1,$zero,0x0
@@ -55,7 +55,7 @@ ffffffff
 ```
 
 ```assembly
-addu 4
+# addu 4
 # 0=-1+1
 addiu $t0,$zero,-0x1
 addiu $t1,$zero,0x1

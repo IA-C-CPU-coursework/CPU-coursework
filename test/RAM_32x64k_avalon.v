@@ -68,9 +68,9 @@ module RAM_32x64k_avalon(
     // assign waitrequest = (write || read) && !pending || !(write || read) && pending;
 
     parameter RAM_INSTR_INIT_FILE = "";
-    parameter RAM_INSTR_SIZE= 10; 
+    parameter RAM_INSTR_INIT_SIZE= 10; 
     parameter RAM_DATA_INIT_FILE = "";
-    parameter RAM_DATA_SIZE= 10;
+    parameter RAM_DATA_INIT_SIZE= 10;
 
     reg[31:0] memory [0:2**16-1]; // 🚧 2^32 is too huge for simulation: doing so cause error [-1:0]
     // 📒 Note
@@ -92,23 +92,23 @@ module RAM_32x64k_avalon(
         if (RAM_INSTR_INIT_FILE != "") begin
         // Load instruction contents from file if specified 
             $display("[RAM] : INIT : Loading instruction contents from %s", RAM_INSTR_INIT_FILE);
-            $readmemh(RAM_INSTR_INIT_FILE, memory, 0, RAM_INSTR_SIZE-1);
+            $readmemh(RAM_INSTR_INIT_FILE, memory, 0, RAM_INSTR_INIT_SIZE-1);
         end
 
         if (RAM_DATA_INIT_FILE != "") begin
         // Load data contents from file if specified 
             $display("[RAM] : INIT : Loading data contents from %s", RAM_DATA_INIT_FILE);
-            $readmemh(RAM_DATA_INIT_FILE, memory, 32'h100, 32'h100+RAM_DATA_SIZE-1);
+            $readmemh(RAM_DATA_INIT_FILE, memory, 32'h100, 32'h100+RAM_DATA_INIT_SIZE-1);
         end
 
         $display("==== [Start] Content in the instruction section before execution ====");
-        for (int j=0; j<RAM_INSTR_SIZE; j++) begin
+        for (int j=0; j<RAM_INSTR_INIT_SIZE; j++) begin
             $display("PRE_INSTR_MEM[%h] = %h", (j*4 + 32'hBFC00000), memory[j + 32'h000]);
         end
         $display("==== [End]   Content in the instruction section before execution ====");
 
         $display("==== [Start] Content in the data section before execution ===========");
-        for (int j=0; j<RAM_DATA_SIZE; j++) begin
+        for (int j=0; j<RAM_DATA_INIT_SIZE; j++) begin
             $display("PRE_DATA_MEM[%h] = %h", (j*4 + 32'hBFC00400), memory[j + 32'h100]);
         end
         $display("==== [End] Content in the data section before execution =============");
@@ -133,13 +133,13 @@ module RAM_32x64k_avalon(
             if (RAM_INSTR_INIT_FILE != "") begin
             // Load instruction content from file if specified 
                 $display("[RAM] : INIT : Loading instruction contents from %s", RAM_INSTR_INIT_FILE);
-                $readmemh(RAM_INSTR_INIT_FILE, memory, 0, RAM_INSTR_SIZE-1);
+                $readmemh(RAM_INSTR_INIT_FILE, memory, 0, RAM_INSTR_INIT_SIZE-1);
             end
 
             if (RAM_DATA_INIT_FILE != "") begin
             // Load data content from file if specified 
                 $display("[RAM] : INIT : Loading data contents from %s", RAM_DATA_INIT_FILE);
-                $readmemh(RAM_DATA_INIT_FILE, memory, 32'h100, 32'h100+RAM_DATA_SIZE-1);
+                $readmemh(RAM_DATA_INIT_FILE, memory, 32'h100, 32'h100+RAM_DATA_INIT_SIZE-1);
             end
         end
     end
