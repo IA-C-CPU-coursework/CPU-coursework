@@ -1,5 +1,9 @@
-addiu $v0,$zero,0xffff
-bltz  $v0,labela
-jr $zero
-labela:addiu $v0,$zero,0x00aa
-jr $zero
+.set noreorder
+addiu $t0,$t0,-0x1
+addiu $v0,$v0,0x1
+bltz $t0,l1
+addiu $v0,$v0,0x10
+addiu $v0,$v0,0x100
+l1:
+jr $ra
+addiu $v0,$v0,0x1000
