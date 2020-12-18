@@ -30,6 +30,7 @@ instructions=(
     "div" "divu" 
     "mult" "multu"
     "mthi" "mtlo" 
+    "mfhi" "mflo" 
     # Branch
     "beq" "bgez" "bgezal" "bgtz" "blez" "bltz" "bltzal" "bne" 
     "j" "jal" "jalr" "jr"
@@ -105,10 +106,10 @@ fi
 # > your script is always invoked as `test/test_mips_cpu_bus.sh`.
 
 dir="./"
-root=`cd ${dir} && pwd`
+ROOT=`cd ${dir} && pwd`
 
 >&2 echo ""
->&2 echo "1. Detected working directorty: ${root}"
+>&2 echo "1. Detected working directorty: ${ROOT}"
 
 # There is a file `this_is_root` in the project root directory
 if [[ -f "this_is_root" ]]
@@ -125,7 +126,7 @@ fi
 # Clean previously generated files in testcase directory
 #------------------------------------------------------------------------------
 
-"${root}/test/"clean_all.sh
+"${ROOT}/test/"clean_all.sh ${ROOT}
 
 
 #-----------------------------------------------------------------------------
@@ -133,9 +134,9 @@ fi
 #-----------------------------------------------------------------------------
 
 >&2 echo ""
->&2 echo "2. Start to assemble all test cases in ${root}/test/testcases"
+>&2 echo "2. Start to assemble all test cases in ${ROOT}/test/testcases"
 
-for instruction in "${root}/test/testcases/"*
+for instruction in "${ROOT}/test/testcases/"*
 do
     if [[ -d ${instruction} ]]
     then
@@ -152,8 +153,8 @@ do
         if [[ -f "${instruction}/readme.md" ]]
         then
             >&2 echo "generating test cases from ${instruction_name}/readme.md"
-            cd "${root}"
-            "${root}/test/generate_testcases.sh" "${instruction}/readme.md"
+            cd "${ROOT}"
+            "${ROOT}/test/generate_testcases.sh" "${instruction}/readme.md"
         fi
 
         >&2 echo "assembling test cases for ${instruction_name}"
@@ -166,7 +167,7 @@ do
                 testcase_name=`cd $testcase && echo "$(basename $PWD)"`
                 cd "${testcase}"
                 >&2 echo "assembling test case ${testcase_name}"
-                ${root}/test/assembler.sh ${testcase}/${testcase_name}.S
+                ${ROOT}/test/assembler.sh ${testcase}/${testcase_name}.S
                 result=$?
 
                 if [[ "${result}" -ne 0 ]]
@@ -179,7 +180,7 @@ do
     fi
 done
 
-cd "${root}"
+cd "${ROOT}"
 
 >&2 echo "✅ Finished assembling all test cases"
 
@@ -193,10 +194,10 @@ cd "${root}"
 
 for instruction in "${test_instruction[@]}"
 do
-    if [[ -d "${root}/test/testcases/${instruction}" ]]
+    if [[ -d "${ROOT}/test/testcases/${instruction}" ]]
     then
         >&2 printf "🔍 found test cases for %-6s\n" "${instruction}"
-        $root/test/test_mips_cpu_bus_one_instruction.sh "${instruction}"
+        "${ROOT}/test/test_mips_cpu_bus_one_instruction.sh" "${ROOT}" "${1}" "${instruction}" # ROOT/ rtl/ instruction_name
     else
         >&2 printf "⛔ can not find test cases for %-6s\n" "${instruction}"
     fi

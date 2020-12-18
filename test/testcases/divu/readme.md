@@ -1,12 +1,12 @@
-# Test bench for `div`
+# Test bench for `divu`
 
 #### Instruction format
 
-6'b000000|5'b<rs>|5'b<rt>|10'b0000000000|6b'011010
+6'b000000|5'b<rs>|5'b<rt>|10'b0000000000|6b'011011
 
 #### Description
 
-LO <= GPR[rs] div GPR[rt]
+LO <= GPR[rs] divu GPR[rt]
 HI <= GPR[rs] mod GPR[rt]
 
 #### Edge cases
@@ -15,17 +15,13 @@ positive / positive
 positive / negative
 positive / zero
 
-nagative / positive
-negative / negative
-negative / zero
-
 zero / positive
 zero / negative
 
 #### Test cases
 
 ```assembly
-# div-1
+# divu-1
 # 5/3
 lui $s0,0xbfc0
 addiu $s0,$s0,0x400
@@ -33,7 +29,7 @@ addiu $v0,$s0,0x0
 
 addiu $t0,$t0,0x5
 addiu $t1,$t1,0x3
-div $t0,$t1
+divu $t0,$t1
 mflo $s1
 sw $s1,0x0($s0)
 mfhi $s2
@@ -51,7 +47,7 @@ bfc00400
 ```
 
 ```assembly
-# div-2
+# divu-2
 # 0/1
 lui $s0,0xbfc0
 addiu $s0,$s0,0x400
@@ -61,7 +57,7 @@ addiu $v0,$s0,0x0
 addiu $t0,$t0,0x0
 addiu $t1,$t1,0x1
 
-div $t0,$t1
+divu $t0,$t1
 mflo $s1
 sw $s1,0x0($s0)
 mfhi $s2
@@ -79,7 +75,7 @@ bfc00400
 ```
 
 ```assembly
-# div-3
+# divu-3
 # -1/1
 lui $s0,0xbfc0
 addiu $s0,$s0,0x400
@@ -89,7 +85,7 @@ addiu $v0,$s0,0x0
 addiu $t0,$t0,-0x1
 addiu $t1,$t1,0x1
 
-div $t0,$t1
+divu $t0,$t1
 mflo $s1
 sw $s1,0x0($s0)
 mfhi $s2
@@ -107,8 +103,8 @@ ffffffff
 ```
 
 ```assembly
-# div-4
-# -1234/0
+# divu-4
+# -0x1234/0
 lui $s0,0xbfc0
 addiu $s0,$s0,0x400
 addiu $v0,$s0,0x0
@@ -117,7 +113,7 @@ addiu $v0,$s0,0x0
 addiu $t0,$t0,-0x1234
 addiu $t1,$t1,0x0
 
-div $t0,$t1
+divu $t0,$t1
 mflo $s1
 sw $s1,0x0($s0)
 mfhi $s2
@@ -135,7 +131,7 @@ xxxxxxxx
 ```
 
 ```assembly
-# div-5
+# divu-5
 # 1234/0
 lui $s0,0xbfc0
 addiu $s0,$s0,0x400
@@ -145,7 +141,7 @@ addiu $v0,$s0,0x0
 addiu $t0,$t0,0x1234
 addiu $t1,$t1,0x0
 
-div $t0,$t1
+divu $t0,$t1
 mflo $s1
 sw $s1,0x0($s0)
 mfhi $s2
@@ -163,7 +159,7 @@ xxxxxxxx
 ```
 
 ```assembly
-# div-6
+# divu-6
 # -7/3
 lui $s0,0xbfc0
 addiu $s0,$s0,0x400
@@ -173,7 +169,7 @@ addiu $v0,$s0,0x0
 addiu $t0,$t0,-0x7
 addiu $t1,$t1,0x3
 
-div $t0,$t1
+divu $t0,$t1
 mflo $s1
 sw $s1,0x0($s0)
 mfhi $s2
@@ -185,13 +181,13 @@ bfc00400
 ========
 
 # data ref
-fffffffe
-ffffffff
+55555553
+00000000
 ========
 ```
 
 ```assembly
-# div-7
+# divu-7
 # 7/-3
 lui $s0,0xbfc0
 addiu $s0,$s0,0x400
@@ -201,7 +197,7 @@ addiu $v0,$s0,0x0
 addiu $t0,$t0,0x7
 addiu $t1,$t1,-0x3
 
-div $t0,$t1
+divu $t0,$t1
 mflo $s1
 sw $s1,0x0($s0)
 mfhi $s2
@@ -213,13 +209,13 @@ bfc00400
 ========
 
 # data ref
-fffffffe
-00000001
+00000000
+00000007
 ========
 ```
 
 ```assembly
-# div-8
+# divu-8
 # -7/-3
 lui $s0,0xbfc0
 addiu $s0,$s0,0x400
@@ -229,7 +225,7 @@ addiu $v0,$s0,0x0
 addiu $t0,$t0,-0x7
 addiu $t1,$t1,-0x3
 
-div $t0,$t1
+divu $t0,$t1
 mflo $s1
 sw $s1,0x0($s0)
 mfhi $s2
@@ -241,13 +237,13 @@ bfc00400
 ========
 
 # data ref
-00000002
-ffffffff
+00000000
+fffffff9
 ========
 ```
 
 ```assembly
-# div-9
+# divu-9
 # 0/-12
 lui $s0,0xbfc0
 addiu $s0,$s0,0x400
@@ -257,7 +253,7 @@ addiu $v0,$s0,0x0
 addiu $t0,$t0,0x0
 addiu $t1,$t1,-0xc
 
-div $t0,$t1
+divu $t0,$t1
 mflo $s1
 sw $s1,0x0($s0)
 mfhi $s2
@@ -275,7 +271,7 @@ bfc00400
 ```
 
 ```assembly
-# div-10
+# divu-10
 # 0/0
 lui $s0,0xbfc0
 addiu $s0,$s0,0x400
@@ -285,7 +281,7 @@ addiu $v0,$s0,0x0
 addiu $t0,$t0,0x0
 addiu $t1,$t1,0x0
 
-div $t0,$t1
+divu $t0,$t1
 mflo $s1
 sw $s1,0x0($s0)
 mfhi $s2

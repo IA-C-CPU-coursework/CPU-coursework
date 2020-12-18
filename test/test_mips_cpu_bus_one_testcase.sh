@@ -7,12 +7,12 @@ set -euo pipefail
 # usage: test/test_mips_cpu_bus_one_testcase.sh <testcase>
 #------------------------------------------------------------------------------
 
-TESTCASE="$1"
+ROOT="${1}"
+RTL_PATH="${2}"
+TESTCASE="${3}"
 INSTRUCTION=$(echo "${TESTCASE}" | sed -E 's/([a-z]+)-[0-9]+/\1/g')
 
-dir="./"
-root=`cd ${dir} && pwd`
-testcase_path="${root}/test/testcases/${INSTRUCTION}/${TESTCASE}"
+testcase_path="${ROOT}/test/testcases/${INSTRUCTION}/${TESTCASE}"
 
 
 #------------------------------------------------------------------------------
@@ -31,10 +31,10 @@ iverilog -g 2012 \
 -P mips_cpu_bus_tb.RAM_DATA_REF_SIZE=$(wc -l "${testcase_path}/${TESTCASE}_data.ref" | cut -d " " -f 1) \
 -P mips_cpu_bus_tb.VCD_OUTPUT=\""${testcase_path}/${TESTCASE}.vcd"\" \
 -o "${testcase_path}/${TESTCASE}" \
-"${root}/rtl/mips_cpu_bus.v" \
-"${root}/rtl/mips_cpu/"*.v \
-"${root}/test/mips_cpu_bus_tb.v" \
-"${root}/test/RAM_32x64k_avalon.v"
+"${RTL_PATH}/mips_cpu_bus.v" \
+"${RTL_PATH}/mips_cpu/"*.v \
+"${ROOT}/test/mips_cpu_bus_tb.v" \
+"${ROOT}/test/RAM_32x64k_avalon.v"
 
 if [[ $? -ne 0 ]]
 then
@@ -71,7 +71,7 @@ fi
 
 >&2 printf "3 - Comparing results with reference\n"
 
-"${root}/test/compare_result.sh"             \
+"${ROOT}/test/compare_result.sh"             \
     "${testcase_path}/${TESTCASE}_data.ref" \
     "${testcase_path}/${TESTCASE}_v0.ref" \
     "${testcase_path}/${TESTCASE}.out"
