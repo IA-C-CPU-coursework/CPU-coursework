@@ -25,14 +25,15 @@ condition is just greater than
 # less than zero
 
 addiu $t0,$t0,-0x1
+
 addiu $v0,$v0,0x1
 bgtz $t0,l1
 addiu $v0,$v0,0x10
 addiu $v0,$v0,0x100
 
 l1:
-addiu $v0,$v0,0x1000
 jr $ra
+addiu $v0,$v0,0x1000
 
 # v0 ref
 00001111
@@ -44,17 +45,18 @@ jr $ra
 # greater than zero
 
 addiu $t0,$t0,0x1
+
 addiu $v0,$v0,0x1
 bgtz $t0,l1
 addiu $v0,$v0,0x10
 addiu $v0,$v0,0x100
 
 l1:
-addiu $v0,$v0,0x1000
 jr $ra
+addiu $v0,$v0,0x1000
 
 # v0 ref
-00001001
+00001011
 ========
 ```
 
@@ -73,11 +75,11 @@ addiu $v0,$v0,0x10
 addiu $v0,$v0,0x100
 
 l1:
-addiu $v0,$v0,0x1000
 jr $ra
+addiu $v0,$v0,0x1000
 
 # v0 ref
-00001001
+00001011
 ========
 ```
 
@@ -86,14 +88,15 @@ jr $ra
 # zero
 
 addiu $t0,$t0,0x0
+
 addiu $v0,$v0,0x1
 bgtz $t0,l1
 addiu $v0,$v0,0x10
 addiu $v0,$v0,0x100
 
 l1:
-addiu $v0,$v0,0x1000
 jr $ra
+addiu $v0,$v0,0x1000
 
 # v0 ref
 00001111
@@ -105,19 +108,18 @@ jr $ra
 # negative index
 
 addiu $t0,$t0,0xa
-addiu $v0,$v0,0x1
 
-addiu $v0,$v0,0x10
+addiu $v0,$v0,0x1
 bgtz $t0,l2
+addiu $v0,$v0,0x10
 
 l1:
-addiu $v0,$v0,0x100
 jr $ra
+addiu $v0,$v0,0x100
 
 l2:
-addiu $v0,$v0,0x1000
 bgtz $t0,l1          # negative index, jump backwards
-nop
+addiu $v0,$v0,0x1000
 
 # v0 ref
 00001111

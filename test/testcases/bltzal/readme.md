@@ -26,6 +26,7 @@ condition is less than zero
 # less than zero
 
 addiu $t0,$t0,-0x1
+
 addiu $v0,$v0,0x1
 bltzal $t0,l1
 addiu $v0,$v0,0x10
@@ -33,11 +34,11 @@ jr $zero
 addiu $v0,$v0,0x100
 
 l1:
-addiu $v0,$v0,0x1000
 jr $ra
+addiu $v0,$v0,0x1000
 
 # v0 ref
-00001011
+00001111
 ========
 ```
 
@@ -46,19 +47,19 @@ jr $ra
 # greater than zero
 
 addiu $t0,$t0,0x1
+
 addiu $v0,$v0,0x1
 bltzal $t0,l1
 addiu $v0,$v0,0x10
-nop
 jr $zero
 addiu $v0,$v0,0x100
 
 l1:
-addiu $v0,$v0,0x1000
 jr $ra
+addiu $v0,$v0,0x1000
 
 # v0 ref
-00000011
+00000111
 ========
 ```
 
@@ -78,11 +79,11 @@ jr $zero
 addiu $v0,$v0,0x100
 
 l1:
-addiu $v0,$v0,0x1000
 jr $ra
+addiu $v0,$v0,0x1000
 
 # v0 ref
-00000011
+00000111
 ========
 ```
 
@@ -91,6 +92,7 @@ jr $ra
 # zero
 
 addiu $t0,$t0,0x0
+
 addiu $v0,$v0,0x1
 bltzal $t0,l1
 addiu $v0,$v0,0x10
@@ -98,11 +100,11 @@ jr $zero
 addiu $v0,$v0,0x100
 
 l1:
-addiu $v0,$v0,0x1000
 jr $ra
+addiu $v0,$v0,0x1000
 
 # v0 ref
-00000011
+00000111
 ========
 ```
 
@@ -111,22 +113,22 @@ jr $ra
 # negative immediate
 
 addiu $t0,$t0,-0xa
-addiu $v0,$v0,0x1
 
-addiu $v0,$v0,0x10
+addiu $v0,$v0,0x1
 bltzal $t0,l2
+addiu $v0,$v0,0x10
 
 l1:
-addiu $v0,$v0,0x100
 jr $ra
+addiu $v0,$v0,0x100
 
 l2:
-addiu $v0,$v0,0x1000
 bltzal $t0,l1          # negative index, jump backwards
-nop
+addiu $v0,$v0,0x1000
 jr $zero
+addiu $v0,$v0,0x4000
 
 # v0 ref
-00001111
+00005111
 ========
 ```

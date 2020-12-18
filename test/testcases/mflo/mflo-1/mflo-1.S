@@ -1,3 +1,4 @@
+.set noreorder
 addiu $t0,$t0,0x0
 mtlo $t0
 nop

@@ -25,17 +25,18 @@ immediate is signed, can jump backwards
 
 addiu $t0,$t0,0xffff
 addiu $t1,$t1,0xffff
+
 addiu $v0,$v0,0x1
 beq $t0,$t1,l1
 addiu $v0,$v0,0x10
 addiu $v0,$v0,0x100
 
 l1:
-addiu $v0,$v0,0x1000
 jr $ra
+addiu $v0,$v0,0x1000
 
 # v0 ref
-00001001
+00001011
 ========
 ```
 
@@ -45,14 +46,15 @@ jr $ra
 
 lui $t0,0xffff          # 0xffff0000
 addiu $t1,$t1,0xffff    # 0xffffffff
+
 addiu $v0,$v0,0x1
 beq $t0,$t1,l1
 addiu $v0,$v0,0x10
 addiu $v0,$v0,0x100
 
 l1:
-addiu $v0,$v0,0x1000
 jr $ra
+addiu $v0,$v0,0x1000
 
 # v0 ref
 00001111
@@ -65,17 +67,18 @@ jr $ra
 
 addiu $t0,$t0,0x0
 addiu $t1,$t1,0x0
+
 addiu $v0,$v0,0x1
 beq $t0,$t1,l1
 addiu $v0,$v0,0x10
 addiu $v0,$v0,0x100
 
 l1:
-addiu $v0,$v0,0x1000
 jr $ra
+addiu $v0,$v0,0x1000
 
 # v0 ref
-00001001
+00001011
 ========
 ```
 
@@ -85,19 +88,18 @@ jr $ra
 
 addiu $t0,$t0,0x0
 addiu $t1,$t1,0x0
-addiu $v0,$v0,0x1
 
-addiu $v0,$v0,0x10
+addiu $v0,$v0,0x1
 beq $t0,$1,l2
+addiu $v0,$v0,0x10
 
 l1:
-addiu $v0,$v0,0x100
 jr $ra
+addiu $v0,$v0,0x100
 
 l2:
-addiu $v0,$v0,0x1000
 beq $t0,$t1,l1          # negative index, jump backwards
-nop
+addiu $v0,$v0,0x1000
 
 # v0 ref
 00001111

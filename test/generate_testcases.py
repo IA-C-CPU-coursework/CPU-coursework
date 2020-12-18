@@ -47,7 +47,7 @@ readme = f.read()
 
 instruction_name_re = r"\#\sTest\sbench\sfor\s\`(\w+)\`"
 testcase_re         = r"^```assembly\n.+?```$"
-instruciton_re      = r"^(\s*\w+\s*\:\s*){0,1}\w+\s*(\$[a-z0-9]{2,4}).*?\n|(nop)\n|^\s*[a-z]+\s*\:\s*\n|^(?![a-fx]+)([a-z]+)(\s+\w+\n)"
+instruciton_re      = r"^(\s*\w+\s*\:\s*){0,1}\w+\s*(\$[a-z0-9]{2,4}).*?\n|(nop)\n|^\s*[a-z0-9]+\s*\:\s*\n|^(?![a-fx]+)([a-z]+)(\s+\w+\n)"
 v0_ref_re           = r"\#\sv0\sref\s*\n([0-9a-fx]{8})\s*\n[\=]{8}\s*"
 data_ref_re         = r"\#\sdata\sref\s*\n((([0-9a-fx]{8})\s*\n)+)[\=]{8}\s*"
 data_init_re        = r"\#\sdata\sinit\s*\n((([0-9a-fx]{8})\s*\n)+)[\=]{8}\s*"
@@ -71,7 +71,7 @@ for testcase in testcases:
     print("\n===== {testcase_name} =====".format(testcase_name=testcase_name))
 
     print("File: "+testcase_name+".S")
-    instructions = "\n".join(list(map(lambda x:x.strip(),
+    instructions =  ".set noreorder\n" + "\n".join(list(map(lambda x:x.strip(),
         [ x.group() for x in re.finditer(instruciton_re, testcase, re.S | re.M)]
     )))
     print(instructions)

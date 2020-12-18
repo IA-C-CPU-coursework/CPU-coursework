@@ -1,3 +1,4 @@
+.set noreorder
 addiu $v0,$v0,0x1
 j l1
 addiu $v0,$v0,0x10

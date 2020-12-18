@@ -27,7 +27,7 @@ addiu $v0,$v0,0x1000
 jr $ra
 
 # v0 ref
-00001001
+00001011
 ========
 ```
 
@@ -35,20 +35,19 @@ jr $ra
 # j-4
 # negative immediate
 
+j l2
 addiu $v0,$v0,0x1
 addiu $v0,$v0,0x10
-j l2
 
 l1:
-addiu $v0,$v0,0x100
 jr $ra
+addiu $v0,$v0,0x100
 
 l2:
-addiu $v0,$v0,0x1000
 j l1
-nop
+addiu $v0,$v0,0x1000
 
 # v0 ref
-00001111
+00001101
 ========
 ```

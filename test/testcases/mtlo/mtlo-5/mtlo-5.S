@@ -1,3 +1,4 @@
+.set noreorder
 lui $t0,0x8000
 mtlo $t0
 nop

@@ -258,7 +258,7 @@ module mips_decoder(
                 ALUControl[0] = SLL   || SLLV || SRL  || SRLV || AND || XOR || ANDI || XORI || SLTU || SLTIU  || MFHI || MFLO || DIV || BEQ || BGEZ || BLEZ || BNE || BGEZAL || LWL || LWR || LB || LBU || LH;
                 Extra         = three_cycle_instr || LWL || LWR;
                 is_branch     = J || JAL || JR || JALR || (BEQ & branch) || (BGEZ & branch) || (BGEZAL & branch) || (BGTZ & branch) || (BLEZ & branch) || (BLTZ & branch) || (BLTZAL & branch) || (BNE & branch);
-                link = BGEZAL|| BLTZAL || JAL || JALR;
+                link = BGEZAL|| BLTZAL || JAL;
                 extension_control = 0; 
                 unaligned = SB || LB || LBU; 
                 alu_src_mem = 0;
