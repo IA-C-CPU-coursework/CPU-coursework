@@ -111,7 +111,7 @@ module mips_cpu_bus(
 
     // sign extension
     logic [15:0] offset;
-        assign offset = mem_out[15:0];
+        assign offset = mem_out_buffer[15:0];
     logic [31:0] signed_offset;
     logic extension_control;
 

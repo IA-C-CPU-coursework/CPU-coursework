@@ -2,7 +2,7 @@
 
 #### Instruction format
 
-6'b001001|5'b<rs>|5'b<rt>|16'b<immediate>
+GPR[rt] <= GPR[rs] + sign_extended(immediate)
 
 #### Description
 
