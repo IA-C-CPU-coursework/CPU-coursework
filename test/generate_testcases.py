@@ -47,10 +47,10 @@ readme = f.read()
 
 instruction_name_re = r"\#\sTest\sbench\sfor\s\`(\w+)\`"
 testcase_re         = r"^```assembly\n.+?```$"
-instruciton_re      = r"\w+\s*(\$[a-z0-9]{2,4}).*?\n|(nop)\n"
-v0_ref_re           = r"\#\sv0\sref\s*\n([0-9a-f]{8})\s*\n[\=]{8}\s*"
-data_ref_re         = r"\#\sdata\sref\s*\n((([0-9a-f]{8})\s*\n)+)[\=]{8}\s*"
-data_init_re        = r"\#\sdata\sinit\s*\n((([0-9a-f]{8})\s*\n)+)[\=]{8}\s*"
+instruciton_re      = r"^(\s*\w+\s*\:\s*){0,1}\w+\s*(\$[a-z0-9]{2,4}).*?\n|(nop)\n|^\s*[a-z]+\s*\:\s*\n|^(?![a-fx]+)([a-z]+)(\s+\w+\n)"
+v0_ref_re           = r"\#\sv0\sref\s*\n([0-9a-fx]{8})\s*\n[\=]{8}\s*"
+data_ref_re         = r"\#\sdata\sref\s*\n((([0-9a-fx]{8})\s*\n)+)[\=]{8}\s*"
+data_init_re        = r"\#\sdata\sinit\s*\n((([0-9a-fx]{8})\s*\n)+)[\=]{8}\s*"
 
 
 ROOT_DIR = os.getcwd()

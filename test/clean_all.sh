@@ -1,6 +1,7 @@
 #!/bin/bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
->&2 echo "${DIR}"
+ROOT=${1}
+TEST_PATH="${ROOT}/test"
+>&2 echo "${TEST_PATH}"
 
-find "${DIR}" -regex "${DIR}/testcases/[a-z]+/[a-z0-9-]+/[a-z0-9-]+\(.log\|.vcd\|.out\|.bin\|.hex\|.elf\)*" -type f -delete
+find "${TEST_PATH}" -regex "${TEST_PATH}/testcases/[a-z]+/[a-z0-9-]+/[a-z0-9-]+\(.log\|.vcd\|.out\|.bin\|.hex\|.elf\)*" -type f -delete

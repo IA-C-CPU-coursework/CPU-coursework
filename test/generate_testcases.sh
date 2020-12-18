@@ -5,6 +5,7 @@
 # directory and generates test cases.
 #-------------------------------------------------------------------------------
 
-readme=$1
+ROOT=${1}
+readme=${2}
 
-python3 test/generate_testcases.py $1 1>/dev/null
+python3 "${ROOT}/test/generate_testcases.py" "${readme}" 1>/dev/null
