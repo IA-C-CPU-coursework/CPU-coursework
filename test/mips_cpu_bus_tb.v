@@ -146,7 +146,7 @@ module mips_cpu_bus_tb();
         end
 
         $display("[TB] : LOG : 🥳 Finished, register_v0 = %h", register_v0);
-        dump_mem();
+        //dump_mem();
 
         $finish;
     end

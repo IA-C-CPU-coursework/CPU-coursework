@@ -49,22 +49,22 @@ fi
 # Check Data Section
 #------------------------------------------------------------------------------
 
->&2 printf "Check data section\n"
+#>&2 printf "Check data section\n"
 
-while IFS= read -r line
-do
-    DATA_REFERENCE=$(printf "POST_DATA_MEM[%08x] = %s" "$((data_start + cnt))" "${line}")
-    #printf "${DATA_REFERENCE} \n"
-    if grep -F -q "${DATA_REFERENCE}" "${result}"
-    then
-        >&2 printf "✅ ${DATA_REFERENCE} is found in the output\n"
-    else
-        >&2 printf "❌ ${DATA_REFERENCE} is not found in the output\n"
-        >&2 printf "Fail on checking data section.\n" # fail if one of the data reference is not found
-        exit 1
-    fi
-    cnt=$((cnt + 0x4)) # increment to next word address
-done < "${data_reference}"
+#while IFS= read -r line
+#do
+    #DATA_REFERENCE=$(printf "POST_DATA_MEM[%08x] = %s" "$((data_start + cnt))" "${line}")
+    ##printf "${DATA_REFERENCE} \n"
+    #if grep -F -q "${DATA_REFERENCE}" "${result}"
+    #then
+        #>&2 printf "✅ ${DATA_REFERENCE} is found in the output\n"
+    #else
+        #>&2 printf "❌ ${DATA_REFERENCE} is not found in the output\n"
+        #>&2 printf "Fail on checking data section.\n" # fail if one of the data reference is not found
+        #exit 1
+    #fi
+    #cnt=$((cnt + 0x4)) # increment to next word address
+#done < "${data_reference}"
 
 
 #------------------------------------------------------------------------------
