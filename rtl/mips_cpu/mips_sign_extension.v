@@ -6,7 +6,7 @@ module mips_sign_extension(
 
     logic[31:0] half_extension;
 
-    assign half_extension[15:0] = offset[25:0];
+    assign half_extension[15:0] = offset[15:0];
     assign half_extension[31:16] = offset[15] ? 16'hffff : 16'h0000;
 
     logic[31:0] byte_extension;
@@ -16,7 +16,4 @@ module mips_sign_extension(
 
     assign signed_offset[31:0] = extension_control ? byte_extension[31:0] : half_extension[31:0];
 
-    //assign signed_offset[15:0] = offset[15:0];
-    //assign signed_offset[31:16] = offset[15] ? 16'hffff : 16'h0000;
-    // assign o[31:16] = {16{i[15]}}; // just another way
 endmodule
