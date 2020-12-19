@@ -78,8 +78,8 @@ module mips_cpu_bus_tb();
     end
 
     always @(posedge clk) begin
-    // check the validity of memory address
-        if (active) begin
+    // check the validity of memory address only when read or write
+        if (active && (read || write)) begin
             if (address == 32'h0) begin 
                 $display("[TB] : LOG : 🚧 PC == 0x0, CPU should halt then");
             end
@@ -89,7 +89,7 @@ module mips_cpu_bus_tb();
                     // $display("[TB] : LOG : ✅ address %h is accessible", address);
                 end
                 else begin
-                    $fatal(1, "[TB] : FATAL : ❌ the requested address %h, which mapped to %h, is out of range.", address, simulated_address);
+                    $error(1, "[TB] : FATAL : ❌ the requested address %h, which mapped to %h, is out of range.", address, simulated_address);
                 end
             end
         end
