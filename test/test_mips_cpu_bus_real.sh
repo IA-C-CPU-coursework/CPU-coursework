@@ -123,10 +123,10 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Clean previously generated files in testcase directory
+# Clear previously generated files in testcase directory
 #------------------------------------------------------------------------------
 
-"${ROOT}/test/"clean_all.sh ${ROOT}
+"${ROOT}/test/"clear_all.sh ${ROOT}
 
 
 #-----------------------------------------------------------------------------
