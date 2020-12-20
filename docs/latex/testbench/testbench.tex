@@ -10,111 +10,110 @@ During argument validation, the main shell script assumes one compulsory argumen
 
 Preprocessing of the test cases removes previously generated files if they exist, and generates test cases from `readme.md` file in each instrucion folder. Each test case contains four files: assembly code, v0 reference, initial content for data section, reference for data section.
 
-\begin{tikzpicture}[node distance=2cm]
-    % define flowchart elements
-    \tikzstyle{startstop} = [
-    rectangle, 
-    align=center, 
-    rounded corners, 
-    minimum width=3cm, 
-    minimum height=1cm,
-    text centered, 
-    draw=black, 
-    fill=red!30
-    ]
-    \tikzstyle{process} = [
-    rectangle, 
-    align=center, 
-    minimum width=3cm, 
-    minimum height=1cm, 
-    text centered, 
-    draw=black, 
-    fill=orange!30,
-    execute at begin node=\setlength{\baselineskip}{1em}
-    ]
-    \tikzstyle{decision} = [diamond, 
-    align=center, 
-    aspect=2, 
-    minimum width=3cm, 
-    minimum height=1cm, 
-    text centered, 
-    draw=black, 
-    fill=green!30,
-    execute at begin node=\setlength{\baselineskip}{1em}
-    ]
-    \tikzstyle{io} = [trapezium, 
-    trapezium left angle=70, 
-    trapezium right angle=110, 
-    minimum width=1cm, 
-    minimum height=1cm, 
-    text centered, 
-    draw=black, 
-    fill=blue!30,
-    execute at begin node=\setlength{\baselineskip}{1em}
-    ]
-    \tikzstyle{arrow} = [thick,->,>=stealth]
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.65\textwidth}
+        \resizebox{\textwidth}{!}{
+            \begin{tikzpicture}[node distance=2cm]
+                % define flowchart elements
+                \tikzstyle{startstop} = [
+                rectangle, 
+                align=center, 
+                rounded corners, 
+                minimum width=3cm, 
+                minimum height=1cm,
+                text centered, 
+                draw=black, 
+                fill=red!30
+                ]
+                \tikzstyle{process} = [
+                rectangle, 
+                align=center, 
+                minimum width=3cm, 
+                minimum height=1cm, 
+                text centered, 
+                draw=black, 
+                fill=orange!30,
+                execute at begin node=\setlength{\baselineskip}{1em}
+                ]
+                \tikzstyle{decision} = [diamond, 
+                align=center, 
+                aspect=2, 
+                minimum width=3cm, 
+                minimum height=1cm, 
+                text centered, 
+                draw=black, 
+                fill=green!30,
+                execute at begin node=\setlength{\baselineskip}{1em}
+                ]
+                \tikzstyle{io} = [trapezium, 
+                trapezium left angle=70, 
+                trapezium right angle=110, 
+                minimum width=1cm, 
+                minimum height=1cm, 
+                text centered, 
+                draw=black, 
+                fill=blue!30,
+                execute at begin node=\setlength{\baselineskip}{1em}
+                ]
+                \tikzstyle{arrow} = [thick,->,>=stealth]
 
+                \node (start) [startstop] {Start};
+                \node (arg_handler) [decision, below of=start] {Are\\arguments\\valid?};
+                \node (error) [io, left of=arg_handler, xshift=-4.0cm] {print error};
+                \node (clean_all) [process, below of=arg_handler, yshift=-0.5cm] {clean previously generated files};
+                \node (assembler) [process, below of=clean_all, yshift=0.5cm] {assemble all test cases in\\test/testcases directory};
+                \node (instruction_loop) [decision, below of=assembler] {for instrucion\\in instructions};
+                \node (testcase_loop) [decision, below of=instruction_loop, yshift=-1.0cm] {for test case\\in test cases};
+                \node (compilation) [process, below of=testcase_loop, yshift=-0.5cm] {compile test case\\with iverilog};
+                \node (execution) [process, below of=compilation, yshift=0.5cm] {execute test case};
+                \node (comparation) [decision, below of=execution, yshift=0cm] {Is result\\the same as\\reference?};
+                \node (pass) [io, left of=comparation, xshift=-4.0cm] {print "pass"};
+                \node (fail) [io, right of=comparation, xshift=4.0cm] {print "fail"};
+                \node (stop) [startstop, left of=instruction_loop, xshift=-3.0cm] {Stop};
 
-    \node (start) [startstop] {Start};
-    \node (arg_handler) [decision, below of=start] {Are\\arguments\\valid?};
-    \node (error) [io, left of=arg_handler, xshift=-4.0cm] {print error};
-    \node (clean_all) [process, below of=arg_handler, yshift=-0.5cm] {clean previously generated files};
-    \node (assembler) [process, below of=clean_all, yshift=0.5cm] {assemble all test cases in\\test/testcases directory};
-    \node (instruction_loop) [decision, below of=assembler] {for instrucion\\in instructions};
-    \node (testcase_loop) [decision, below of=instruction_loop, yshift=-1.0cm] {for test case\\in test cases};
-    \node (compilation) [process, below of=testcase_loop, yshift=-0.5cm] {compile test case\\with iverilog};
-    \node (execution) [process, below of=compilation, yshift=0.5cm] {execute test case};
-    \node (comparation) [decision, below of=execution, yshift=0cm] {Is result\\the same as\\reference?};
-    \node (pass) [io, left of=comparation, xshift=-4.0cm] {print "pass"};
-    \node (fail) [io, right of=comparation, xshift=4.0cm] {print "fail"};
-    \node (stop) [startstop, left of=instruction_loop, xshift=-3.0cm] {Stop};
+                \draw [arrow] (start) -- (arg_handler);
+                \draw [arrow] (arg_handler) -- node[anchor=east] {TRUE} (clean_all);
+                \draw [arrow] (arg_handler) -- node[anchor=south] {FALSE} (error);
+                \draw [arrow] (clean_all) -- (assembler);
+                \draw [arrow] (assembler) -- (instruction_loop);
+                \draw [arrow] (instruction_loop) -- node[anchor=east] {TRUE} (testcase_loop);
+                \draw [arrow] (instruction_loop.west) -- node[anchor=south] {FALSE} (stop.east);
+                \draw [arrow] (testcase_loop) -- node[anchor=east] {TRUE} (compilation);
+                \draw [arrow] (testcase_loop.east) -- ++(2,0) -- ++(0,1.0) -- ++(0,2) -- node[anchor=east, yshift=-2.5cm, xshift=0.8cm] {FALSE} (instruction_loop.east);
+                \draw [arrow] (compilation) -- (execution);
+                \draw [arrow] (comparation) -- node[anchor=south] {TRUE} (pass);
+                \draw [arrow] (comparation) -- node[anchor=south] {FALSE} (fail);
+                \draw [arrow] (execution) -- (comparation);
+                \draw [arrow] (comparation.south) -- ++(0,-0.8) -- ++(-9,0) -- ++(0,8) -- (testcase_loop.west);
+            \end{tikzpicture}
+        }
+            \caption{flow chart for test bench}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \scriptsize
+            \dirtree{%
+                .1 test/.
+                .2 RAM\_32x64k\_avalon.v.
+                .2 generate\_testcases.sh.
+                .2 mips\_cpu\_bus\_tb.v.
+                .2 test\_mips\_cpu\_bus.sh.
+                .2 testcases/.
+                .3 instruction\_1.
+                .4 testcase\_1.
+                .5 testcase.S.
+                .5 testcase\_data.init.
+                .5 testcase\_data.ref.
+                .5 testcase\_v0.ref.
+                .4 testcase\_2.
+                .4 ....
+                .3 instruction\_2.
+                .3 ....
+            }
+            \caption{structure for test/ directory}
+            \vfill
+    \end{subfigure}
+\end{figure}
 
-
-    \draw [arrow] (start) -- (arg_handler);
-    \draw [arrow] (arg_handler) -- node[anchor=east] {TRUE} (clean_all);
-    \draw [arrow] (arg_handler) -- node[anchor=south] {FALSE} (error);
-    \draw [arrow] (clean_all) -- (assembler);
-    \draw [arrow] (assembler) -- (instruction_loop);
-    \draw [arrow] (instruction_loop) -- node[anchor=east] {TRUE} (testcase_loop);
-    \draw [arrow] (instruction_loop.west) -- node[anchor=south] {FALSE} (stop.east);
-    \draw [arrow] (testcase_loop) -- node[anchor=east] {TRUE} (compilation);
-    \draw [arrow] (testcase_loop.east) -- ++(2,0) -- ++(0,1.0) -- ++(0,2) -- node[anchor=east, yshift=-2.5cm, xshift=0.8cm] {FALSE} (instruction_loop.east);
-    \draw [arrow] (compilation) -- (execution);
-    \draw [arrow] (comparation) -- node[anchor=south] {TRUE} (pass);
-    \draw [arrow] (comparation) -- node[anchor=south] {FALSE} (fail);
-    \draw [arrow] (execution) -- (comparation);
-    \draw [arrow] (comparation.south) -- ++(0,-0.8) -- ++(-9,0) -- ++(0,8) -- (testcase_loop.west);
-
-\end{tikzpicture}
-
-
-\subsection{Parser}
-
-\dirtree{%
-    .1 test/.
-    .2 RAM\_32x64k\_avalon.v.
-    .2 assembler.sh.
-    .2 clear\_all.sh.
-    .2 compare\_result.sh.
-    .2 generate\_testcases.py.
-    .2 generate\_testcases.sh.
-    .2 mips\_cpu\_bus\_tb.v.
-    .2 test\_mips\_cpu\_bus.sh.
-    .2 test\_mips\_cpu\_bus\_one\_instruction.sh.
-    .2 test\_mips\_cpu\_bus\_one\_testcase.sh.
-    .2 test\_mips\_cpu\_bus\_real.sh.
-    .2 testcases/.
-    .3 instruction\_1.
-    .4 testcase\_1.
-    .5 testcase.S.
-    .5 testcase\_data.init.
-    .5 testcase\_data.ref.
-    .5 testcase\_v0.ref.
-    .4 testcase\_2.
-    .4 ....
-    .3 instruction\_2.
-    .3 ....
-}
-
-\begin{lstlisting}[caption=Parser part 1, label=lst:parser]
-\end{lstlisting}
+%\begin{lstlisting}[caption=Parser part 1, label=lst:parser]
+%\end{lstlisting}

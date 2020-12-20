@@ -2,11 +2,8 @@
 lui $s0,0xbfc0
 addiu $s0,$s0,0x400
 addiu $v0,$s0,0x0
-addiu $t0,$t0,-0x7
-addiu $t1,$t1,0x3
+addiu $t0,$t0,-0x1
+addiu $t1,$t1,0x1
 div $t0,$t1
-mflo $s1
-sw $s1,0x0($s0)
-mfhi $s2
-sw $s2,0x4($s0)
+mflo $v0
 jr $ra
