@@ -5,8 +5,5 @@ addiu $v0,$s0,0x0
 addiu $t0,$t0,0x0
 addiu $t1,$t1,0x0
 multu $t0,$t1
-mfhi $s2
-sw $s2,0x0($s0)
-mflo $s1
-sw $s1,0x4($s0)
+mfhi $v0
 jr $ra

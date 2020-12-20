@@ -1,0 +1,9 @@
+.set noreorder
+lui $s0,0xbfc0
+addiu $s0,$s0,0x400
+addiu $v0,$s0,0x0
+addiu $t0,$t0,0x0
+addiu $t1,$t1,-0xc
+div $t0,$t1
+mflo $v0
+jr $ra
