@@ -28,3 +28,9 @@ a.out
 *.elf
 *.out
 *.log
+
+# latex
+*.fls
+*.log
+*.fdb_latexmk
+*.aux
