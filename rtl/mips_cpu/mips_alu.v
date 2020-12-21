@@ -73,10 +73,10 @@ module mips_alu(
             6'b011001:   alu_result[31:0] = (alu_src_1[31:0]    <   alu_src_2[31:0]); // (usigned comparison) sltu and sltui
             6'b011010:   ; // add logics at the bottom block (signed multiplication calculation)
             6'b011011:   ; // add logics at the bottom block (signed division calculation)
-            6'b011100:   alu_result[31:0] = alu_src_1[31:0]          +   $signed(alu_src_2[31:0] & 32'hfffffffc); //used for data transfer instructions; --- word aligned instructions only
+            6'b011100:   alu_result[31:0] = (alu_src_1[31:0]          +   $signed(alu_src_2[31:0])) & 32'hfffffffc; //used for data transfer instructions; --- word aligned instructions only
             // for lwl and lwr
             6'b011101:   begin
-                alu_result[31:0] = alu_src_1[31:0]          +   $signed(alu_src_2[31:0] & 32'hfffffffc);
+                alu_result[31:0] = (alu_src_1[31:0]          +   $signed(alu_src_2[31:0])) & 32'hfffffffc;
             end 
             // this is for lwl instruction
             6'b011110:   begin
@@ -134,7 +134,7 @@ module mips_alu(
 
 
         if((ALUControl == 6'b011101) && load_enable ==0)begin
-            load_byte = alu_src_2[31:0] % 4;
+            load_byte = ($signed(alu_src_2[31:0]) + alu_src_1[31:0]) & 32'h00000003;
             load_enable = 1;
         end
         case(ALUControl)

@@ -270,6 +270,7 @@ module mips_cpu_bus(
     //to calculate specific byte location
     mips_remainder byte_calculation(
         .alu_src_2(alu_src_2),
+        .alu_src_1(alu_src_1),
         .byte_remainder(byte_remainder)
     );
 

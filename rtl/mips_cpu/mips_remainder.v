@@ -1,11 +1,12 @@
 module mips_remainder(
     input [31:0] alu_src_2,
+    input [31:0] alu_src_1,
     output logic[3:0] byte_remainder
 );
 
 
 logic[31:0] remainder;
-assign remainder[31:0] = alu_src_2[31:0] % 4;
+assign remainder[31:0] = ($signed(alu_src_2[31:0]) + alu_src_1[31:0]) & 32'h00000003;
 
 always_comb begin
 if(remainder == 0)begin
